@@ -26,7 +26,8 @@ new Ext.Application({
         });
 
         var tabButtonHandler = function(button, event) {
-            for (var i = 0, ln = data.cities.length; i < ln; i++) {
+            ln = data.cities.length;
+            for (var i = 0; i < ln; i++) {
                 if (data.cities[i].name == button.id) {
                     map.map.panTo(new google.maps.LatLng(data.cities[i].lat, data.cities[i].lng));
                     break;
