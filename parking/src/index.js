@@ -26,13 +26,12 @@ new Ext.Application({
         });
 
         var tabButtonHandler = function(button, event) {
-            ln = data.cities.length;
-            for (var i = 0; i < ln; i++) {
-                if (data.cities[i].name == button.id) {
-                    map.map.panTo(new google.maps.LatLng(data.cities[i].lat, data.cities[i].lng));
-                    break;
+            Ext.each(data.cities, function(city) {
+                if (city.name == button.id) {
+                    map.map.panTo(new google.maps.LatLng(city.lat, city.lng));
+                    return false;
                 }
-            }
+            });
         };
 
         var createParkingInfoWindow = function(parking) {
@@ -47,21 +46,19 @@ new Ext.Application({
         var loadData = function() {
             bar.removeAll();  // belongs to the hack above
             // Add points to the map
-            for (var i = 0, lni = data.cities.length; i < lni; i++) {
-                var city = data.cities[i];
+            Ext.each( data.cities, function(city) {
                 bar.add({
                     text: city.name,
                     id  : city.name,
                     handler: tabButtonHandler
                 });
                 bar.doLayout();
-                for (var j = 0, lnj = city.parkings.length; j < lnj; j++) {
-                    var parking = city.parkings[j];
+                Ext.each( city.parkings, function(parking) {
                     var position = new google.maps.LatLng(parking.lat, parking.lng);
                     addMarker(parking, position);
-                }
+                });
                 city = null;
-            }
+            });
         };
 
         // These are all Google Maps APIs
