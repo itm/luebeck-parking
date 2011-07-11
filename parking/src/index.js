@@ -76,9 +76,20 @@ new Ext.Application({
 
         // These are all Google Maps APIs
         var addMarker = function(parking, position) {
+            var image;
+            switch (parking.kind) {
+                case "Parkplatz":
+                    image = "images/parking.png"
+                    break;
+                case "Parkhaus":
+                    image = "images/parking.png"
+                    break;
+            };
+            
             var marker = new google.maps.Marker({
                 map: map.map,
-                position: position
+                position: position,
+                icon: image
             });
             marker.title = parking.name;
             var infoWindow = new google.maps.InfoWindow({
