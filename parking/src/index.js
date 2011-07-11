@@ -10,20 +10,90 @@ new Ext.Application({
                 zoom: 13
             }
         });
-
-        var bar = new Ext.TabBar({
+               
+        var dockHome = new Ext.Toolbar({
             dock : 'top',
-            ui   : 'dark',
-            items: [
-                {text: 'Start'} // this is a hack to make the tab-bar render properly
-            ]
+            title: 'SmartLübeck Parking'
+        });
+        
+        var infoHandler = function() {
+            if (!this.popup) {
+                this.popup = new Ext.Panel({
+                    floating: true,
+                    modal: true,
+                    centered: true,
+                    width: 300,
+                    height: 200,
+                    styleHtmlContent: true,
+                    scroll: 'vertical',
+                    html: '<p>Im Rahmen des Projekts SmartLübeck</p>',
+                    dockedItems: [{
+                        dock: 'top',
+                        xtype: 'toolbar',
+                        title: 'Info'
+                    }]
+                });
+            }
+            this.popup.show('pop');
+        };
+        
+        var pnlHome = new Ext.Panel({
+            dockedItems : [dockHome],
+            layout: {
+                type: 'vbox',
+                pack: 'center'
+            },
+            defaults: {
+                xtype:  'button',
+                width:  300,
+                style:  'margin: 0.5em;'
+            },
+            items:  [
+                { 
+                    text: 'Karte',
+                    handler: function() {
+                        main.setActiveItem(1);
+                        loadData();
+                    }      
+                },
+                {
+                    text: 'Info',
+                    handler: infoHandler
+                }
+            ],
         });
 
+        var btnHome = new Ext.Button({
+            iconCls: 'home',
+            iconMask: true,
+            ui: 'plain',
+            dock: 'right',
+            style:  'margin-top: 1px;', // hack
+            handler: function() {
+                main.setActiveItem(0);
+            }
+        });
+        
+        var bar = new Ext.TabBar({
+            dock        : 'top',
+            ui          : 'dark',
+            dockedItems : btnHome, 
+            items       : [
+                           {text: 'Start'} // this is a hack to make the tab-bar render properly
+                          ]
+        });
+               
         var pnlMap = new Ext.Panel({
             dockedItems: [bar],
-            fullscreen : true,
             items      : [map]
         });
+        
+        var main = new Ext.Panel({
+            fullscreen: true,
+            layout:     'card',
+            items:      [pnlHome, pnlMap]
+        });
+        main.setActiveItem(0);
 
         var tabButtonHandler = function(button, event) {
             Ext.each(data.cities, function(city) {
@@ -53,8 +123,7 @@ new Ext.Application({
                     + occupation
                     + "%;\"></div></div>"
                     + "</div>"
-        };
-        
+        };   
 
         var loadData = function() {
             bar.removeAll();  // belongs to the hack above
@@ -66,6 +135,7 @@ new Ext.Application({
                     handler: tabButtonHandler
                 });
                 bar.doLayout();
+                
                 Ext.each( city.parkings, function(parking) {
                     var position = new google.maps.LatLng(parking.lat, parking.lng);
                     addMarker(parking, position);
@@ -102,8 +172,6 @@ new Ext.Application({
                 infoWindow.open(map.map, marker);
             });
         };
-
-        loadData();
     }
 });
 
