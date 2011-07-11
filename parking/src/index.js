@@ -33,15 +33,28 @@ new Ext.Application({
                 }
             });
         };
+        
+        // for debugging while there's no api
+        var getOccupation = function(parking) {
+            var occupied = Math.floor(Math.random() * (parking.spaces+1));
+            return Math.floor(100 * (occupied / parking.spaces))
+        };
 
         var createParkingInfoWindow = function(parking) {
+            var occupation = getOccupation(parking);
             return "<div class=\"parkingInfoWindow\">"
                     + "<b>" + parking.name + "</b> (" + parking.kind + ")</b>"
                     + "<br/>"
-                    + "<b>Pl&auml;tze:</b> "
-                    + parking.spaces
+                    + "<b>Auslastung</b> "
+                    + "<br/>"
+                    + occupation + " / " + parking.spaces
+                    + "<br/>"
+                    + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
+                    + occupation
+                    + "%;\"></div></div>"
                     + "</div>"
         };
+        
 
         var loadData = function() {
             bar.removeAll();  // belongs to the hack above
@@ -71,7 +84,10 @@ new Ext.Application({
             var infoWindow = new google.maps.InfoWindow({
                 content: createParkingInfoWindow(parking)
             });
-            google.maps.event.addListener(marker, 'click', function() {
+            // Sencha Touch has problems with the maps handlers...
+            // click wont work on mobile devices
+            // see http://www.sencha.com/forum/showthread.php?117876-OPEN-642-map-on-1.0.1-not-responding-to-click-events-on-iPhone-Android/
+            google.maps.event.addListener(marker, 'mousedown', function() {
                 infoWindow.open(map.map, marker);
             });
         };

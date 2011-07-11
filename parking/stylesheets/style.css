@@ -1,0 +1,9 @@
+.free {
+    background-color: #DEDFE0;
+    width: 100px;
+}
+
+.occupied {
+    background-color: #C00D1A;
+    height: 10px;
+}
