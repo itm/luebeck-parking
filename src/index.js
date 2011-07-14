@@ -26,7 +26,7 @@ new Ext.Application({
                     height: 200,
                     styleHtmlContent: true,
                     scroll: 'vertical',
-                    html: '<p>Im Rahmen des Projekts SmartLübeck</p>',
+                    html: '<p>Im Rahmen des Projekts SmartLübeck.<br/>Basierend auf dem Parkleitsystem der KWL.</p>',
                     dockedItems: [{
                         dock: 'top',
                         xtype: 'toolbar',
