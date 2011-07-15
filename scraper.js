@@ -3,14 +3,13 @@ const request  = require('request'),
       scraper  = require('./scraper'),
       JSON     = require('./json2');
       
-const scrapeURL   = 'http://kwlpls.adiwidjaja.com/index.php';    
 const scrapeDivId = "cc-m-externalsource-container-m8a3ae44c30fa9708";
-const result      = new Array();
+const result = new Array();
 
 var fetch = function() {    
-    request({ uri: scrapeURL }, function (error, response, body) {
+    request({ uri:'http://kwlpls.adiwidjaja.com/index.php' }, function (error, response, body) {
       if (error && response.statusCode !== 200) {
-        console.log('Error when contacting ' + scrapeURL);
+        console.log('Error when contacting http://kwlpls.adiwidjaja.com/index.php')
       }
     
       jsdom.env({
@@ -22,9 +21,6 @@ var fetch = function() {
         processPage(window);
       });
   });
-  
-  // console.log(JSON.stringify(result));
-  return JSON.stringify(result);
 };
 
 function processPage(window) {  
@@ -37,13 +33,15 @@ function processPage(window) {
       processRow($, row);
     }
   });
+
+  console.log(JSON.stringify(result));
 }
 
 function processRow($,row) {
   var elements = $(row).children('td');
   var item     = new Object();
   item.name    = elements.eq(0).html();
-  
+
   if ( elements.size() > 2 ) {
     item.free      = elements.eq(1).html();
     item.parkings  = elements.eq(2).html();
@@ -52,11 +50,13 @@ function processRow($,row) {
     // temporarily closed
     item.status = "closed";
   } else {
-    // this is no item (i.e. "Travemünde" header
+    // this is no item (i.e. "Travemünde" header)
     return;
   };
 
   result.push(item);
+  //console.log(this.rows[this.rows.length-1]);
+  
 }
 
 module.exports = fetch;
