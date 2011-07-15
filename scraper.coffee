@@ -1,7 +1,7 @@
 request  = require('request')
 jsdom    = require('jsdom')
-scraper  = require('./scraper')
 JSON     = require('./json2')
+geo      = require('./geo')
       
 scrapeURL   = 'http://kwlpls.adiwidjaja.com/index.php'
 jqueryUrl   = 'http://code.jquery.com/jquery-1.6.1.min.js'
@@ -13,13 +13,17 @@ fetch = ->
     if error and response.statusCode isnt 200
       console.log 'Error when contacting #{scrapeURL}'
   
-    jsdom.env { html: body, scripts: [jqueryUrl] }, (err, window) -> processPage(window)
+    jsdom.env
+      html: body,
+      scripts: [jqueryUrl],
+      (err, window) ->
+        processPage(window)
   
   #console.log(JSON.stringify(result));
   JSON.stringify(result)
 
 processPage = (window) ->  
-  $ = window.jQuery
+  $    = window.jQuery
   rows = $('table').children()
   num  = $(rows).size()
   
@@ -30,15 +34,18 @@ processPage = (window) ->
 processRow = ($,row) ->
   elements  = $(row).children('td')
   item      = new Object()
-  item.name = elements.eq(0).html()
+  nameStr   = elements.eq(0).html()
+  item.kind = nameStr.substring 0,2
+  item.name = nameStr.substring 3
+  item.geo  = geo.cities[nameStr]
   
   if elements.size() > 2
     item.free      = elements.eq(1).html()
     item.parkings  = elements.eq(2).html()
-    item.status = "open"
+    item.status    = "open"
   else if elements.size() > 0
     # Vorrübergehend geschlossen
-    item.status = "closed"
+    item.status    = "closed"
   else
     # Keine Parkmöglichkeit (z.B. "Travemünde" Überschrift)
     return
