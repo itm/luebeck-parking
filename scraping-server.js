@@ -17,6 +17,7 @@ var fetch = function() {
           'http://code.jquery.com/jquery-1.6.1.min.js'
         ]
       }, function (err, window) {
+        scraper.scraper.window = window;
         scraper.scraper.$ = window.jQuery;    
         scraper.scraper.processPage();
         // jQuery is now loaded on the jsdom window created from 'agent.body'
@@ -25,8 +26,27 @@ var fetch = function() {
   });
 };
 
-const delay = 10000; // 2 minutes  
+const delay = 10000; // 10 seconds
+
+/* Die Funktion fetch() alle delay-Sekunden aufrufen */  
 var intervalId = setInterval(fetch, delay);
 
 //clearInterval(intervalId);
   
+  
+  processPage: function() {
+    //$('#log').html(page);
+    var $    = this.$;    
+    var rows = $('table tbody').children();
+    var num  = $(rows).size(); 
+    
+    console.log("#rows=" + num);
+    
+    rows.each(function(i, row) {
+      if ( i>1 || i == num-1 ) { // cut off header and footer
+        this.processRow(row);
+      }
+    });
+    
+    console.log(JSON.stringify(this.rows));
+  },

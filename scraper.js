@@ -5,9 +5,9 @@ var scraper =
   
   rows : new Array(),
   
-  processPage: function() {
+  processPage: function(window) {
     //$('#log').html(page);
-    var $    = this.$;    
+    var $ = window.jQuery;
     var rows = $('table tbody').children();
     var num  = $(rows).size(); 
     
@@ -15,16 +15,16 @@ var scraper =
     
     rows.each(function(i, row) {
       if ( i>1 || i == num-1 ) { // cut off header and footer
-        this.processRow(row);
+        this.processRow(window, row);
       }
     });
     
     console.log(JSON.stringify(this.rows));
   },
   
-  processRow: function(row) {
+  processRow: function($, row) {
     console.log("processRow( " + row + " )");
-    var $        = this.$;
+        var $ = window.jQuery;
     var elements = $(row).children('td');
     var item     = new Object();
     item.name    = elements.eq(0).html();
