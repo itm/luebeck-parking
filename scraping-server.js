@@ -1,9 +1,10 @@
-var request  = require('request'),
-    jsdom    = require('jsdom'),
-    Scraper  = require('./scraper'),
-    JSON     = require('./json2');
+const request  = require('request'),
+      jsdom    = require('jsdom'),
+      scraper  = require('./scraper'),
+      JSON     = require('./json2');
 
 var fetch = function() {
+    console.log("Server started...");
     request({ uri:'http://kwlpls.adiwidjaja.com/index.php' }, function (error, response, body) {
       if (error && response.statusCode !== 200) {
         console.log('Error when contacting google.com')
@@ -17,7 +18,7 @@ var fetch = function() {
       }, function (err, window) {
         var $ = window.jQuery;
     
-        Scraper.processPage();
+        scraper.scraper.processPage();
         // jQuery is now loaded on the jsdom window created from 'agent.body'
         // console.log($('table').html());
       });
