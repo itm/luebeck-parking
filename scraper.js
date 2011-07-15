@@ -8,8 +8,8 @@ var scraper =
   processPage: function() {
     //$('#log').html(page);
     
-    var rows = $('table tbody').children();
-    var num  = $(rows).size(); 
+    var rows = this.$('table tbody').children();
+    var num  = this.$(rows).size(); 
     
     rows.each(function(i, row) {
       if ( i>1 || i == num-1 ) { // cut off header and footer
@@ -21,7 +21,7 @@ var scraper =
   },
   
   processRow: function(row) {
-    var elements = $(row).children('td');
+    var elements = this.$(row).children('td');
     var item     = new Object();
     item.name    = elements.eq(0).html();
     
