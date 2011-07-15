@@ -4,7 +4,7 @@ _json2   = require './json2'
 
 console.log 'Scraping server started...'
 
-fetch = () ->
+fetch = ->
     _request uri:'http://kwlpls.adiwidjaja.com/index.php', (error, response, body) ->
         console.log 'Fehler beim Kontaktieren der KWL Webseite!' if (error && response.statusCode != 200)
 
@@ -34,7 +34,6 @@ fetch = () ->
                 console.log _json2.JSON.stringify(tableRows)
 
             processRow = (row) ->
-                console.log 'processRow( ' + row + ' )'
                 elements     = $(row).children('td')
                 item         = new Object()
                 item.name    = elements.eq(0).html()
