@@ -1,5 +1,7 @@
-var request = require('request'),
-    jsdom = require('jsdom');
+var request  = require('request'),
+    jsdom    = require('jsdom'),
+    Scraper  = require('Scraper'),
+    JSON     = require('JSON');
 
 var fetch = function() {
     request({ uri:'http://kwlpls.adiwidjaja.com/index.php' }, function (error, response, body) {
@@ -15,8 +17,9 @@ var fetch = function() {
       }, function (err, window) {
         var $ = window.jQuery;
     
+        Scraper.processPage();
         // jQuery is now loaded on the jsdom window created from 'agent.body'
-        console.log($('table').html());
+        // console.log($('table').html());
       });
   });
 };

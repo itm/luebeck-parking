@@ -1,25 +1,12 @@
 var Scraper = 
 {
   parkings    : "",
-  //scrapeUrl   : "http://kwlpls.adiwidjaja.com/index.php",
-  scrapeUrl   : "parkings.htm",
   scrapeDivId : "cc-m-externalsource-container-m8a3ae44c30fa9708",
   
   rows : new Array(),
   
-  scrape : function() {
-    $.ajax({ 
-        url: this.scrapeUrl,
-        type: "GET",
-        dataType: "text",
-        success: function(data) {
-          Scraper.processPage(data);
-        }
-    });
-  },
-
-  processPage: function(page) {
-    $('#log').html(page);
+  processPage: function() {
+    //$('#log').html(page);
     
     var rows = $('table tbody').children();
     var num  = $(rows).size(); 
@@ -56,3 +43,5 @@ var Scraper =
   }
 
 }
+
+exports.Scraper = Scraper;
