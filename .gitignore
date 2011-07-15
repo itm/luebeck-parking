@@ -1,2 +1,5 @@
 media
 .DS_Store
+.idea
+*.iml
+

@@ -1,8 +1,8 @@
 const _request = require('request'),
-        _jsdom = require('jsdom'),
-        _json2 = require('./json2');
+      _jsdom   = require('jsdom'),
+      _json2   = require('./json2');
 
-console.log("Server started...");
+console.log("Scraping server started...");
 
 var fetch = function() {
     _request({ uri:'http://kwlpls.adiwidjaja.com/index.php' }, function (error, response, body) {
