@@ -17,7 +17,7 @@ var fetch = function() {
           'http://code.jquery.com/jquery-1.6.1.min.js'
         ]
       }, function (err, window) {
-        var scraper.scraper.$ = window.jQuery;
+        scraper.scraper.$ = window.jQuery;
     
         scraper.scraper.processPage();
         // jQuery is now loaded on the jsdom window created from 'agent.body'
