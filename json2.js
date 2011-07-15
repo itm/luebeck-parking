@@ -479,5 +479,5 @@ if (!JSON) {
     }
 }());
 
-exports.JSON = JSON;
+module.exports = JSON;
 
