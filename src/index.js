@@ -2,6 +2,7 @@ new Ext.Application({
     launch: function() {
 
         var lübeck = new google.maps.LatLng(53.867814, 10.687208); // default
+        var infoWindow = new google.maps.InfoWindow({maxWidth: 350}); // 350 is a hack to get autosizing working
         var map = new Ext.Map({
             title: 'Map',
             getLocation: true,
@@ -91,7 +92,8 @@ new Ext.Application({
         var main = new Ext.Panel({
             fullscreen: true,
             layout:     'card',
-            items:      [pnlHome, pnlMap]
+            items:      [pnlHome, pnlMap],
+            cardSwitchAnimation: 'slide'
         });
         main.setActiveItem(0);
 
@@ -138,14 +140,14 @@ new Ext.Application({
                 
                 Ext.each( city.parkings, function(parking) {
                     var position = new google.maps.LatLng(parking.lat, parking.lng);
-                    addMarker(parking, position);
+                    addMarker(parking, position, infoWindow);
                 });
                 city = null;
             });
         };
 
         // These are all Google Maps APIs
-        var addMarker = function(parking, position) {
+        var addMarker = function(parking, position, infowindow) {
             var image;
             switch (parking.kind) {
                 case "Parkplatz":
@@ -162,15 +164,16 @@ new Ext.Application({
                 icon: image
             });
             marker.title = parking.name;
-            var infoWindow = new google.maps.InfoWindow({
-                content: createParkingInfoWindow(parking)
-            });
+
             // Sencha Touch has problems with the maps handlers...
             // click wont work on mobile devices
             // see http://www.sencha.com/forum/showthread.php?117876-OPEN-642-map-on-1.0.1-not-responding-to-click-events-on-iPhone-Android/
-            google.maps.event.addListener(marker, 'mousedown', function() {
+            var evListener = function() {
+                infowindow.setContent(createParkingInfoWindow(parking));
                 infoWindow.open(map.map, marker);
-            });
+            };
+            //google.maps.event.addListener(marker, 'mousedown', evListener);
+            google.maps.event.addListener(marker, 'click', evListener);
         };
     }
 });
