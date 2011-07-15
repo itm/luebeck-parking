@@ -29,6 +29,8 @@ var Scraper =
         Scraper.processRow(row);
       }
     });
+    
+    console.log(JSON.stringify(this.rows));
   },
   
   processRow: function(row) {
@@ -49,7 +51,7 @@ var Scraper =
     };
   
     this.rows.push(item);
-    console.log(this.rows[this.rows.length-1]);
+    //console.log(this.rows[this.rows.length-1]);
     
   }
 
