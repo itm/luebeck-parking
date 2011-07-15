@@ -1,7 +1,7 @@
 var request  = require('request'),
     jsdom    = require('jsdom'),
-    Scraper  = require('Scraper'),
-    JSON     = require('JSON');
+    Scraper  = require('./scraper'),
+    JSON     = require('./json2');
 
 var fetch = function() {
     request({ uri:'http://kwlpls.adiwidjaja.com/index.php' }, function (error, response, body) {

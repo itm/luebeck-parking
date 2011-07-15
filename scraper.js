@@ -1,4 +1,4 @@
-var Scraper = 
+var scraper = 
 {
   parkings    : "",
   scrapeDivId : "cc-m-externalsource-container-m8a3ae44c30fa9708",
@@ -42,6 +42,6 @@ var Scraper =
     
   }
 
-}
+};
 
-exports.Scraper = Scraper;
+exports.scraper = scraper;
