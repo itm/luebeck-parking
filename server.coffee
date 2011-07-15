@@ -7,6 +7,7 @@ console.log 'Scraping server started...'
 fetch = () ->
     _request uri:'http://kwlpls.adiwidjaja.com/index.php', (error, response, body) ->
         console.log 'Fehler beim Kontaktieren der KWL Webseite!' if (error && response.statusCode != 200)
+        clearInterval(intervalId) if intervalId
 
         _jsdom.env
             html: body,
@@ -14,9 +15,10 @@ fetch = () ->
                 'http://code.jquery.com/jquery-1.6.1.min.js'
             ]
         , (err, window) ->
+            console.log html
+
             $ = window.jQuery
             scrapeDivId = 'cc-m-externalsource-container-m8a3ae44c30fa9708'
-
             rows = new Array()
 
             processPage = ->
@@ -25,6 +27,7 @@ fetch = () ->
 
                 console.log '#rows=' + num
 
+                # Zeilenweise verarbeiten
                 rows.each( (i, row) ->
                     processRow(row) if (i > 1 || i == num - 1) # Header und Footer abschneiden
                 )
@@ -42,15 +45,13 @@ fetch = () ->
                     item.parkings = elements.eq(2).html()
                     item.status   = 'open'
                 else if elements.size() > 0
-                    # Voruebergehend geschlossen
-                    item.status = 'closed'
+                    item.status = 'closed' # Voruebergehend geschlossen
                 else
                     return # Dies ist kein Item (z.B. 'Travemünde' header)
 
-
                 rows.push(item)
-                #console.log(rows[rows.length-1]);
 
+            # Seitenverarbeitung anstossen
             processPage()
 
 delay = 10000 # 10 secs
@@ -58,4 +59,3 @@ delay = 10000 # 10 secs
 # Die Funktion fetch() alle delay-Sekunden aufrufen
 intervalId = setInterval(fetch, delay)
 
-#clearInterval(intervalId)
