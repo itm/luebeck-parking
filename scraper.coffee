@@ -4,21 +4,16 @@ scraper  = require('./scraper')
 JSON     = require('./json2')
       
 scrapeURL   = 'http://kwlpls.adiwidjaja.com/index.php'
+jqueryUrl   = 'http://code.jquery.com/jquery-1.6.1.min.js'
 scrapeDivId = "cc-m-externalsource-container-m8a3ae44c30fa9708"
 result      = new Array()
 
 fetch = -> 
-  request({ uri: scrapeURL }, (error, response, body) ->
+  request { uri: scrapeURL }, (error, response, body) ->
     if error and response.statusCode isnt 200
       console.log 'Error when contacting #{scrapeURL}'
   
-    jsdom.env({
-      html: body
-      scripts: ['http://code.jquery.com/jquery-1.6.1.min.js']
-    }, (err, window) ->
-      processPage(window)
-    )
-  )
+    jsdom.env { html: body, scripts: [jqueryUrl] }, (err, window) -> processPage(window)
   
   #console.log(JSON.stringify(result));
   JSON.stringify(result)
@@ -29,7 +24,7 @@ processPage = (window) ->
   num  = $(rows).size()
   
   rows.each (i, row) ->
-    if i>1 or i is num-1 # cut off header and footer
+    if i>1 or i is num-1 # Kopf und Fußzeile abschneiden
       processRow($, row)
 
 processRow = ($,row) ->
@@ -40,12 +35,12 @@ processRow = ($,row) ->
   if elements.size() > 2
     item.free      = elements.eq(1).html()
     item.parkings  = elements.eq(2).html()
-    item.status = "openn"
+    item.status = "open"
   else if elements.size() > 0
-    # temporarily closed
+    # Vorrübergehend geschlossen
     item.status = "closed"
   else
-    # this is no item (i.e. "Travemünde" header)
+    # Keine Parkmöglichkeit (z.B. "Travemünde" Überschrift)
     return
 
   result.push(item)

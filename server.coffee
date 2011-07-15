@@ -1,12 +1,13 @@
 scrape      = require './scraper'
 jsonScraped = ""
 
-console.log "Server started..."
+console.log "Server gestartet..."
 
 cacheJson = ->
-  console.log "Scraping and Caching..."
+  console.log "Scrape und cache Daten..."
   jsonScraped = scrape()
 
+# Alle delay ms die Daten erneut von der KWL holen
 delay = 30000 
 intervalId = setInterval cacheJson, delay
 
@@ -15,7 +16,7 @@ intervalId = setInterval cacheJson, delay
 cacheJson()
 
 ###
-Server part for the data
+Server-Teil um das Json rauszugeben
 ###
 http = require 'http'
 
@@ -25,6 +26,4 @@ http.createServer( (req, response) ->
   response.end       '\n'
 ).listen 1337, "127.0.0.1"
 
-console.log 'Server running at http://127.0.0.1:1337/'
-  
-
+console.log 'Server läuft auf http://127.0.0.1:1337/'
