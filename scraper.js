@@ -21,6 +21,9 @@ var fetch = function() {
         processPage(window);
       });
   });
+  
+  // console.log(JSON.stringify(result));
+  return JSON.stringify(result);
 };
 
 function processPage(window) {  
@@ -33,8 +36,6 @@ function processPage(window) {
       processRow($, row);
     }
   });
-
-  console.log(JSON.stringify(result));
 }
 
 function processRow($,row) {
@@ -59,4 +60,4 @@ function processRow($,row) {
   
 }
 
-module.exports = fetch;
+module.exports = fetch;JSON.stringify(result)
