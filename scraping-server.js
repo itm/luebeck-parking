@@ -1,48 +1,46 @@
-const request = require('request'),
-        jsdom = require('jsdom'),
-        scraper = require('./scraper'),
-        JSON = require('./json2');
+const _request = require('request'),
+        _jsdom = require('jsdom'),
+        _json2 = require('./json2');
 
 console.log("Server started...");
 
 var fetch = function() {
-    request({ uri:'http://kwlpls.adiwidjaja.com/index.php' }, function (error, response, body) {
+    _request({ uri:'http://kwlpls.adiwidjaja.com/index.php' }, function (error, response, body) {
         if (error && response.statusCode !== 200) {
             console.log('Fehler beim Kontaktieren der KWL Webseite!')
         }
 
-        jsdom.env({
+        _jsdom.env({
             html: body,
             scripts: [
                 'http://code.jquery.com/jquery-1.6.1.min.js'
             ]
         }, function (err, window) {
             var $ = window.jQuery;
-            const parkings = "";
             const scrapeDivId = "cc-m-externalsource-container-m8a3ae44c30fa9708";
 
             var rows = new Array();
 
             var processPage = function() {
                 var rows = $('table tbody').children();
-                var num = $(rows).size();
+                var num  = $(rows).size();
 
                 console.log("#rows=" + num);
 
                 rows.each(function(i, row) {
                     if (i > 1 || i == num - 1) { // cut off header and footer
-                        this.processRow(window, row);
+                        this.processRow(row);
                     }
                 });
 
-                console.log(JSON.stringify(this.rows));
+                console.log(_json2.JSON.stringify(this.rows));
             };
 
             var processRow = function(row) {
                 console.log("processRow( " + row + " )");
                 var elements = $(row).children('td');
-                var item = new Object();
-                item.name = elements.eq(0).html();
+                var item     = new Object();
+                item.name    = elements.eq(0).html();
 
                 if (elements.size() > 2) {
                     item.free = elements.eq(1).html();
@@ -55,7 +53,6 @@ var fetch = function() {
                     // this is no item (i.e. "Travemünde" header
                     return;
                 }
-                ;
 
                 this.rows.push(item);
                 //console.log(this.rows[this.rows.length-1]);
