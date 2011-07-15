@@ -7,7 +7,6 @@ console.log 'Scraping server started...'
 fetch = () ->
     _request uri:'http://kwlpls.adiwidjaja.com/index.php', (error, response, body) ->
         console.log 'Fehler beim Kontaktieren der KWL Webseite!' if (error && response.statusCode != 200)
-        clearInterval(intervalId) if intervalId
 
         _jsdom.env
             html: body,
@@ -15,14 +14,14 @@ fetch = () ->
                 'http://code.jquery.com/jquery-1.6.1.min.js'
             ]
         , (err, window) ->
-            console.log html
+            console.log body
 
             $ = window.jQuery
             scrapeDivId = 'cc-m-externalsource-container-m8a3ae44c30fa9708'
-            rows = new Array()
+            tableRows = new Array()
 
             processPage = ->
-                rows = $('table tbody').children()
+                rows = $('table').children()
                 num  = $(rows).size()
 
                 console.log '#rows=' + num
@@ -32,7 +31,7 @@ fetch = () ->
                     processRow(row) if (i > 1 || i == num - 1) # Header und Footer abschneiden
                 )
 
-                console.log _json2.JSON.stringify(rows)
+                console.log _json2.JSON.stringify(tableRows)
 
             processRow = (row) ->
                 console.log 'processRow( ' + row + ' )'
@@ -49,7 +48,7 @@ fetch = () ->
                 else
                     return # Dies ist kein Item (z.B. 'Travemünde' header)
 
-                rows.push(item)
+                tableRows.push(item)
 
             # Seitenverarbeitung anstossen
             processPage()
