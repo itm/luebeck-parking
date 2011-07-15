@@ -29,11 +29,11 @@ var fetch = function() {
 
                 rows.each(function(i, row) {
                     if (i > 1 || i == num - 1) { // cut off header and footer
-                        this.processRow(row);
+                        processRow(row);
                     }
                 });
 
-                console.log(_json2.JSON.stringify(this.rows));
+                console.log(_json2.JSON.stringify(rows));
             };
 
             var processRow = function(row) {
@@ -54,8 +54,8 @@ var fetch = function() {
                     return;
                 }
 
-                this.rows.push(item);
-                //console.log(this.rows[this.rows.length-1]);
+                rows.push(item);
+                //console.log(rows[rows.length-1]);
 
             };
 
