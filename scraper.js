@@ -3,13 +3,14 @@ const request  = require('request'),
       scraper  = require('./scraper'),
       JSON     = require('./json2');
       
+const scrapeURL   = 'http://kwlpls.adiwidjaja.com/index.php';    
 const scrapeDivId = "cc-m-externalsource-container-m8a3ae44c30fa9708";
-const result = new Array();
+const result      = new Array();
 
 var fetch = function() {    
-    request({ uri:'http://kwlpls.adiwidjaja.com/index.php' }, function (error, response, body) {
+    request({ uri: scrapeURL }, function (error, response, body) {
       if (error && response.statusCode !== 200) {
-        console.log('Error when contacting http://kwlpls.adiwidjaja.com/index.php')
+        console.log('Error when contacting ' + scrapeURL);
       }
     
       jsdom.env({
@@ -56,8 +57,6 @@ function processRow($,row) {
   };
 
   result.push(item);
-  //console.log(this.rows[this.rows.length-1]);
-  
 }
 
-module.exports = fetch;JSON.stringify(result)
+module.exports = fetch;
