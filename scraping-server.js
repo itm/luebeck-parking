@@ -19,7 +19,7 @@ var fetch = function() {
       }, function (err, window) {
         scraper.scraper.window = window;
         scraper.scraper.$ = window.jQuery;    
-        scraper.scraper.processPage();
+        scraper.scraper.processPage(window);
         // jQuery is now loaded on the jsdom window created from 'agent.body'
         //console.log($('table').html());
       });
@@ -32,21 +32,3 @@ const delay = 10000; // 10 seconds
 var intervalId = setInterval(fetch, delay);
 
 //clearInterval(intervalId);
-  
-  
-  processPage: function() {
-    //$('#log').html(page);
-    var $    = this.$;    
-    var rows = $('table tbody').children();
-    var num  = $(rows).size(); 
-    
-    console.log("#rows=" + num);
-    
-    rows.each(function(i, row) {
-      if ( i>1 || i == num-1 ) { // cut off header and footer
-        this.processRow(row);
-      }
-    });
-    
-    console.log(JSON.stringify(this.rows));
-  },
