@@ -1,5 +1,5 @@
 (function() {
-  var fetch, _jsdom, _json2, _request;
+  var delay, fetch, intervalId, _jsdom, _json2, _request;
   _request = require('request');
   _jsdom = require('jsdom');
   _json2 = require('./json2');
@@ -52,4 +52,6 @@
       });
     });
   };
+  delay = 10000;
+  intervalId = setInterval(fetch, delay);
 }).call(this);

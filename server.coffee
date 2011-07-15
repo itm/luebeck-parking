@@ -52,3 +52,10 @@ fetch = () ->
                 #console.log(rows[rows.length-1]);
 
             processPage()
+
+delay = 10000 # 10 secs
+
+# Die Funktion fetch() alle delay-Sekunden aufrufen
+intervalId = setInterval(fetch, delay)
+
+#clearInterval(intervalId)
