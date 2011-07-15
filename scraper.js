@@ -7,13 +7,15 @@ var scraper =
   
   processPage: function() {
     //$('#log').html(page);
+    var $    = this.$;    
+    var rows = $('table tbody').children();
+    var num  = $(rows).size(); 
     
-    var rows = this.$('table tbody').children();
-    var num  = this.$(rows).size(); 
+    console.log("#rows=" + num);
     
     rows.each(function(i, row) {
       if ( i>1 || i == num-1 ) { // cut off header and footer
-        Scraper.processRow(row);
+        this.processRow(row);
       }
     });
     
@@ -21,7 +23,9 @@ var scraper =
   },
   
   processRow: function(row) {
-    var elements = this.$(row).children('td');
+    console.log("processRow( " + row + " )");
+    var $        = this.$;
+    var elements = $(row).children('td');
     var item     = new Object();
     item.name    = elements.eq(0).html();
     
