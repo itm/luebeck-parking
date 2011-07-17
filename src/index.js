@@ -144,12 +144,41 @@ new Ext.Application({
           store: store
         });
         
-        var btnSort = {
-            text: 'Sortieren',
-            handler: function() {
-                store.sort('free');
+        var sortHandler = function() {
+            if (!this.actions) {
+                this.actions = new Ext.ActionSheet({
+                    items: [{
+                        text: 'Name',
+                        handler : function() {
+                          store.sort('name');
+                        }
+                    },{
+                        text : 'Freie Plätze',
+                        handler : function() {
+                          store.sort('free');
+                        }
+                    },{
+                        text : 'Gesamt Plätze',
+                        handler : function() {
+                          store.sort('spaces');
+                        }
+                    },{
+                        text : 'Zurück',
+                        ui: 'decline',
+                        scope : this,
+                        handler : function(){
+                            this.actions.hide();
+                        }
+                    }]
+                });
             }
-        };
+            this.actions.show();
+        }
+        
+        var btnSort = {
+          text: 'Sortieren',
+          handler: sortHandler
+        }
         
         var pnlList = new Ext.Panel( {
           items       : [list],
