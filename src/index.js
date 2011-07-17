@@ -172,6 +172,8 @@ new Ext.Application({
         var lübeck = new google.maps.LatLng(53.867814, 10.687208); // default
         var infoWindow = new google.maps.InfoWindow({maxWidth: 350}); // 350 is a hack to get autosizing working
         var lastActiveItem = 0;
+        var myPosition;
+        var directionsDisplay = new google.maps.DirectionsRenderer();
         var map = new Ext.Map({
             title: 'Map',
             getLocation: true,
@@ -333,7 +335,8 @@ new Ext.Application({
             var marker = getMarkerAt(position);
             infoWindow.setContent(createParkingInfoWindow(marker.parking));
             infoWindow.open(map.map, marker);
-            map.map.setZoom(16);
+            map.map.setZoom(15);
+            createRoute(position);
           },
           itemTpl : tpl,
           grouped : true,
@@ -400,6 +403,22 @@ new Ext.Application({
             cardSwitchAnimation: 'slide'
         });
         main.setActiveItem(0);
+        
+        var createRoute = function(destination) {
+          var directionsService = new google.maps.DirectionsService();
+
+          var request = {
+              origin: myPosition,
+              destination: destination,
+              travelMode: google.maps.TravelMode["DRIVING"]
+          };
+          directionsService.route(request, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+              directionsDisplay.setDirections(response);
+            }
+          });
+
+        };
 
         var tabButtonHandler = function(button, event) {
             Ext.each(theData.cities, function(city) {
@@ -450,6 +469,8 @@ new Ext.Application({
                     handler: tabButtonHandler
                 });
             });
+            //bar.add({xtype:'spacer'});
+            
             bar.doLayout();
             //console.log(city);
             Ext.each( theData.parkings, function(parking) {
@@ -459,6 +480,11 @@ new Ext.Application({
                 }
             });
             city = null;  
+            getMyPosition();
+            infoWindow.close();
+            directionsDisplay.setMap(null);
+            directionsDisplay = new google.maps.DirectionsRenderer();
+            directionsDisplay.setMap(map.map);
         };
 
         // These are all Google Maps APIs
@@ -492,6 +518,23 @@ new Ext.Application({
             google.maps.event.addListener(marker, 'mousedown', evListener);
             google.maps.event.addListener(marker, 'click', evListener);
         };
+        
+        var getMyPosition = function() {
+          if (typeof(navigator.geolocation) != 'undefined') {
+              navigator.geolocation.getCurrentPosition(function(position) {
+                  var lat = position.coords.latitude;
+                  var lng = position.coords.longitude;
+                  myPosition = new google.maps.LatLng(lat, lng);
+                  var marker = new google.maps.Marker({
+                      map: map.map,
+                      position: myPosition
+                  });
+                  marker.title = "Ihre Position";
+            });
+          }
+        };
+        
+        getMyPosition();
     }
 });
 
