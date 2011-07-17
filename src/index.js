@@ -171,6 +171,7 @@ new Ext.Application({
 
         var lübeck = new google.maps.LatLng(53.867814, 10.687208); // default
         var infoWindow = new google.maps.InfoWindow({maxWidth: 350}); // 350 is a hack to get autosizing working
+        var lastActiveItem = 0;
         var map = new Ext.Map({
             title: 'Map',
             getLocation: true,
@@ -230,6 +231,7 @@ new Ext.Application({
                     iconMask: true,
                     iconCls: 'maps',
                     handler: function() {
+                        lastActiveItem = 0;
                         main.setActiveItem(1);
                         loadData();
                     }      
@@ -239,6 +241,7 @@ new Ext.Application({
                     iconMask: true,
                     iconCls: 'bookmarks',
                     handler: function() {
+                        lastActiveItem = 2;
                         main.setActiveItem(2);
                         store.load();
                     }      
@@ -253,18 +256,19 @@ new Ext.Application({
         });
         
         // --- Kartenansicht ---
-
-        var btnHome = {
+        
+        var btnBack = {
             ui: 'back',
             text: 'Zurück',
             handler: function() {
-                main.setActiveItem(0);
+                console.log(lastActiveItem);
+                main.setActiveItem(lastActiveItem);
             }
         };
         
         var bar = new Ext.Toolbar({
             dock        : 'top',
-            items       : [btnHome]
+            items       : [btnBack]
         });
                
         var pnlMap = new Ext.Panel({
@@ -373,6 +377,14 @@ new Ext.Application({
           handler: sortHandler
         }
         
+        var btnHome = {
+            ui: 'back',
+            text: 'Zurück',
+            handler: function() {
+                main.setActiveItem(0);
+            }
+        };
+        
         var pnlList = new Ext.Panel( {
           layout: 'fit',
           items       : [list],
@@ -429,7 +441,7 @@ new Ext.Application({
         var loadData = function() {
             map.markers = new Array();
             bar.removeAll();
-            bar.add(btnHome);
+            bar.add(btnBack);
             // Add points to the map
             Ext.each( theData.cities, function(city) {
                 bar.add({
