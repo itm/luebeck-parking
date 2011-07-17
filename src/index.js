@@ -26,7 +26,8 @@ new Ext.Application({
                     height: 200,
                     styleHtmlContent: true,
                     scroll: 'vertical',
-                    html: '<p>Entwickelt im Rahmen des Projekts SmartLübeck.<br/>Verwendet das Parkleitsystem der KWL.</p>',
+                    html: '<p>Entwickelt im Rahmen des Projekts SmartLübeck.'
+                          + '<br/>Verwendet das Parkleitsystem der KWL.</p>',
                     dockedItems: [{
                         dock: 'top',
                         xtype: 'toolbar',
@@ -51,6 +52,8 @@ new Ext.Application({
             items:  [
                 { 
                     text: 'Karte',
+                    iconMask: true,
+                    iconCls: 'maps',
                     handler: function() {
                         main.setActiveItem(1);
                         loadData();
@@ -58,6 +61,8 @@ new Ext.Application({
                 },
                 { 
                     text: 'Liste',
+                    iconMask: true,
+                    iconCls: 'bookmarks',
                     handler: function() {
                         main.setActiveItem(2);
                         store.load();
@@ -65,6 +70,8 @@ new Ext.Application({
                 },
                 {
                     text: 'Info',
+                    iconMask: true,
+                    iconCls: 'info',
                     handler: infoHandler
                 }
             ],
@@ -138,7 +145,7 @@ new Ext.Application({
         );
         
         var list = new Ext.List({
-          fullscreen: true,
+          //fullscreen: true,
           itemTpl : tpl,
           grouped : true,
           store: store
@@ -181,6 +188,7 @@ new Ext.Application({
         }
         
         var pnlList = new Ext.Panel( {
+          layout: 'fit',
           items       : [list],
           dockedItems : [{xtype: 'toolbar', dock: 'top', items: [btnHome,{xtype:'spacer'},btnSort] }]
         });
