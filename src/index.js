@@ -179,7 +179,7 @@ new Ext.Application({
             getLocation: true,
             mapOptions: {
                 center: lübeck,
-                zoom: 13
+                zoom: 15
             }
         });
         
@@ -481,6 +481,8 @@ new Ext.Application({
             });
             city = null;  
             getMyPosition();
+            map.map.setCenter(lübeck);
+            map.map.setZoom(15);
             infoWindow.close();
             directionsDisplay.setMap(null);
             directionsDisplay = new google.maps.DirectionsRenderer();
