@@ -93,7 +93,7 @@ new Ext.Application({
         // --- Model, Store und Liste ---
         
         Ext.regModel('Parking', {
-          fields: ['kind', 'name', 'status', 'free', 'spaces']
+          fields: ['kind', 'name', 'status', {name:'free', type:'int'}, {name:'spaces', type:'int'}, "city"]
         });
         
         var store = new Ext.data.JsonStore({
@@ -108,6 +108,15 @@ new Ext.Application({
                 root: 'parkings'
             },
             callbackParam: 'callback'
+          },
+          sorters: [
+              {
+                  property : 'name',
+                  direction: 'ASC'
+              }
+          ],
+          getGroupString : function(record) {
+              return record.get('city');
           }
         });
         
@@ -131,14 +140,20 @@ new Ext.Application({
         var list = new Ext.List({
           fullscreen: true,
           itemTpl : tpl,
-          grouped : false,
-          indexBar: false,
+          grouped : true,
           store: store
         });
         
+        var btnSort = {
+            text: 'Sortieren',
+            handler: function() {
+                store.sort('free');
+            }
+        };
+        
         var pnlList = new Ext.Panel( {
           items       : [list],
-          dockedItems : [{xtype: 'toolbar', dock: 'top', items: [btnHome]}]
+          dockedItems : [{xtype: 'toolbar', dock: 'top', items: [btnHome,{xtype:'spacer'},btnSort] }]
         });
         
         // --- Haupt Panel ---
