@@ -183,6 +183,10 @@ new Ext.Application({
             }
         });
         
+        window.onbeforeunload = function() {
+          return "Wirklich die Anwendung verlassen?";
+        }
+        
         var getMarkerAt = function(position) {
           for (i=0; i<map.markers.length; i++) {
             var marker = map.markers[i];
