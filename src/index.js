@@ -167,7 +167,7 @@ Ext.reg('jeplist', Ext.jep.List);
 new Ext.Application({
     launch: function() {
     
-        var jsonServer = 'http://192.168.2.32:8080';
+        var jsonServer = 'http://localhost:8080';
 
         var lübeck = new google.maps.LatLng(53.867814, 10.687208); // default
         var infoWindow = new google.maps.InfoWindow({maxWidth: 350}); // 350 is a hack to get autosizing working
