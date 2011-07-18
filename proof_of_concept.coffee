@@ -65,15 +65,57 @@ scrape = ->
 
             # Seitenverarbeitung anstossen
             processPage()
-            
+
+#
+# ABSPEICHERN DER HISTORIE
+#
+# Stammdaten sind Daten, die sich selten ändern wie z.B. die Anzahl
+# der verfügbaren Stellplätze auf einem Parkplatz. Sie werden hier mit
+# Redis als Keys gespeichert, die wie folgt aufgebaut sind: 
+#
+#    "parking:<Parkplatzname>:total"
+#
+# Als Redis-Befehl also:
+#
+#    SET "parking:Parkhaus Falkenstraße:total" 100
+#
+# um die Kapazität des Parkhauses Falkenstraße als 100 zu speichern. 
+# Damit der Wert nicht immer wieder überschrieben werden muss, wird der 
+# Befehl "SETNX" verwendet, der einen Key nur überschreibt, falls er noch nicht
+# existiert.
+#
+# Bewegungsdaten sind Daten, die sich ständig ändern, z.B. die Parkplatzbelegung
+# und der Zeitpunkt zu dem eine bestimmte Belegung vorlag. Daher haben die
+# Bewegungsdaten eine fortlaufende ID im Key unter dem sie gespeichert werden.
+#
+#    INCR "parking:Parkhaus Falkenstraße"
+#
+# Dieser Redis-Befehl ist eine atomare Operation und erhöht die ID für den Key
+# des Parkhauses Falkenstraße um 1. So können wir dann neue Bewegungsdaten
+# mit einer neuen ID im Key speichern.
+#
+# Aufbau z.B: "parking:Parkhaus Falkenstraße:<ID>:occupied".
+#
+#    SET "parking:Parkhaus Falkenstraße:2:occupied" 50
+#    SET "parking:Parkhaus Falkenstraße:2:date"     <aktueller Zeitstempel>
+#
+# Speichert die Belegung 50 für das Parkhaus Falkenstraße zum aktuellen 
+# Zeitpunkt mit der ID 2.
+#
+# Alle Redis-Befehle sind als Callbacks verkettet um Nodes asnychronem
+# Charakter Rechnung zu tragen. Zudem werden auf diese Weise keine weiteren
+# Redis-Befehle ausgeführt, falls einer der vorhergehenden Befehle scheitert.
+#
 storeHistory = ->
     storeHistoryItem = (row) ->
         if row.name and row.occupied and row.total
             # Stammdaten
             parkingId = "parking:" + row.name
-            db.setnx parkingId + ':total', row.total, (err) ->                
+            db.setnx parkingId + ':total', row.total, (err) -> 
+                throw err if err               
                 # Bewegungsdaten
-                db.incr parkingId, (err, id) ->              
+                db.incr parkingId, (err, id) ->        
+                    throw err if err      
                     db.set parkingId + ':' + id + ':date', new Date().getTime()
                     db.set parkingId + ':' + id + ':occupied', row.occupied 
                     
@@ -98,7 +140,7 @@ port = 8080
 
 http.createServer( (req, response) ->
   response.writeHead(200, 'content-type': 'text/json')
-  response.write(data)
+  response.write(jsonData)
   response.end('\n')
 ).listen(port, host)
 
