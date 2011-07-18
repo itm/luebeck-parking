@@ -82,7 +82,9 @@ scrape = ->
 # um die Kapazität des Parkhauses Falkenstraße als 100 zu speichern. 
 # Damit der Wert nicht immer wieder überschrieben werden muss, wird der 
 # Befehl "SETNX" verwendet, der einen Key nur überschreibt, falls er noch nicht
-# existiert.
+# existiert. (Mehr Redis-Befehle gibt es hier: http://redis.io/commands)
+#
+#    SETNX "parking:Parkhaus Falkenstraße:total" 100
 #
 # Bewegungsdaten sind Daten, die sich ständig ändern, z.B. die Parkplatzbelegung
 # und der Zeitpunkt zu dem eine bestimmte Belegung vorlag. Daher haben die
