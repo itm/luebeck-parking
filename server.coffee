@@ -11,7 +11,7 @@ cacheJson = ->
   jsonScraped = scrape()
 
 # Alle delay ms die Daten erneut von der KWL holen
-delay = 1 * 10 * 1000
+delay = 3 * 60 * 1000 # 3 Minuten
 intervalId = setInterval cacheJson, delay
 
 #clearInterval intervalId
