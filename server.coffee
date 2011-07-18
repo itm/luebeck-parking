@@ -1,13 +1,17 @@
 scrape      = require './scraper'
+url         = require('url')
+
+# Behälter für Zwischenspeichern
 jsonScraped = ""
 
-console.log "Server started..."
+console.log "Server gestartet..."
 
 cacheJson = ->
-  console.log "Scraping and Caching..."
+  console.log "Scrape und cache Daten..."
   jsonScraped = scrape()
 
-delay = 30000 
+# Alle delay ms die Daten erneut von der KWL holen
+delay = 1 * 6 * 1000
 intervalId = setInterval cacheJson, delay
 
 #clearInterval intervalId
@@ -15,16 +19,28 @@ intervalId = setInterval cacheJson, delay
 cacheJson()
 
 ###
-Server part for the data
+Server-Teil um das Json rauszugeben
 ###
 http = require 'http'
+host = '0.0.0.0'
+port = 8080
 
 http.createServer( (req, response) ->
-  response.writeHead 200, {'content-type': 'text/json' }
-  response.write     jsonScraped
+
+  response.writeHead 200, {'content-type': 'text/json', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers' : 'x-requested-with' }
+  # Parameter extrahieren
+  params = url.parse(req.url, true).query
+  # Welche Methode der Json Antwort
+  if params.callback?
+    response.write    "#{params.callback}(#{jsonScraped})"
+  else if params.field?
+    response.write    "var #{params.field}= #{jsonScraped};"
+  else
+    response.write    jsonScraped
   response.end       '\n'
-).listen 1337, "127.0.0.1"
-
-console.log 'Server running at http://127.0.0.1:1337/'
   
+  console.log "Request beantwortet..."
+  
+).listen port, host
 
+console.log "Server läuft auf http://#{host}:#{port}/"
