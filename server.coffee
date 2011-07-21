@@ -31,11 +31,11 @@ http.createServer( (req, response) ->
     params = url.parse(req.url, true).query
     # Welche Methode der Json Antwort
     if params.callback?
-        response.write    "#{params.callback}(#{jsonScraped})"
+        response.write "#{params.callback}(#{jsonScraped})"
     else if params.field?
-        response.write    "var #{params.field}= #{jsonScraped};"
+        response.write "var #{params.field}= #{jsonScraped};"
     else
-        response.write    jsonScraped
+        response.write jsonScraped
     response.end       '\n'
   
     console.log "Request beantwortet..."
