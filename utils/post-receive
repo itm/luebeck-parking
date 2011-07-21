@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+# Copyright Institut für Telematik, Universität zu Lübeck, 2011
+#
+# Author: Sönke Nommensen
+#
+# Server-side Git post receive script to deploy new files to the
+# locally installed Apache and restart NodeJS server.
+#
+
+location="/var/www/parking"
+
+server_script="server"
+
+additional_scripts="scraper
+geo"
+
+# Server stop
+forever stop ${location}/${server_script}.js
+
+# Remove old JS files
+if [ -a ${location}/${server_script}.js ]
+then
+    rm ${location}/${server_script}.js
+fi
+
+for script in ${additional_scripts}
+do
+    if [ -a ${location}/${script}.js ]
+    then
+        rm ${location}/${script}.js
+    fi
+done
+
+# Pull changes from master
+cd ${location}
+env -i git pull origin master
+
+# Compile new coffee scripts
+coffee --compile ${location}/${server_script}.coffee
+
+for script in ${additional_scripts}
+do
+    coffee --compile ${location}/${script}.coffee
+done
+
+# Server start
+forever start -l -o ${location}/out.log -e ${location}/err.log ${location}/${server_script}.js
