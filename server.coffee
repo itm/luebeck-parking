@@ -1,5 +1,5 @@
 scrape      = require './scraper'
-url         = require('url')
+url         = require 'url'
 
 # Behälter für Zwischenspeichern
 jsonScraped = ""

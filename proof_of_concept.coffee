@@ -1,5 +1,6 @@
 request = require 'request'
 jsdom   = require 'jsdom'
+log     = require './log'
 
 # Behaelter für gescrapte Daten als JSON kodiert
 jsonData = null
@@ -7,20 +8,20 @@ jsonData = null
 # Rohdaten als Array
 rawData  = new Array()
 
-console.log 'Server gestartet...'
+log.info 'Server gestartet...'
 
 # Initialisiere Datenbankverbindung um Daten-Historie anzulegen
 redis = require('redis')
 db    = redis.createClient()
 db.on 'error', 
     (err) -> 
-        console.log err
+        log.error err
         process.exit(1)
 
 scrape = ->
     request uri:'http://kwlpls.adiwidjaja.com/index.php', (error, response, body) ->
         if error and response.statusCode != 200
-            console.log 'Fehler beim Kontaktieren der KWL-Webseite!' 
+            log.info 'Fehler beim Kontaktieren der KWL-Webseite!'
 
         jsdom.env
             html: body,
@@ -36,7 +37,7 @@ scrape = ->
                 rows = $('table').children()
                 num  = $(rows).size()
 
-                console.log 'Belegungsdaten für ' + num + ' Parkplätze gefunden.'
+                log.info 'Belegungsdaten für ' + num + ' Parkplätze gefunden.'
 
                 # Zeilenweise verarbeiten
                 rows.each( (i, row) ->
@@ -54,7 +55,7 @@ scrape = ->
 
                 if elements.size() > 2
                     item.total     = elements.eq(1).html()
-                    item.occupied  = elements.eq(2).html()
+                    item.free      = elements.eq(2).html()
                     item.status    = 'open'
                 else if elements.size() > 0
                     item.status = 'closed' # Voruebergehend geschlossen
@@ -112,14 +113,16 @@ storeHistory = ->
     storeHistoryItem = (row) ->
         if row.name and row.occupied and row.total
             # Stammdaten
+            if row.name.indexOf("<strong>") != -1
+                return
             parkingId = "parking:" + row.name
-            db.setnx parkingId + ':total', row.total, (err) -> 
+            db.setnx "#{parkingId}:total", row.total, (err) ->
                 throw err if err               
                 # Bewegungsdaten
                 db.incr parkingId, (err, id) ->        
                     throw err if err      
-                    db.set parkingId + ':' + id + ':date', new Date().getTime()
-                    db.set parkingId + ':' + id + ':occupied', row.occupied 
+                    db.set "#{parkingId}:#{id}:timestamp", new Date().getTime()
+                    db.set "#{parkingId}:#{id}:free", row.free
                     
     storeHistoryItem(row) for row in rawData                                               
 
@@ -146,4 +149,5 @@ http.createServer( (req, response) ->
   response.end('\n')
 ).listen(port, host)
 
-console.log('http://' + host + ':' + port)
+log.info "http://#{host}:#{port}/"
+

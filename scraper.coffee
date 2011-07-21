@@ -1,6 +1,6 @@
 request  = require('request')
 jsdom    = require('jsdom')
-JSON     = require('./json2')
+JSON     = require('./lib/json2')
 geo      = require('./geo')
       
 scrapeURL   = 'http://kwlpls.adiwidjaja.com/index.php'
