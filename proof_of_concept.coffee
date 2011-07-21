@@ -1,6 +1,6 @@
 request = require 'request'
 jsdom   = require 'jsdom'
-log     = require './log'
+log     = require './lib/logger'
 
 # Behaelter für gescrapte Daten als JSON kodiert
 jsonData = null
