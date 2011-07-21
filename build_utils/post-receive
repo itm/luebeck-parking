@@ -16,19 +16,19 @@ additional_scripts="scraper
 geo"
 
 # Server stop
-forever stop ${location}/${server_script}.js
+forever stop ${location}/nodejs/${server_script}.js
 
 # Remove old JS files
-if [ -a ${location}/${server_script}.js ]
+if [ -a ${location}/nodejs/${server_script}.js ]
 then
-    rm ${location}/${server_script}.js
+    rm ${location}/nodejs/${server_script}.js
 fi
 
 for script in ${additional_scripts}
 do
-    if [ -a ${location}/${script}.js ]
+    if [ -a ${location}/nodejs/${script}.js ]
     then
-        rm ${location}/${script}.js
+        rm ${location}/nodejs/${script}.js
     fi
 done
 
@@ -37,12 +37,12 @@ cd ${location}
 env -i git pull origin master
 
 # Compile new coffee scripts
-coffee --compile ${location}/${server_script}.coffee
+coffee --compile ${location}/nodejs/${server_script}.coffee
 
 for script in ${additional_scripts}
 do
-    coffee --compile ${location}/${script}.coffee
+    coffee --compile ${location}/nodejs/${script}.coffee
 done
 
 # Server start
-forever start --append --minUptime 10000 -o ${location}/out.log -e ${location}/err.log ${location}/${server_script}.js
+forever start --append --minUptime 10000 -o ${location}/nodejs/out.log -e ${location}/nodejs/err.log ${location}/nodejs/${server_script}.js
