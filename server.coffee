@@ -26,20 +26,19 @@ host = '0.0.0.0'
 port = 8080
 
 http.createServer( (req, response) ->
-
-  response.writeHead 200, {'content-type': 'text/json', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers' : 'x-requested-with' }
-  # Parameter extrahieren
-  params = url.parse(req.url, true).query
-  # Welche Methode der Json Antwort
-  if params.callback?
-    response.write    "#{params.callback}(#{jsonScraped})"
-  else if params.field?
-    response.write    "var #{params.field}= #{jsonScraped};"
-  else
-    response.write    jsonScraped
-  response.end       '\n'
+    response.writeHead 200, {'content-type': 'text/json', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers' : 'x-requested-with' }
+    # Parameter extrahieren
+    params = url.parse(req.url, true).query
+    # Welche Methode der Json Antwort
+    if params.callback?
+        response.write    "#{params.callback}(#{jsonScraped})"
+    else if params.field?
+        response.write    "var #{params.field}= #{jsonScraped};"
+    else
+        response.write    jsonScraped
+    response.end       '\n'
   
-  console.log "Request beantwortet..."
+    console.log "Request beantwortet..."
   
 ).listen port, host
 
