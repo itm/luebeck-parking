@@ -45,4 +45,4 @@ do
 done
 
 # Server start
-forever start --append -o ${location}/out.log -e ${location}/err.log ${location}/${server_script}.js
+forever start --append --minUptime 10000 -o ${location}/out.log -e ${location}/err.log ${location}/${server_script}.js
