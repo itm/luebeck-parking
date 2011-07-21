@@ -18,9 +18,9 @@ intervalId = setInterval cacheJson, delay
 
 cacheJson()
 
-###
-Server-Teil um das Json rauszugeben
-###
+#
+# Server-Teil um das Json rauszugeben
+#
 http = require 'http'
 host = '0.0.0.0'
 port = 8080

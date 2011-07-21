@@ -45,4 +45,4 @@ do
 done
 
 # Server start
-forever start -l -o ${location}/out.log -e ${location}/err.log ${location}/${server_script}.js
+forever start --append -o ${location}/out.log -e ${location}/err.log ${location}/${server_script}.js
