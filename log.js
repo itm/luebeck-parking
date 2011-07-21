@@ -9,7 +9,7 @@ if (!LOG) {
 }
 
 (function () {
-    var defaultDateFormat = 'dd-Mm-yyyy-H:m:s';
+    var defaultDateFormat = 'dd-Mm-yyyy-H:k:s';
 
     var log = function (message, level) {
         var now = DATE.formattedString(new Date(), defaultDateFormat);

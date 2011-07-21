@@ -26,9 +26,9 @@ if (!DATE) {
             f = f.replace(/Dd\*/g, nd);
             f = f.replace(/dd/g, String(padLeft(d.getDate(), '0', 2)));
             f = f.replace(/d\*/g, d.getDate());
-            f = f.replace(/H/g, d.getHours());
-            f = f.replace(/m/g, d.getMinutes());
-            f = f.replace(/s/g, d.getSeconds());
+            f = f.replace(/H/g, this.hours(d));
+            f = f.replace(/k/g, this.minutes(d));
+            f = f.replace(/s/g, this.seconds(d));
             return f;
         };
     }
@@ -83,6 +83,42 @@ if (!DATE) {
                     return 'Friday';
                 case 6:
                     return 'Saturday';
+            }
+        };
+    }
+
+    if (typeof DATE.hours !== 'function') {
+        DATE.hours = function (d) {
+            var hours = d.getHours();
+            if (hours < 10) {
+                return "0" + hours;
+            }
+            else {
+                return "" + hours;
+            }
+        };
+    }
+
+    if (typeof DATE.minutes !== 'function') {
+        DATE.minutes = function (d) {
+            var min = d.getMinutes();
+            if (min < 10) {
+                return "0" + min;
+            }
+            else {
+                return "" + min;
+            }
+        };
+    }
+
+    if (typeof DATE.seconds !== 'function') {
+        DATE.seconds = function (d) {
+            var secs = d.getSeconds();
+            if (secs < 10) {
+                return "0" + secs;
+            }
+            else {
+                return "" + secs;
             }
         };
     }
