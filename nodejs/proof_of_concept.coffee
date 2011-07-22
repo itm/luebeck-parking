@@ -110,8 +110,9 @@ scrape = ->
 # Redis-Befehle ausgeführt, falls einer der vorhergehenden Befehle scheitert.
 #
 storeHistory = ->
+    log.info 'Speichere Historie.'
     storeHistoryItem = (row) ->
-        if row.name and row.occupied and row.total
+        if row.name and row.free and row.total
             # Stammdaten
             if row.name.indexOf("<strong>") != -1
                 return
@@ -127,13 +128,13 @@ storeHistory = ->
     storeHistoryItem(row) for row in rawData                                               
 
 # Intervall, das festlegt, wie haeufig die Daten angefordert werden
-scrapeDelay = 2 * 60 * 1000 # 2 Minuten
+scrapeDelay = 1 * 60 * 1000 # 2 Minuten
 
 # Die Funktion scrape() scrapeDelay-oft aufrufen
 scrapeIntervalId = setInterval(scrape, scrapeDelay)
 
 # Intervall, das festlegt, wie haeufig die Daten historisiert werden
-historyDelay = 15 * 60 * 1000 # 15 Minuten
+historyDelay = 2 * 60 * 1000 # 15 Minuten
 
 # Die Funktion storeHistory() historyDelay-oft aufrufen
 historyIntervalId = setInterval(storeHistory, historyDelay)
