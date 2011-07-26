@@ -14,6 +14,7 @@ git_location="/var/www/parking"
 server_script="server"
 
 additional_scripts="scraper
+history
 geo"
 
 # Server stop
