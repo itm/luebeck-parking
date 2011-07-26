@@ -6,7 +6,6 @@ db = redis.createClient()
 db.on 'error', 
     (err) -> 
         log.error err
-        process.exit(1)
 
 #
 # ABSPEICHERN DER HISTORIE
