@@ -1,21 +1,34 @@
 scrape      = require './scraper'
+history     = require './history'
+JSON        = require './custom_modules/json2'
+log         = require './custom_modules/logger'
 url         = require 'url'
 
 # Behälter für Zwischenspeichern
 jsonScraped = ""
 
-console.log "Server gestartet..."
+log.info "Server gestartet..."
 
 cacheJson = ->
-  console.log "Scrape und cache Daten..."
-  jsonScraped = scrape()
+  log.info "Scrape und cache Daten..."
+  jsonScraped = scrape() 
+  
+storeHistory = ->
+    scraped  = JSON.parse(jsonScraped)
+    parkings = scraped.parkings if scraped
+    history(parkings) if parkings        
 
 # Alle delay ms die Daten erneut von der KWL holen
 delay = 3 * 60 * 1000 # 3 Minuten
 intervalId = setInterval cacheJson, delay
 
+# Alle historyDelay ms die Daten in die Historie speichern
+historyDelay = 10 * 60 * 1000 # 10 Minuten
+historyIntervalId = setInterval storeHistory, historyDelay
+
 #clearInterval intervalId
 
+# Initialer Aufruf zum Scrapen der Daten
 cacheJson()
 
 #
@@ -38,8 +51,8 @@ http.createServer( (req, response) ->
         response.write jsonScraped
     response.end       '\n'
   
-    console.log "Request beantwortet..."
+    log.info "Request beantwortet..."
   
 ).listen port, host
 
-console.log "Server läuft auf http://#{host}:#{port}/"
+log.info "Server läuft auf http://#{host}:#{port}/"

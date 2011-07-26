@@ -1,14 +1,15 @@
-request  = require('request')
-jsdom    = require('jsdom')
-JSON     = require('./custom_modules/json2')
-geo      = require('./geo')
+request  = require 'request'
+jsdom    = require 'jsdom'
+JSON     = require './custom_modules/json2'
+log      = require './custom_modules/logger'
+geo      = require './geo'
       
 scrapeURL   = 'http://kwlpls.adiwidjaja.com/index.php'
 jqueryUrl   = 'http://code.jquery.com/jquery-1.6.1.min.js'
 scrapeDivId = "cc-m-externalsource-container-m8a3ae44c30fa9708"
 
-result = new Object()
-result.cities = new Array()
+result          = new Object()
+result.cities   = new Array()
 result.parkings = new Array()
 
 currentCity = ""
@@ -16,8 +17,8 @@ currentCity = ""
 fetch = -> 
   # Den Inhalt der KWL Seite holen
   request { uri: scrapeURL }, (error, response, body) ->
-    if error and response.statusCode isnt 200
-      console.log 'Error when contacting #{scrapeURL}'
+    if error and response and response.statusCode isnt 200
+      log.error 'Error when contacting #{scrapeURL}'
     # Fake Brwoser Umgebung mit dem eben geholten Inhalt und Jquery
     jsdom.env
       html: body,

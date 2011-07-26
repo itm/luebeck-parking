@@ -1,6 +1,7 @@
 #!/bin/bash
 
 input="geo
+history
 scraper
 server"
 
@@ -22,7 +23,7 @@ cleanup() {
         if [ -a ${script}.js ] 
         then          
             rm ${script}.js
-            echo Deleted ${script}.coffee            
+            echo Deleted ${script}.js            
         fi    
     done
 }
