@@ -44,7 +44,7 @@ app.configure () ->
     app.use(express.static(__dirname + '/public'))
     app.use(express.errorHandler(dumpExceptions: true, showStack: true ))
 
-app.get('/current',  (req, res) ->
+app.get('/',  (req, res) ->
     res.writeHead 200, {'content-type': 'text/json', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers' : 'x-requested-with' }
     # Parameter extrahieren
     params = url.parse(req.url, true).query
