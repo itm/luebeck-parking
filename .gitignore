@@ -3,5 +3,4 @@ media
 .idea
 *.iml
 *.log
-
-
+dump.rdb

@@ -19,11 +19,11 @@ storeHistory = ->
     history(parkings) if parkings        
 
 # Alle delay ms die Daten erneut von der KWL holen
-delay      = 1 * 60 * 1000 # 3 Minuten
+delay      = 3 * 60 * 1000 # 3 Minuten
 intervalId = setInterval cacheJson, delay
 
 # Alle historyDelay ms die Daten in die Historie speichern
-historyDelay      = 1 * 60 * 1000 # 10 Minuten
+historyDelay      = 10 * 60 * 1000 # 10 Minuten
 historyIntervalId = setInterval storeHistory, historyDelay
 
 #clearInterval intervalId
@@ -77,7 +77,7 @@ getParkingStatus = (p, id, fn) ->
     db.get tempId, (err, free) ->        
         throw err if err         
         _result.name = p.name
-        _result.free = if free then free else -1
+        _result.free = free ? -1
         fn(_result) 
         
 getAll = (res, id, parkings, fn) ->
