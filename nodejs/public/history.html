@@ -7,8 +7,11 @@
             font-family: Helvetica, Arial, sans-serif;
         }
 
+        table#heading {
+            border: none;
+        }
+
         div#chooser {
-            float: left;
         }
 
         div#container {
@@ -28,17 +31,23 @@
 <body>
 <h1>Freie Parkplätze in L&uuml;beck</h1>
 
-<div>
-    <div id="overview"></div>
-    <div id="chooser">
-        <label for="parkings">Parkplatz/Parkhaus: </label>
-        <select id="parkings" name="parkings">
-            <option value="Falkenstrasse">Falkenstrasse</option>
-            <option value="MuK">MuK</option>
-            <option value="Pferdemarkt">Pferdemarkt</option>
-        </select>
-    </div>
-</div>
+<table id="heading">
+    <tr>
+        <td>
+            <div id="overview"></div>
+        </td>
+        <td>
+            <div id="chooser">
+                <label for="parkings">Parkplatz/Parkhaus: </label>
+                <select id="parkings" name="parkings">
+                    <option value="Falkenstrasse">Falkenstrasse</option>
+                    <option value="MuK">MuK</option>
+                    <option value="Pferdemarkt">Pferdemarkt</option>
+                </select>
+            </div>
+        </td>
+    </tr>
+</table>
 
 <div id="container"></div>
 
