@@ -1,5 +1,12 @@
 $(function () {
 
+    var parking = "Falkenstrasse";
+
+    $("#parkings").change(function() {
+        parking = $(this).val();
+        fetchData(parking);
+    });
+
     var options = {
         lines: { show: true },
         points: { show: true },
@@ -79,11 +86,15 @@ $(function () {
         });
     }
 
-    $.ajax({
-        url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/Falkenstrasse',
-        //url: 'http://localhost:8080/history/Falkenstrasse',
-        method: 'GET',
-        dataType: 'json',
-        success: onDataReceived
-    });
+    var fetchData = function(parking) {
+        $.ajax({
+            url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/Falkenstrasse',
+            //url: 'http://localhost:8080/history/Falkenstrasse',
+            method: 'GET',
+            dataType: 'json',
+            success: onDataReceived
+        });
+    };
+
+    fetchData(parking);
 });
