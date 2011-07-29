@@ -60,7 +60,7 @@ $(function () {
         // and plot all we got
         var plot = $.plot(container, [data], options);
 
-        var smallPlot = $.plot($("#overview"), [data], {
+        var smallPlot = $.plot(overview, [data], {
             series: {
                 lines: { show: true, lineWidth: 1 },
                 shadowSize: 0
@@ -87,8 +87,8 @@ $(function () {
     }
 
     var fetchData = function(parking) {
-        plot = null;
-        smallPlot = null;
+        plot = $.plot(container, []);
+        smallPlot = $.plot(overview, []);
 
         $.ajax({
             url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
