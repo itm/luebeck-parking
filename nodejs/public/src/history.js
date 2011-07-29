@@ -80,7 +80,7 @@ $(function () {
     }
 
     $.ajax({
-        url: 'http://141.83.151.102:8080/history/Falkenstrasse',
+        url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/history/Falkenstrasse',
         method: 'GET',
         dataType: 'json',
         success: onDataReceived
