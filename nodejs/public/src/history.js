@@ -13,8 +13,6 @@ $(function () {
         }
     };
 
-    var data = [];
-
     // Returns the weekends in a period
     function weekendAreas(axes) {
         var markings = [];
@@ -35,31 +33,35 @@ $(function () {
         return markings;
     }
 
+    var occupancy = [];
+
     var plot = null;
     var smallPlot = null;
 
     function onDataReceived(parkingData) {
 
+        var spaces = -1;
+        if (parkingData && parkingData.spaces) {
+            spaces = parkingData.spaces;
+        }
+
         jQuery.each(parkingData.occupancy, function(i, parking) {
             var millis = parseInt(parking.timestamp);
-            var entry = [millis, parseInt(parking.free)];
-            data.push(entry);
+            occupancy.push([millis, spaces - parseInt(parking.free)]);
         });
 
-        if (parkingData && parkingData.spaces) {
-            options.yaxis.max = parkingData.spaces;
-        }
+        options.yaxis.max = spaces;
 
         // first correct the timestamps - they are recorded as the daily
         // midnights in UTC+0100, but Flot always displays dates in UTC
         // so we have to add one hour to hit the midnights in the plot
-        for (var i = 0; i < data.length; ++i)
-            data[i][0] += 60 * 60 * 1000;
+        for (var i = 0; i < occupancy.length; ++i)
+            occupancy[i][0] += 60 * 60 * 1000;
 
         // and plot all we got
-        plot = $.plot($("#container"), [data], options);
+        plot = $.plot($("#container"), [occupancy], options);
 
-        smallPlot = $.plot($("#overview"), [data], {
+        smallPlot = $.plot($("#overview"), [occupancy], {
             series: {
                 lines: { show: true, lineWidth: 1, fill: 0.25 },
                 shadowSize: 0
@@ -71,7 +73,7 @@ $(function () {
 
         $("#container").bind("plotselected", function (event, ranges) {
             // do the zooming
-            plot = $.plot($("#container"), [data],
+            plot = $.plot($("#container"), [occupancy],
                     $.extend(true, {}, options, {
                         xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
                     }));
@@ -94,7 +96,7 @@ $(function () {
 
     function fetchData(parking) {
         // reset data
-        data = [];
+        occupancy = [];
 
         $.ajax({
             url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
