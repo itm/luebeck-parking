@@ -44,8 +44,14 @@ app.configure () ->
     app.use(express.static(__dirname + '/public'))
     app.use(express.errorHandler(dumpExceptions: true, showStack: true ))
 
+# Durch '/data' o.Ä. ersetzen?
 app.get('/',  (req, res) ->
-    res.writeHead 200, {'content-type': 'text/json', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers' : 'x-requested-with' }
+    res.writeHead 200, {
+        'content-type': 'text/json', 
+        'Access-Control-Allow-Origin': '*', 
+        'Access-Control-Allow-Headers' : 'x-requested-with' 
+    }
+    
     # Parameter extrahieren
     params = url.parse(req.url, true).query
     # Welche Methode der Json Antwort
@@ -69,38 +75,66 @@ db.on 'error',
     (err) -> 
         log.error err
 
-getParkingStatus = (p, id, fn) -> 
-    _result = new Object()
-    if not p.name 
-        return
-    tempId = "parking:" + p.name + ":" + id + ":free" 
-    db.get tempId, (err, free) ->        
-        throw err if err         
-        _result.name = p.name
-        _result.free = free ? -1
-        fn(_result) 
+parkingBaseName = (name) -> "parking:" + name
+
+findParking = (name, id, callback) -> 
+    parking     = new Object()    
+    freeId      = parkingBaseName(name) + ":" + id + ":free"
+    timestampId = parkingBaseName(name) + ":" + id + ":timestamp"
+    
+    db.get freeId, (err, free) ->        
+        throw err if err?         
+        parking.free = free ? -1
+    
+        db.get timestampId, (err, timestamp) ->
+            throw err if err
+            parking.timestamp = timestamp ? -1 
+            callback(parking)
         
-getAll = (res, id, parkings, fn) ->
-    _result = new Array()
-    for p in parkings
-        getParkingStatus(p, id, 
-            (x) -> 
-                log.info JSON.stringify(x)
-                _result.push(x)               
-                fn(_result) if _result.length == parkings.length # Wir sind hier fertig
-        )                    
+findAll = (name, callback) ->
+    allParkings = new Array()
 
-app.get('/history/:id', (req, res) ->
-    id       = req.params.id
+    if not name? then callback(allParkings)
+
+    parkingId   = parkingBaseName(name)
+    
+    db.get parkingId, 
+        (err, dbId) ->
+            throw err if err?
+            
+            if not dbId? 
+                callback(allParkings)
+                return
+                
+            asyncResultCounter = dbId
+            
+            for parkingId in [1..dbId]
+                findParking(name, parkingId,  
+                    (parking) -> 
+                        allParkings.push(parking) if parking.free? and parking.timestamp?
+                        asyncResultCounter--                                                                                       
+                        callback(allParkings) if asyncResultCounter is 0
+                )                    
+                
+
+app.get('/history/:name', (req, res) ->
+    name     = req.params?.name
     scraped  = JSON.parse(jsonScraped)
-    parkings = scraped.parkings if scraped    
+    parkings = scraped?.parkings
 
-    getAll(res, id, parkings, 
-        (result) ->                                  
-            if result.length < 1
-                res.send('Derzeit keine Daten f&uuml;r ID "' + id + '" verf&uuml;gbar.')
+    findAll(name,
+        (result) ->
+            obj           = new Object()
+            obj.name      = name ? 'no data'
+            obj.occupancy = result ? []            
+            json          = JSON.stringify(obj)
+
+            log.info (json)
+                               
+            if not result? or result?.length < 1
+                res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.')
             else            
-                res.send(JSON.stringify(result))
+                res.send(json)
     )
 )                        
 
