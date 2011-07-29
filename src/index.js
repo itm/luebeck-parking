@@ -446,7 +446,7 @@ new Ext.Application({
 
         // for debugging while there's no api
         var getOccupation = function(parking) {
-            return Math.floor(100 * (parking.free / parking.spaces));
+            return Math.floor(100 * (parking.spaces / parking.free));
         };
 
         var createParkingInfoWindow = function(parking) {
