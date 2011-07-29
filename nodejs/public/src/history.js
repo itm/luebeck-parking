@@ -9,8 +9,7 @@ $(function () {
         },
         grid: { markings: weekendAreas },
         yaxis: {
-            min: 0,
-            max: 1000
+            min: 0
         }
     };
 
@@ -47,6 +46,10 @@ $(function () {
             data.push(entry);
         });
 
+        if (parkingData && parkingData.spaces) {
+            options.yaxis.max = parkingData.spaces;
+        }
+
         // first correct the timestamps - they are recorded as the daily
         // midnights in UTC+0100, but Flot always displays dates in UTC
         // so we have to add one hour to hit the midnights in the plot
@@ -58,7 +61,7 @@ $(function () {
 
         smallPlot = $.plot($("#overview"), [data], {
             series: {
-                lines: { show: true, lineWidth: 1 },
+                lines: { show: true, lineWidth: 1, fill: 0.25 },
                 shadowSize: 0
             },
             xaxis: { ticks: [], mode: "time" },

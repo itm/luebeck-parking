@@ -78,43 +78,49 @@ db.on 'error',
 parkingBaseName = (name) -> "parking:" + name
 
 findParking = (name, id, callback) -> 
-    parking     = new Object()    
+    parking     = new Object()
     freeId      = parkingBaseName(name) + ":" + id + ":free"
     timestampId = parkingBaseName(name) + ":" + id + ":timestamp"
-    
-    db.get freeId, (err, free) ->        
-        throw err if err?         
+
+    db.get freeId, (err, free) ->
+        throw err if err?
         parking.free = free ? -1
-    
+
         db.get timestampId, (err, timestamp) ->
             throw err if err
-            parking.timestamp = timestamp ? -1 
+            parking.timestamp = timestamp ? -1
             callback(parking)
         
 findAll = (name, callback) ->
-    allParkings = new Array()
+    parkingSpaces = -1
+    allParkings   = new Array()
 
-    if not name? then callback(allParkings)
+    if not name? then callback(allParkings, parkingSpaces)
 
-    parkingId   = parkingBaseName(name)
-    
-    db.get parkingId, 
-        (err, dbId) ->
-            throw err if err?
-            
-            if not dbId? 
-                callback(allParkings)
-                return
-                
-            asyncResultCounter = dbId
-            
-            for parkingId in [1..dbId]
-                findParking(name, parkingId,  
-                    (parking) -> 
-                        allParkings.push(parking) if parking.free? and parking.timestamp?
-                        asyncResultCounter--                                                                                       
-                        callback(allParkings) if asyncResultCounter is 0
-                )                    
+    spacesId  = parkingBaseName(name) + ":" + "spaces"
+    parkingId = parkingBaseName(name)
+
+    db.get spacesId, (err, spaces) ->
+        throw err if err?
+        parkingSpaces = spaces ? -1
+
+        db.get parkingId,
+            (err, dbId) ->
+                throw err if err?
+
+                if not dbId?
+                    callback(allParkings, parkingSpaces)
+                    return
+
+                asyncResultCounter = dbId
+
+                for parkingId in [1..dbId]
+                    findParking(name, parkingId,
+                        (parking) ->
+                            allParkings.push(parking) if parking.free? and parking.timestamp?
+                            asyncResultCounter--
+                            callback(allParkings, parkingSpaces) if asyncResultCounter is 0
+                    )
                 
 
 app.get('/json/history/:name', (req, res) ->
@@ -123,15 +129,16 @@ app.get('/json/history/:name', (req, res) ->
     parkings = scraped?.parkings
 
     findAll(name,
-        (result) ->
+        (occupancy, spaces) ->
             obj           = new Object()
             obj.name      = name ? 'no data'
-            obj.occupancy = result ? []            
+            obj.spaces    = spaces ? -1
+            obj.occupancy = occupancy ? []
             json          = JSON.stringify(obj)
 
 #            log.info (json)
                                
-            if not result? or result?.length < 1
+            if not occupancy? or occupancy?.length < 1
                 res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.')
             else            
                 res.send(json)
