@@ -6,16 +6,30 @@
         body {
             font-family: Helvetica, Arial, sans-serif;
         }
+
+        div#container {
+            width: 600px;
+            height: 300px;
+        }
+
+        div#overview {
+            margin-left: 50px;
+            margin-top: 20px;
+            width: 400px;
+            height: 50px;
+        }
     </style>
 </head>
 <body>
 <h1>Freie Parkplätze in L&uuml;beck</h1>
-<div id="container" style="width: 600px; height: 300px;"></div>
+
+<div id="container"></div>
 <p>Wochenenden sind hervorgehoben. Versuchen Sie zu zoomen.</p>
-<div id="overview" style="margin-left:50px;margin-top:20px;width:400px;height:50px"></div>
+
+<div id="overview"></div>
 </body>
 <script language="javascript" type="text/javascript" src="lib/flot/jquery.js"></script>
 <script language="javascript" type="text/javascript" src="lib/flot/jquery.flot.js"></script>
 <script language="javascript" type="text/javascript" src="lib/flot/jquery.flot.selection.js"></script>
-<script type="text/javascript" src="src/history.js"></script>
+<script language="javascript" type="text/javascript" src="src/history.js"></script>
 </html>

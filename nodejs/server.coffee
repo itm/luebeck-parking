@@ -45,23 +45,25 @@ app.configure () ->
     app.use(express.errorHandler(dumpExceptions: true, showStack: true ))
 
 # Durch '/data' o.Ä. ersetzen?
-app.get('/',  (req, res) ->
-    res.writeHead 200, {
-        'content-type': 'text/json', 
-        'Access-Control-Allow-Origin': '*', 
-        'Access-Control-Allow-Headers' : 'x-requested-with' 
-    }
-    
-    # Parameter extrahieren
-    params = url.parse(req.url, true).query
-    # Welche Methode der Json Antwort
-    if params.callback?
-        res.write "#{params.callback}(#{jsonScraped})"
-    else if params.field?
-        res.write "var #{params.field}= #{jsonScraped};"
-    else
-        res.write jsonScraped
-    res.end '\n'
+app.get('/json/current',  (req, res) ->
+#    res.writeHead 200, {
+#        'content-type': 'text/json',
+#        'Access-Control-Allow-Origin': '*',
+#        'Access-Control-Allow-Headers' : 'x-requested-with'
+#    }
+#
+#    # Parameter extrahieren
+#    params = url.parse(req.url, true).query
+#    # Welche Methode der Json Antwort
+#    if params.callback?
+#        res.write "#{params.callback}(#{jsonScraped})"
+#    else if params.field?
+#        res.write "var #{params.field}= #{jsonScraped};"
+#    else
+#        res.write jsonScraped
+#    res.end '\n'
+
+    res.send(jsonScraped)
   
     log.info "Request von #{req.header('host')} beantwortet."  
 )
@@ -117,7 +119,7 @@ findAll = (name, callback) ->
                 )                    
                 
 
-app.get('/history/:name', (req, res) ->
+app.get('/json/history/:name', (req, res) ->
     name     = req.params?.name
     scraped  = JSON.parse(jsonScraped)
     parkings = scraped?.parkings
@@ -129,7 +131,7 @@ app.get('/history/:name', (req, res) ->
             obj.occupancy = result ? []            
             json          = JSON.stringify(obj)
 
-            log.info (json)
+#            log.info (json)
                                
             if not result? or result?.length < 1
                 res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.')
