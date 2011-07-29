@@ -80,7 +80,7 @@ $(function () {
     }
 
     $.ajax({
-        url: 'http://localhost:8080/history/Falkenstrasse',
+        url: 'http://141.83.151.102:8080/history/Falkenstrasse',
         method: 'GET',
         dataType: 'json',
         success: onDataReceived
