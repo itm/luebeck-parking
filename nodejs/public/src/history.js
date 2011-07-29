@@ -86,12 +86,12 @@ $(function () {
     });
 
     function fetchData(parking) {
-        $("#container").empty();
-        $("#overview").empty();
+        //$("#container").empty();
+        //$("#overview").empty();
 
         data = [];
-        plot = null;
-        smallPlot = null;
+        //plot = null;
+        //smallPlot = null;
 
         $.ajax({
             url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
