@@ -46,24 +46,22 @@ app.configure () ->
 
 # Durch '/data' o.Ä. ersetzen?
 app.get('/json/current',  (req, res) ->
-#    res.writeHead 200, {
-#        'content-type': 'text/json',
-#        'Access-Control-Allow-Origin': '*',
-#        'Access-Control-Allow-Headers' : 'x-requested-with'
-#    }
-#
-#    # Parameter extrahieren
-#    params = url.parse(req.url, true).query
-#    # Welche Methode der Json Antwort
-#    if params.callback?
-#        res.write "#{params.callback}(#{jsonScraped})"
-#    else if params.field?
-#        res.write "var #{params.field}= #{jsonScraped};"
-#    else
-#        res.write jsonScraped
-#    res.end '\n'
+    res.writeHead 200, {
+        'content-type': 'text/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers' : 'x-requested-with'
+    }
 
-    res.send(jsonScraped)
+    # Parameter extrahieren
+    params = url.parse(req.url, true).query
+    # Welche Methode der Json Antwort
+    if params.callback?
+        res.write "#{params.callback}(#{jsonScraped})"
+    else if params.field?
+        res.write "var #{params.field}= #{jsonScraped};"
+    else
+        res.write jsonScraped
+    res.end '\n'
   
     log.info "Request von #{req.header('host')} beantwortet."  
 )
