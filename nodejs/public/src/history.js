@@ -85,7 +85,7 @@ $(function () {
         fetchData(parking);
     });
 
-    var fetchData = function(parking) {
+    function fetchData(parking) {
         $("#container").empty();
         $("#overview").empty();
 
@@ -100,7 +100,7 @@ $(function () {
             dataType: 'json',
             success: onDataReceived
         });
-    };
+    }
 
     fetchData(parking);
 });

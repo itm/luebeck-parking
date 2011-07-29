@@ -1,10 +1,10 @@
 .free {
     /*background-color: #DEDFE0;*/
-    background-color: #008000;
+    background-color: #adff2f;
     width: 100px;
 }
 
 .occupied {
-    background-color: #C00D1A;
+    background-color: #ff4500;
     height: 10px;
 }
