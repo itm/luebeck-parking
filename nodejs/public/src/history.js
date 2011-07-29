@@ -1,25 +1,5 @@
 $(function () {
 
-    var parking = "Falkenstrasse";
-
-    $("#parkings").change(function() {
-        parking = $(this).val();
-        fetchData(parking);
-    });
-
-    var fetchData = function(parking) {
-        plot = $.plot(container, []);
-        smallPlot = $.plot(overview, []);
-
-        $.ajax({
-            url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
-            //url: 'http://localhost:8080/history/Falkenstrasse',
-            method: 'GET',
-            dataType: 'json',
-            success: onDataReceived
-        });
-    };
-
     var options = {
         lines: { show: true },
         points: { show: true },
@@ -29,10 +9,6 @@ $(function () {
         },
         grid: { markings: weekendAreas }
     };
-
-    var container = $("#container");
-
-    var overview = $("#overview");
 
     var data = [];
 
@@ -56,6 +32,9 @@ $(function () {
         return markings;
     }
 
+    var plot = null;
+    var smallPlot = null;
+
     function onDataReceived(parkingData) {
 
         jQuery.each(parkingData.occupancy, function(i, parking) {
@@ -71,9 +50,9 @@ $(function () {
             data[i][0] += 60 * 60 * 1000;
 
         // and plot all we got
-        var plot = $.plot(container, [data], options);
+        plot = $.plot($("#container"), [data], options);
 
-        var smallPlot = $.plot(overview, [data], {
+        smallPlot = $.plot($("#overview"), [data], {
             series: {
                 lines: { show: true, lineWidth: 1 },
                 shadowSize: 0
@@ -83,7 +62,7 @@ $(function () {
             selection: { mode: "x" }
         });
 
-        container.bind("plotselected", function (event, ranges) {
+        $("#container").bind("plotselected", function (event, ranges) {
             // do the zooming
             plot = $.plot($("#container"), [data],
                     $.extend(true, {}, options, {
@@ -94,10 +73,34 @@ $(function () {
             smallPlot.setSelection(ranges, true);
         });
 
-        overview.bind("plotselected", function (event, ranges) {
+        $("#overview").bind("plotselected", function (event, ranges) {
             plot.setSelection(ranges);
         });
     }
 
-    //fetchData(parking);
+    var parking = "Falkenstrasse";
+
+    $("#parkings").change(function() {
+        parking = $(this).val();
+        fetchData(parking);
+    });
+
+    var fetchData = function(parking) {
+        $("#container").empty();
+        $("#overview").empty();
+
+        data = [];
+        plot = null;
+        smallPlot = null;
+
+        $.ajax({
+            //url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
+            url: 'http://localhost:8080/json/history/' + parking,
+            method: 'GET',
+            dataType: 'json',
+            success: onDataReceived
+        });
+    };
+
+    fetchData(parking);
 });
