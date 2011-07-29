@@ -23,7 +23,7 @@ delay      = 3 * 60 * 1000 # 3 Minuten
 intervalId = setInterval cacheJson, delay
 
 # Alle historyDelay ms die Daten in die Historie speichern
-historyDelay      = 10 * 60 * 1000 # 10 Minuten
+historyDelay      = 30 * 60 * 1000 # 30 Minuten
 historyIntervalId = setInterval storeHistory, historyDelay
 
 #clearInterval intervalId
