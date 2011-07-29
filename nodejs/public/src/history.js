@@ -42,7 +42,7 @@ $(function () {
 
         var spaces = -1;
         if (parkingData && parkingData.spaces) {
-            spaces = parkingData.spaces;
+            spaces = parse.Int(parkingData.spaces);
         }
 
         jQuery.each(parkingData.occupancy, function(i, parking) {
