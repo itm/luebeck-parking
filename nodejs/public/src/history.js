@@ -1,13 +1,17 @@
 $(function () {
 
     var options = {
-        lines: { show: true },
+        lines: { show: true, fill: 0.25 },
         points: { show: true },
         xaxis:{
             mode: "time",
             tickLength: 5
         },
-        grid: { markings: weekendAreas }
+        grid: { markings: weekendAreas },
+        yaxis: {
+            min: 0,
+            max: 1000
+        }
     };
 
     var data = [];
@@ -86,12 +90,8 @@ $(function () {
     });
 
     function fetchData(parking) {
-        //$("#container").empty();
-        //$("#overview").empty();
-
+        // reset data
         data = [];
-        //plot = null;
-        //smallPlot = null;
 
         $.ajax({
             url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,

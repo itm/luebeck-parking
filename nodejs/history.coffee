@@ -5,7 +5,7 @@ log   = require './custom_modules/logger'
 db = redis.createClient()
 db.on 'error', 
     (err) -> 
-        log.error err
+        log.error err if err?
 
 #
 # ABSPEICHERN DER HISTORIE
@@ -14,18 +14,18 @@ db.on 'error',
 # der verfügbaren Stellplätze auf einem Parkplatz. Sie werden hier mit
 # Redis als Keys gespeichert, die wie folgt aufgebaut sind: 
 #
-#    "parking:<Parkplatzname>:total"
+#    "parking:<Parkplatzname>:spaces"
 #
 # Als Redis-Befehl also:
 #
-#    SET "parking:Parkhaus Falkenstraße:total" 100
+#    SET "parking:Parkhaus Falkenstraße:spaces" 100
 #
 # um die Kapazität des Parkhauses Falkenstraße als 100 zu speichern. 
 # Damit der Wert nicht immer wieder überschrieben werden muss, wird der 
 # Befehl "SETNX" verwendet, der einen Key nur überschreibt, falls er noch nicht
 # existiert. (Mehr Redis-Befehle gibt es hier: http://redis.io/commands)
 #
-#    SETNX "parking:Parkhaus Falkenstraße:total" 100
+#    SETNX "parking:Parkhaus Falkenstraße:spaces" 100
 #
 # Bewegungsdaten sind Daten, die sich ständig ändern, z.B. die Parkplatzbelegung
 # und der Zeitpunkt zu dem eine bestimmte Belegung vorlag. Daher haben die
@@ -37,13 +37,13 @@ db.on 'error',
 # des Parkhauses Falkenstraße um 1. So können wir dann neue Bewegungsdaten
 # mit einer neuen ID im Key speichern.
 #
-# Aufbau z.B: "parking:Parkhaus Falkenstraße:<ID>:occupied".
+# Aufbau z.B: "parking:Parkhaus Falkenstraße:<ID>:free".
 #
-#    SET "parking:Parkhaus Falkenstraße:2:occupied" 50
-#    SET "parking:Parkhaus Falkenstraße:2:date"     <aktueller Zeitstempel>
+#    SET "parking:Parkhaus Falkenstraße:2:free" 50
+#    SET "parking:Parkhaus Falkenstraße:2:timestamp" <aktueller Zeitstempel>
 #
-# Speichert die Belegung 50 für das Parkhaus Falkenstraße zum aktuellen 
-# Zeitpunkt mit der ID 2.
+# Speichert die Anzahl freier Plätze 50 für das Parkhaus Falkenstraße zum
+# aktuellen Zeitpunkt mit der ID 2.
 #
 # Alle Redis-Befehle sind als Callbacks verkettet um Nodes asnychronem
 # Charakter Rechnung zu tragen. Zudem werden auf diese Weise keine weiteren
@@ -53,19 +53,32 @@ db.on 'error',
 #
 storeHistory = (rows) ->
     log.info 'Speichere Historie.'
+
+    if not rows? then return
+
     storeHistoryItem = (row) ->
-        if row.name and row.free and row.spaces
-            # Stammdaten
-            if row.name.indexOf("<strong>") != -1
-                return
-            parkingId = "parking:" + row.name
-            db.setnx "#{parkingId}:spaces", row.spaces, (err) ->
-                throw err if err               
-                # Bewegungsdaten
-                db.incr parkingId, (err, id) ->        
-                    throw err if err      
-                    db.set "#{parkingId}:#{id}:timestamp", new Date().getTime()
-                    db.set "#{parkingId}:#{id}:free", row.free
+        if not row? or not row.name? or not row.free? or not row.spaces? then return
+
+        #
+        # Stammdaten
+        #
+        if row.name.indexOf("<strong>") != -1 then return
+
+        parkingId = "parking:" + row.name
+
+        # Speichere absolute Anzahl vorhandener Stellplätze für diesen Parkplatz
+        db.setnx "#{parkingId}:spaces", row.spaces, (err) ->
+            throw err if err?
+
+            #
+            # Bewegungsdaten
+            #
+            db.incr parkingId, (err, id) ->
+                throw err if err?
+                if not id? then return
+
+                # Speichere Zeitstempel und zu diesem Zeitpunkt Anzahl freier Stellplätze für diesen Parkplatz
+                db.mset "#{parkingId}:#{id}:timestamp", new Date().getTime() "#{parkingId}:#{id}:free", row.free
                     
     storeHistoryItem(row) for row in rows
 
