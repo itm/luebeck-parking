@@ -87,8 +87,11 @@ $(function () {
     }
 
     var fetchData = function(parking) {
+        plot = null;
+        smallPlot = null;
+
         $.ajax({
-            url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/Falkenstrasse',
+            url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
             //url: 'http://localhost:8080/history/Falkenstrasse',
             method: 'GET',
             dataType: 'json',
