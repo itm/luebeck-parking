@@ -1,13 +1,14 @@
-scrape  = require './lib/scraper'
+scraper  = require './lib/scraper'
 history = require './lib/history'
 url     = require 'url'
 util    = require 'util'
 
 # Fehlerbehandlung für unerwartete Exceptions
 process.on('uncaughtException', (err) ->
-    util.log err if err?
-    # Exit?
-    # process.exit(1)
+    if err?
+        util.trace err
+        # Exit
+        process.exit(1)
 )
 process.on('exit', () ->
     util.log 'Server wird beendet.'
@@ -16,20 +17,25 @@ process.on('exit', () ->
 #
 # Behälter für Zwischenspeichern der ge-scrapten Daten im JSON-Format
 #
-jsonScraped = ""
+data = []
 
-cacheJson = ->
-    jsonScraped = scrape()
-    json        = JSON.parse(jsonScraped)
-    util.log 'Daten geholt (' + json?.parkings?.length + ' Einträge)'
+cacheJson = () ->
+    scraper.fetch(
+        (err, result) ->
+            util.log err if err?
+            data = result ? []
+            util.log 'Daten geholt (' + data?.parkings?.length + ' Eintraege)'
+    )
   
-handleHistory = ->
-    scraped  = JSON.parse(jsonScraped)
-    parkings = scraped?.parkings
-    history.storeHistory(parkings) if parkings?
+handleHistory = () ->
+    parkings = data?.parkings
+    if parkings?
+        history.storeHistory(parkings, () ->
+            util.log 'Daten historisiert (' + parkings.length + ' Eintraege)'
+        )
 
 # Alle delay ms die Daten erneut von der KWL holen
-scrapeDelay      = 3 * 60 * 1000 # 3 Minuten
+scrapeDelay      = 3 * 30 * 1000 # 3 Minuten
 scrapeIntervalId = setInterval cacheJson, scrapeDelay
 
 # Alle historyDelay ms die Daten in die Historie speichern
@@ -45,9 +51,11 @@ port    = 8080
 
 app = express.createServer()
 
-app.configure () ->
-    app.use(express.static(__dirname + '/public'))
-    app.use(express.errorHandler(dumpExceptions: true, showStack: true ))
+app.configure(
+    () ->
+        app.use(express.static(__dirname + '/public'))
+        app.use(express.errorHandler(dumpExceptions: true, showStack: true ))
+)
 
 # Durch '/data' o.Ä. ersetzen?
 app.get('/json/current',  (req, res) ->
@@ -63,11 +71,11 @@ app.get('/json/current',  (req, res) ->
     params = url.parse(req.url, true).query
     # Welche Methode der Json Antwort
     if params.callback?
-        res.write "#{params.callback}(#{jsonScraped})"
+        res.write "#{params.callback}(#{JSON.stringify(data)})"
     else if params.field?
-        res.write "var #{params.field}= #{jsonScraped};"
+        res.write "var #{params.field}= #{JSON.stringify(data)};"
     else
-        res.write jsonScraped
+        res.write JSON.stringify(data)
     res.end '\n'
 
     console.timeEnd 'Ausgeliefert: /json/current'
@@ -83,9 +91,6 @@ app.get('/json/history/:name', (req, res) ->
 
     console.time 'Ausgeliefert: /json/history/' + name
 
-    scraped  = JSON.parse(jsonScraped)
-    parkings = scraped?.parkings
-
     history.findAll(name, (occupancy, spaces) ->
         obj           = new Object()
         obj.name      = name ? 'no data'
@@ -94,7 +99,7 @@ app.get('/json/history/:name', (req, res) ->
         json          = JSON.stringify(obj)
 
         if not occupancy? or occupancy?.length < 1
-            res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.')
+            res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.', 404)
         else
             res.send(json)
 

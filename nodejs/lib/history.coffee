@@ -9,8 +9,10 @@ db.on 'error',
 
 #
 # Generiert einheitlich den Schlüssel-Präfix für einen DB-Eintrag.
+# Alle Sonderzeichen werden aus dem Namen entfernt.
 #
-parkingBaseName = (name) -> "parking:" + name if name?
+parkingBaseName = (name) ->
+    "parking:" + name.replace(/[^a-zA-Z0-9 ]/g, "") if name?
 
 #
 # ABSPEICHERN DER HISTORIE
@@ -56,36 +58,34 @@ parkingBaseName = (name) -> "parking:" + name if name?
 #
 # Diese Methode benötigt ein Array mit den gelesenen Parkplatzdaten als Eingabe.
 #
-exports.storeHistory = (rows) ->
+exports.storeHistory = (rows, callback) ->
     if not rows? then return
-
-    storeHistoryItem = (row) ->
-        if not row? or not row.name? or not row.free? or not row.spaces? then return
-
-        #
-        # Stammdaten
-        #
-        if row.name.indexOf("<strong>") != -1 then return
-
-        parkingId = parkingBaseName(row.name)
-
-        # Speichere absolute Anzahl vorhandener Stellplätze für diesen Parkplatz
-        db.setnx parkingId + ":spaces", row.spaces, (err) ->
-            throw err if err?
-
-            #
-            # Bewegungsdaten
-            #
-            db.incr parkingId, (err, id) ->
-                throw err if err?
-                if not id? then return
-
-                # Speichere Zeitstempel und zu diesem Zeitpunkt Anzahl freier Stellplätze für diesen Parkplatz
-                db.mset parkingId + ":" + id + ":timestamp", new Date().getTime(), parkingId + ":" + id + ":free", row.free
                     
     storeHistoryItem(row) for row in rows
 
-    util.log 'Daten historisiert (' + rows.length + ' Eintraege)'
+    callback()
+
+storeHistoryItem = (row) ->
+    if not row? or not row.name? or not row.free? or not row.spaces? then return
+
+    #
+    # Stammdaten
+    #
+    parkingId = parkingBaseName(row.name)
+
+    # Speichere absolute Anzahl vorhandener Stellplätze für diesen Parkplatz
+    db.setnx parkingId + ":spaces", row.spaces, (err) ->
+        throw err if err?
+
+        #
+        # Bewegungsdaten
+        #
+        db.incr parkingId, (err, id) ->
+            throw err if err?
+            if not id? then return
+
+            # Speichere Zeitstempel und zu diesem Zeitpunkt Anzahl freier Stellplätze für diesen Parkplatz
+            db.mset parkingId + ":" + id + ":timestamp", new Date().getTime(), parkingId + ":" + id + ":free", row.free
 
 #
 # Sucht einen Parkplatz-Eintrag zu dem gegebenen Namen und der gegebenen ID.
