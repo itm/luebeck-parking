@@ -1,11 +1,16 @@
-redis = require 'redis'
-log   = require './custom_modules/logger'
+redis   = require 'redis'
+util    = require 'util'
 
 # Initialisiere Datenbankverbindung um Daten-Historie anzulegen
 db = redis.createClient()
 db.on 'error', 
     (err) -> 
-        log.error err if err?
+        util.log err if err?
+
+#
+# Generiert einheitlich den Schlüssel-Präfix für einen DB-Eintrag.
+#
+parkingBaseName = (name) -> "parking:" + name if name?
 
 #
 # ABSPEICHERN DER HISTORIE
@@ -51,9 +56,7 @@ db.on 'error',
 #
 # Diese Methode benötigt ein Array mit den gelesenen Parkplatzdaten als Eingabe.
 #
-storeHistory = (rows) ->
-    log.info 'Speichere Historie.'
-
+exports.storeHistory = (rows) ->
     if not rows? then return
 
     storeHistoryItem = (row) ->
@@ -64,10 +67,10 @@ storeHistory = (rows) ->
         #
         if row.name.indexOf("<strong>") != -1 then return
 
-        parkingId = "parking:" + row.name
+        parkingId = parkingBaseName(row.name)
 
         # Speichere absolute Anzahl vorhandener Stellplätze für diesen Parkplatz
-        db.setnx "#{parkingId}:spaces", row.spaces, (err) ->
+        db.setnx parkingId + ":spaces", row.spaces, (err) ->
             throw err if err?
 
             #
@@ -78,10 +81,61 @@ storeHistory = (rows) ->
                 if not id? then return
 
                 # Speichere Zeitstempel und zu diesem Zeitpunkt Anzahl freier Stellplätze für diesen Parkplatz
-                db.mset "#{parkingId}:#{id}:timestamp", new Date().getTime() "#{parkingId}:#{id}:free", row.free
+                db.mset parkingId + ":" + id + ":timestamp", new Date().getTime(), parkingId + ":" + id + ":free", row.free
                     
     storeHistoryItem(row) for row in rows
 
-# Exportiere die Funktion zum Speichern der Historie    
-module.exports = storeHistory      
+    util.log 'Daten historisiert (' + rows.length + ' Einträge)'
+
+#
+# Sucht einen Parkplatz-Eintrag zu dem gegebenen Namen und der gegebenen ID.
+#
+findParking = (name, id, callback) ->
+    parking     = new Object()
+    freeId      = parkingBaseName(name) + ":" + id + ":free"
+    timestampId = parkingBaseName(name) + ":" + id + ":timestamp"
+
+    db.get freeId, (err, free) ->
+        throw err if err?
+        parking.free = free ? -1
+
+        db.get timestampId, (err, timestamp) ->
+            throw err if err
+            parking.timestamp = timestamp ? -1
+            callback(parking)
+
+#
+# Sucht alle Parkplatz-Einträge aus der Redis-DB zu dem gegebenen Namen.
+#
+exports.findAll = (name, callback) ->
+    parkingSpaces = -1
+    allParkings   = new Array()
+
+    if not name? then callback(allParkings, parkingSpaces)
+
+    spacesId  = parkingBaseName(name) + ":" + "spaces"
+    parkingId = parkingBaseName(name)
+
+    db.get spacesId, (err, spaces) ->
+        throw err if err?
+        parkingSpaces = spaces ? -1
+
+        db.get parkingId,
+            (err, dbId) ->
+                throw err if err?
+
+                if not dbId?
+                    callback(allParkings, parkingSpaces)
+                    return
+
+                asyncResultCounter = dbId
+
+                for parkingId in [1..dbId]
+                    findParking(name, parkingId,
+                        (parking) ->
+                            allParkings.push(parking) if parking.free? and parking.timestamp?
+                            asyncResultCounter--
+                            callback(allParkings, parkingSpaces) if asyncResultCounter is 0
+                    )
+
           

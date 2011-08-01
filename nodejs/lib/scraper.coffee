@@ -1,8 +1,7 @@
-request  = require 'request'
-jsdom    = require 'jsdom'
-JSON     = require './custom_modules/json2'
-log      = require './custom_modules/logger'
-geo      = require './geo'
+request = require 'request'
+jsdom   = require 'jsdom'
+winston = require 'winston'
+geo     = require './geo'
       
 scrapeURL   = 'http://kwlpls.adiwidjaja.com/index.php'
 jqueryUrl   = 'http://code.jquery.com/jquery-1.6.1.min.js'
@@ -18,7 +17,7 @@ fetch = ->
   # Den Inhalt der KWL Seite holen
   request { uri: scrapeURL }, (error, response, body) ->
     if error and response and response.statusCode isnt 200
-      log.error 'Error when contacting #{scrapeURL}'
+      winston.error 'Error when contacting #{scrapeURL}'
     # Fake Brwoser Umgebung mit dem eben geholten Inhalt und Jquery
     jsdom.env
       html: body,
@@ -41,7 +40,7 @@ processPage = (window) ->
   num  = $(rows).size()
 
   rows.each (i, row) ->
-    if i>0 and i isnt num-1 # Kopf und Fußzeile abschneiden
+    if i > 0 and i isnt num - 1 # Kopf und Fußzeile abschneiden
       processRow($, row)
 
 processRow = ($,row) ->

@@ -8,29 +8,30 @@
 # locally installed Apache and restart NodeJS server.
 #
 
-script_location="/var/www/parking/nodejs"
+server_location="/var/www/parking/nodejs"
+lib_location="/var/www/parking/nodejs/lib"
 git_location="/var/www/parking"
 
 server_script="server"
 
-additional_scripts="scraper
+lib_scripts="scraper
 history
 geo"
 
 # Server stop
-forever stop ${script_location}/${server_script}.js
+forever stop ${server_location}/${server_script}.js
 
 # Remove old JS files
-if [ -a ${script_location}/${server_script}.js ]
+if [ -a ${server_location}/${server_script}.js ]
 then
-    rm ${script_location}/${server_script}.js
+    rm ${server_location}/${server_script}.js
 fi
 
-for script in ${additional_scripts}
+for script in ${lib_scripts}
 do
-    if [ -a ${script_location}/${script}.js ]
+    if [ -a ${lib_location}/${script}.js ]
     then
-        rm ${script_location}/${script}.js
+        rm ${lib_location}/${script}.js
     fi
 done
 
@@ -39,12 +40,12 @@ cd ${git_location}
 env -i git pull origin master
 
 # Compile new coffee scripts
-coffee --compile ${script_location}/${server_script}.coffee
+coffee --compile ${server_location}/${server_script}.coffee
 
-for script in ${additional_scripts}
+for script in ${lib_scripts}
 do
-    coffee --compile ${script_location}/${script}.coffee
+    coffee --compile ${lib_location}/${script}.coffee
 done
 
 # Server start
-forever start --append -o ${script_location}/out.log -e ${script_location}/err.log ${script_location}/${server_script}.js
+forever start --append -o ${server_location}/out.log -e ${server_location}/err.log ${server_location}/${server_script}.js

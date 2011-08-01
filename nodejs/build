@@ -1,12 +1,20 @@
 #!/bin/bash
 
-input="geo
-history
-scraper
-server"
+server="server"
+
+lib="lib/geo
+lib/history
+lib/scraper"
 
 compile() {
-    for script in ${input}
+    if [ -a ${server}.js ]
+    then
+        rm ${server}.js
+    fi
+    echo "Compiling ${server}.coffee => ${server}.js"
+    coffee --compile ${server}.coffee
+
+    for script in ${lib}
     do
         if [ -a ${script}.js ] 
         then    
@@ -18,7 +26,13 @@ compile() {
 }
 
 cleanup() {
-    for script in ${input}
+    if [ -a ${server}.js ]
+    then
+        rm ${server}.js
+        echo Deleted ${server}.js
+    fi
+
+    for script in ${lib}
     do
         if [ -a ${script}.js ] 
         then          

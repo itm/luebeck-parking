@@ -1,38 +1,43 @@
-scrape      = require './scraper'
-history     = require './history'
-JSON        = require './custom_modules/json2'
-log         = require './custom_modules/logger'
-url         = require 'url'
+scrape  = require './lib/scraper'
+history = require './lib/history'
+url     = require 'url'
+util    = require 'util'
 
-# Behälter für Zwischenspeichern
+# Fehlerbehandlung für unerwartete Exceptions
+process.on('uncaughtException', (err) ->
+    util.log err if err?
+    # Exit?
+    # process.exit(1)
+)
+process.on('exit', () ->
+    util.log 'Server wird beendet.'
+)
+
+#
+# Behälter für Zwischenspeichern der ge-scrapten Daten im JSON-Format
+#
 jsonScraped = ""
 
-log.info "Server gestartet..."
-
 cacheJson = ->
-  log.info "Scrape und cache Daten..."
-  jsonScraped = scrape() 
+    jsonScraped = scrape()
+    json        = JSON.parse(jsonScraped)
+    util.log 'Daten geholt (' + json?.parkings?.length + ' Einträge)'
   
-storeHistory = ->
+handleHistory = ->
     scraped  = JSON.parse(jsonScraped)
-    parkings = scraped.parkings if scraped
-    history(parkings) if parkings        
+    parkings = scraped?.parkings
+    history.storeHistory(parkings) if parkings?
 
 # Alle delay ms die Daten erneut von der KWL holen
-delay      = 3 * 60 * 1000 # 3 Minuten
-intervalId = setInterval cacheJson, delay
+scrapeDelay      = 1 * 60 * 1000 # 3 Minuten
+scrapeIntervalId = setInterval cacheJson, scrapeDelay
 
 # Alle historyDelay ms die Daten in die Historie speichern
 historyDelay      = 30 * 60 * 1000 # 30 Minuten
-historyIntervalId = setInterval storeHistory, historyDelay
-
-#clearInterval intervalId
-
-# Initialer Aufruf zum Scrapen der Daten
-cacheJson()
+historyIntervalId = setInterval handleHistory, historyDelay
 
 #
-# Server-Teil um das Json rauszugeben
+# Server-Teil um die JSON-Daten auszuliefern
 #
 express = require 'express'
 host    = '0.0.0.0'
@@ -46,6 +51,8 @@ app.configure () ->
 
 # Durch '/data' o.Ä. ersetzen?
 app.get('/json/current',  (req, res) ->
+    console.time 'Ausgeliefert: /json/current'
+
     res.writeHead 200, {
         'content-type': 'text/json',
         'Access-Control-Allow-Origin': '*',
@@ -62,89 +69,39 @@ app.get('/json/current',  (req, res) ->
     else
         res.write jsonScraped
     res.end '\n'
-  
-    log.info "Request von #{req.header('host')} beantwortet."  
+
+    console.timeEnd 'Ausgeliefert: /json/current'
+
+    util.log "Request von #{req.header('host')} beantwortet."  
 )
 
 #
 # Rest-like Interface für historische Daten
 #
-redis = require 'redis'
-db = redis.createClient()
-db.on 'error', 
-    (err) -> 
-        log.error err
-
-parkingBaseName = (name) -> "parking:" + name
-
-findParking = (name, id, callback) -> 
-    parking     = new Object()
-    freeId      = parkingBaseName(name) + ":" + id + ":free"
-    timestampId = parkingBaseName(name) + ":" + id + ":timestamp"
-
-    db.get freeId, (err, free) ->
-        throw err if err?
-        parking.free = free ? -1
-
-        db.get timestampId, (err, timestamp) ->
-            throw err if err
-            parking.timestamp = timestamp ? -1
-            callback(parking)
-        
-findAll = (name, callback) ->
-    parkingSpaces = -1
-    allParkings   = new Array()
-
-    if not name? then callback(allParkings, parkingSpaces)
-
-    spacesId  = parkingBaseName(name) + ":" + "spaces"
-    parkingId = parkingBaseName(name)
-
-    db.get spacesId, (err, spaces) ->
-        throw err if err?
-        parkingSpaces = spaces ? -1
-
-        db.get parkingId,
-            (err, dbId) ->
-                throw err if err?
-
-                if not dbId?
-                    callback(allParkings, parkingSpaces)
-                    return
-
-                asyncResultCounter = dbId
-
-                for parkingId in [1..dbId]
-                    findParking(name, parkingId,
-                        (parking) ->
-                            allParkings.push(parking) if parking.free? and parking.timestamp?
-                            asyncResultCounter--
-                            callback(allParkings, parkingSpaces) if asyncResultCounter is 0
-                    )
-                
-
 app.get('/json/history/:name', (req, res) ->
     name     = req.params?.name
+
+    console.time 'Ausgeliefert: /json/history/' + name
+
     scraped  = JSON.parse(jsonScraped)
     parkings = scraped?.parkings
 
-    findAll(name,
-        (occupancy, spaces) ->
-            obj           = new Object()
-            obj.name      = name ? 'no data'
-            obj.spaces    = spaces ? -1
-            obj.occupancy = occupancy ? []
-            json          = JSON.stringify(obj)
+    history.findAll(name, (occupancy, spaces) ->
+        obj           = new Object()
+        obj.name      = name ? 'no data'
+        obj.spaces    = spaces ? -1
+        obj.occupancy = occupancy ? []
+        json          = JSON.stringify(obj)
 
-#            log.info (json)
-                               
-            if not occupancy? or occupancy?.length < 1
-                res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.')
-            else            
-                res.send(json)
+        if not occupancy? or occupancy?.length < 1
+            res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.')
+        else
+            res.send(json)
+
+        console.timeEnd 'Ausgeliefert: /json/history/' + name
     )
 )                        
 
 app.listen port, host
 
-log.info "Server läuft auf http://#{host}:#{port}/"
+util.log "Server läuft auf http://#{host}:#{port}/"
