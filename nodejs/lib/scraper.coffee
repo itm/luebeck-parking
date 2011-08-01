@@ -1,6 +1,6 @@
 request = require 'request'
 jsdom   = require 'jsdom'
-winston = require 'winston'
+util    = require 'util'
 geo     = require './geo'
       
 scrapeURL   = 'http://kwlpls.adiwidjaja.com/index.php'
@@ -17,7 +17,7 @@ fetch = ->
   # Den Inhalt der KWL Seite holen
   request { uri: scrapeURL }, (error, response, body) ->
     if error and response and response.statusCode isnt 200
-      winston.error 'Error when contacting #{scrapeURL}'
+      util.log 'Error when contacting #{scrapeURL}'
     # Fake Brwoser Umgebung mit dem eben geholten Inhalt und Jquery
     jsdom.env
       html: body,
