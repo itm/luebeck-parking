@@ -85,7 +85,7 @@ exports.storeHistory = (rows) ->
                     
     storeHistoryItem(row) for row in rows
 
-    util.log 'Daten historisiert (' + rows.length + ' Einträge)'
+    util.log 'Daten historisiert (' + rows.length + ' Eintraege)'
 
 #
 # Sucht einen Parkplatz-Eintrag zu dem gegebenen Namen und der gegebenen ID.
