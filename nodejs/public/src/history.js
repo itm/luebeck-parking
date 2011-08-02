@@ -101,7 +101,7 @@ $(function () {
                             y = item.datapoint[1].toFixed(2);
 
                     showTooltip(item.pageX, item.pageY,
-                            item.series.label + ": " + y);
+                            item.series.label + ": " + parseInt(y));
                 }
             }
             else {
