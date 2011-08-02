@@ -7,12 +7,11 @@ $(function () {
             mode: "time",
             tickLength: 5
         },
-        grid: { markings: weekendAreas },
         yaxis: {
             min: 0
         },
         selection: { mode: "x" },
-        grid: { hoverable: true, clickable: true }
+        grid: { hoverable: true, clickable: true, markings: weekendAreas }
     };
 
     // Returns the weekends in a period
@@ -45,6 +44,10 @@ $(function () {
         var spaces = -1;
         if (parkingData && parkingData.spaces) {
             spaces = parseInt(parkingData.spaces);
+        }
+        else {
+            spaces = 100;
+            alert("Keine Daten gefunden! Parkplatz vermutlich voruebergehend geschlossen.");
         }
 
         jQuery.each(parkingData.occupancy, function(i, parking) {
