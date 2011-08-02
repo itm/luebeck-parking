@@ -47,10 +47,6 @@ $(function () {
         if (parkingData && parkingData.spaces) {
             spaces = parseInt(parkingData.spaces);
         }
-        else {
-            spaces = 100;
-            alert("Keine Daten gefunden! Parkplatz vermutlich voruebergehend geschlossen.");
-        }
 
         jQuery.each(parkingData.occupancy, function(i, parking) {
             var millis = parseInt(parking.timestamp);
@@ -85,9 +81,9 @@ $(function () {
             plot = $.plot($("#placeholder"), [
                 { data: occupancy, label: "Belegung"}
             ],
-            $.extend(true, {}, options, {
-                xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
-            }));
+                    $.extend(true, {}, options, {
+                        xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                    }));
 
             // don't fire event on the overview to prevent eternal loop
             smallPlot.setSelection(ranges, true);
@@ -149,7 +145,12 @@ $(function () {
             //url: 'http://localhost:8080/json/history/' + parking,
             method: 'GET',
             dataType: 'json',
-            success: onDataReceived
+            success: onDataReceived,
+            statusCode: {
+                404: function() {
+                    alert('Keine Daten fuer Parkplatz "' + parking + '" vorhanden! Vermutlich voruebergehend geschlossen.');
+                }
+            }
         });
     }
 
