@@ -170,8 +170,8 @@ $(function () {
         occupancy = [];
 
         $.ajax({
-            //url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
-            url: 'http://localhost:8080/json/history/' + parking,
+            url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
+            //url: 'http://localhost:8080/json/history/' + parking,
             method: 'GET',
             dataType: 'json',
             success: onDataReceived,
