@@ -40,6 +40,7 @@ $(function () {
     var smallPlot = null;
 
     function onDataReceived(parkingData) {
+        if ($("#tooltip")) $("#tooltip").remove();
 
         console.log(JSON.stringify(parkingData));
 
@@ -129,7 +130,35 @@ $(function () {
         }).appendTo("body").fadeIn(200);
     }
 
-    var parking = "St%20Marien";
+    function onNoDataRecieved() {
+        plot = $.plot($("#placeholder"), [
+            { data: [], label: "Belegung"}
+        ], options);
+
+        smallPlot = $.plot($("#overview"), [], {
+            series: {
+                lines: { show: true, lineWidth: 1, fill: 0.25 },
+                shadowSize: 0
+            },
+            xaxis: { ticks: [], mode: "time" },
+            yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
+            selection: { mode: "x" }
+        });
+
+        $('<div id="tooltip">' + 'Keine Daten verf&uuml;gbar!' + '</div>').css({
+            position: 'absolute',
+            display: 'none',
+            top: 300,
+            left: 350,
+            border: '3px solid red',
+            color: 'red',
+            'font-weight': 'bold',
+            padding: '5px',
+            'background-color': 'white'
+        }).appendTo("body").fadeIn(200);
+    }
+
+    var parking = "Falkenstrasse";
 
     $("#parkings").change(function() {
         parking = $(this).val();
@@ -141,15 +170,13 @@ $(function () {
         occupancy = [];
 
         $.ajax({
-            url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
-            //url: 'http://localhost:8080/json/history/' + parking,
+            //url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
+            url: 'http://localhost:8080/json/history/' + parking,
             method: 'GET',
             dataType: 'json',
             success: onDataReceived,
             statusCode: {
-                404: function() {
-                    alert('Keine Daten fuer Parkplatz "' + parking + '" vorhanden! Vermutlich voruebergehend geschlossen.');
-                }
+                404: onNoDataRecieved
             }
         });
     }
