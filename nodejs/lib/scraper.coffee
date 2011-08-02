@@ -53,6 +53,7 @@ processRow = ($, row, callback) ->
     item.kind = nameStr.substring 0, 2
     item.name = nameStr.substring 3
     item.geo  = geo.data[nameStr]
+    item.city = currentCity
   
     if elements.size() > 2
         free   = elements?.eq(2).html()
@@ -69,7 +70,6 @@ processRow = ($, row, callback) ->
         currentCity = header.split(' ')[1]
         city.name = currentCity
         city.geo = geo.cities[currentCity]
-        item.city = currentCity
 
     callback(item, city)
 

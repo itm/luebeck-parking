@@ -11,7 +11,8 @@ $(function () {
         yaxis: {
             min: 0
         },
-        selection: { mode: "x" }
+        selection: { mode: "x" },
+        grid: { hoverable: true, clickable: true }
     };
 
     // Returns the weekends in a period
@@ -89,23 +90,21 @@ $(function () {
             $("#x").text(pos.x.toFixed(2));
             $("#y").text(pos.y.toFixed(2));
 
-            if ($("#enableTooltip:checked").length > 0) {
-                if (item) {
-                    if (previousPoint != item.dataIndex) {
-                        previousPoint = item.dataIndex;
+            if (item) {
+                if (previousPoint != item.dataIndex) {
+                    previousPoint = item.dataIndex;
 
-                        $("#tooltip").remove();
-                        var x = item.datapoint[0].toFixed(2),
-                                y = item.datapoint[1].toFixed(2);
-
-                        showTooltip(item.pageX, item.pageY,
-                                item.series.label + " of " + x + " = " + y);
-                    }
-                }
-                else {
                     $("#tooltip").remove();
-                    previousPoint = null;
+                    var x = item.datapoint[0].toFixed(2),
+                            y = item.datapoint[1].toFixed(2);
+
+                    showTooltip(item.pageX, item.pageY,
+                            item.series.label + " of " + x + " = " + y);
                 }
+            }
+            else {
+                $("#tooltip").remove();
+                previousPoint = null;
             }
         });
 
