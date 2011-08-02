@@ -41,6 +41,8 @@ $(function () {
 
     function onDataReceived(parkingData) {
 
+        console.log(JSON.stringify(parkingData));
+
         var spaces = -1;
         if (parkingData && parkingData.spaces) {
             spaces = parseInt(parkingData.spaces);
