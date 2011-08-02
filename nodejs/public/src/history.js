@@ -77,10 +77,12 @@ $(function () {
 
         $("#placeholder").bind("plotselected", function (event, ranges) {
             // do the zooming
-            plot = $.plot($("#placeholder"), [occupancy],
-                    $.extend(true, {}, options, {
-                        xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
-                    }));
+            plot = $.plot($("#placeholder"), [
+                { data: occupancy, label: "Belegung"}
+            ],
+            $.extend(true, {}, options, {
+                xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+            }));
 
             // don't fire event on the overview to prevent eternal loop
             smallPlot.setSelection(ranges, true);
@@ -96,10 +98,10 @@ $(function () {
 
                     $("#tooltip").remove();
                     var x = item.datapoint[0].toFixed(2),
-                        y = item.datapoint[1].toFixed(2);
+                            y = item.datapoint[1].toFixed(2);
 
                     showTooltip(item.pageX, item.pageY,
-                            item.series.label + ": " +  y);
+                            item.series.label + ": " + y);
                 }
             }
             else {
