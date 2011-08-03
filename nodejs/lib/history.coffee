@@ -100,7 +100,7 @@ findParking = (name, id, callback) ->
         parking.free = free ? -1
 
         db.get timestampId, (err, timestamp) ->
-            throw err if err
+            throw err if err?
             parking.timestamp = timestamp ? -1
             callback(parking)
 

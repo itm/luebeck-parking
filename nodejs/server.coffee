@@ -99,9 +99,9 @@ app.get('/json/history/:name', (req, res) ->
         json          = JSON.stringify(obj)
 
         if not occupancy? or occupancy?.length < 1
-            res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.', 404)
+            res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.', 404) # Status 404 senden
         else
-            res.send(json)
+            res.send(json) # Status 200, alles OK
 
         console.timeEnd 'Ausgeliefert: /json/history/' + name
     )

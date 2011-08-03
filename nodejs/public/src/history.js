@@ -18,6 +18,17 @@ $(function () {
         grid: { hoverable: true, clickable: true, markings: weekendAreas }
     };
 
+    var smallOptions = {
+        series: {
+            lines: { show: true, lineWidth: 1, fill: true },
+            shadowSize: 0,
+            stack: true
+        },
+        xaxis: { ticks: [], mode: "time" },
+        yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
+        selection: { mode: "x" }
+    };
+
     // Returns the weekends in a period
     function weekendAreas(axes) {
         var markings = [];
@@ -55,14 +66,15 @@ $(function () {
         }
 
         jQuery.each(parkingData.occupancy, function(i, parking) {
-            var millis   = parseInt(parking.timestamp);
+            var millis = parseInt(parking.timestamp);
             var occupied = spaces - parseInt(parking.free);
             occupancy.push([millis, occupied]);
             total.push([millis, spaces - occupied]); // avoid stacking
         });
 
         // set maximum für y-axis
-        options.yaxis.max = spaces;
+        options.yaxis.max      = spaces;
+        smallOptions.yaxis.max = spaces;
 
         // first correct the timestamps - they are recorded as the daily
         // midnights in UTC+0100, but Flot always displays dates in UTC
@@ -82,17 +94,7 @@ $(function () {
         smallPlot = $.plot($("#overview"), [
             { data: occupancy, color: "rgb(200, 20, 30)" },
             { data: total, color: "rgb(30, 180, 20)" }
-        ],
-                {
-                    series: {
-                        lines: { show: true, lineWidth: 1, fill: true },
-                        shadowSize: 0,
-                        stack: true
-                    },
-                    xaxis: { ticks: [], mode: "time" },
-                    yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
-                    selection: { mode: "x" }
-                });
+        ], smallOptions);
 
         $("#placeholder").bind("plotselected", function (event, ranges) {
             // do the zooming
@@ -166,7 +168,7 @@ $(function () {
         $('<div id="tooltip">' + 'Keine Daten verf&uuml;gbar!' + '</div>').css({
             position: 'absolute',
             display: 'none',
-            top: 300,
+            top: 400,
             left: 350,
             border: '3px solid red',
             color: 'red',
@@ -180,6 +182,10 @@ $(function () {
 
     $("#parkings").change(function() {
         parking = $(this).val();
+        fetchData(parking);
+    });
+
+    $("#reset").click(function() {
         fetchData(parking);
     });
 
