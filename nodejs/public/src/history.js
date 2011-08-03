@@ -4,7 +4,7 @@ $(function () {
         series: {
             stack: true,
             lines: { show: true, fill: true },
-            points: { show: true },
+            points: { show: false },
             shadowSize: 0
         },
         xaxis:{
