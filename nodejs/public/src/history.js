@@ -55,11 +55,10 @@ $(function () {
         }
 
         jQuery.each(parkingData.occupancy, function(i, parking) {
-            var millis = parseInt(parking.timestamp);
-            console.log(JSON.stringify([millis, spaces - parseInt(parking.free)]));
-            occupancy.push([millis, spaces - parseInt(parking.free)]);
-            console.log(JSON.stringify([millis, spaces]));
-            total.push([millis, spaces]);
+            var millis   = parseInt(parking.timestamp);
+            var occupied = spaces - parseInt(parking.free);
+            occupancy.push([millis, occupied]);
+            total.push([millis, spaces - occupied]); // avoid stacking
         });
 
         // set maximum für y-axis
