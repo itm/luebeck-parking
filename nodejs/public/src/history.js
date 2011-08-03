@@ -123,7 +123,7 @@ $(function () {
                     var y = item.datapoint[1].toFixed(2);
 
                     var timestamp = new Date();
-                    timestamp.setTime(x + 60 * 60 * 1000);
+                    timestamp.setTime(x /*+ 60 * 60 * 1000*/);
 
                     showTooltip(item.pageX, item.pageY,
                             "<b>"
