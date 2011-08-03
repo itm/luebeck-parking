@@ -97,8 +97,8 @@ $(function () {
         $("#placeholder").bind("plotselected", function (event, ranges) {
             // do the zooming
             plot = $.plot($("#placeholder"), [
-                { data: occupancy, label: "Belegt", color: "rgb(30, 180, 20)" },
-                { data: total, label: "Verf&uuml;gbar", color: "rgb(200, 20, 30)" }
+                { data: occupancy, label: "Belegt", color: "rgb(200, 20, 30)" },
+                { data: total, label: "Verf&uuml;gbar", color: "rgb(30, 180, 20)" }
             ],
                     $.extend(true, {}, options, {
                         xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
