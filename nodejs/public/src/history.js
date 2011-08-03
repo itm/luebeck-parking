@@ -73,7 +73,7 @@ $(function () {
         });
 
         // set maximum für y-axis
-        options.yaxis.max      = spaces;
+        options.yaxis.max = spaces;
         smallOptions.yaxis.max = spaces;
 
         // first correct the timestamps - they are recorded as the daily
@@ -119,11 +119,22 @@ $(function () {
                     previousPoint = item.dataIndex;
 
                     $("#tooltip").remove();
-                    var x = item.datapoint[0].toFixed(2),
-                            y = item.datapoint[1].toFixed(2);
+                    var x = item.datapoint[0].toFixed(2);
+                    var y = item.datapoint[1].toFixed(2);
+
+                    var timestamp = new Date();
+                    timestamp.setTime(x);
 
                     showTooltip(item.pageX, item.pageY,
-                            item.series.label + ": " + parseInt(y) + " / " + spaces);
+                            "<b>"
+                                    + item.series.label
+                                    + ":</b> "
+                                    + parseInt(y)
+                                    + " / "
+                                    + spaces
+                                    + "; <b>Zeitpunkt:</b> "
+                                    + timestamp
+                    );
                 }
             }
             else {
