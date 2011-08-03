@@ -48,7 +48,7 @@ $(function () {
     function onDataReceived(parkingData) {
         if ($("#tooltip")) $("#tooltip").remove();
 
-        console.log(JSON.stringify(parkingData));
+        //if (console && console.log) console.log(JSON.stringify(parkingData));
 
         if (parkingData && parkingData.spaces) {
             spaces = parseInt(parkingData.spaces);
