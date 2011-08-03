@@ -62,7 +62,7 @@ $(function () {
         });
 
         // set maximum für y-axis
-        options.yaxis.max = spaces + 20;
+        options.yaxis.max = spaces;
 
         // first correct the timestamps - they are recorded as the daily
         // midnights in UTC+0100, but Flot always displays dates in UTC
