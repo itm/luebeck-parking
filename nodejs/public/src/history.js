@@ -1,8 +1,12 @@
 $(function () {
 
     var options = {
-        lines: { show: true, fill: 0.25 },
-        points: { show: true },
+        series: {
+            stack: true,
+            lines: { show: true, fill: true },
+            points: { show: true },
+            shadowSize: 0
+        },
         xaxis:{
             mode: "time",
             tickLength: 5
@@ -35,7 +39,8 @@ $(function () {
     }
 
     var occupancy = [];
-    var spaces    = 0;
+    var total = [];
+    var spaces = 0;
 
     var plot = null;
     var smallPlot = null;
@@ -51,10 +56,14 @@ $(function () {
 
         jQuery.each(parkingData.occupancy, function(i, parking) {
             var millis = parseInt(parking.timestamp);
+            console.log(JSON.stringify([millis, spaces - parseInt(parking.free)]));
             occupancy.push([millis, spaces - parseInt(parking.free)]);
+            console.log(JSON.stringify([millis, spaces]));
+            total.push([millis, spaces]);
         });
 
-        options.yaxis.max = spaces;
+        // set maximum für y-axis
+        options.yaxis.max = spaces + 20;
 
         // first correct the timestamps - they are recorded as the daily
         // midnights in UTC+0100, but Flot always displays dates in UTC
@@ -62,25 +71,35 @@ $(function () {
         for (var i = 0; i < occupancy.length; ++i)
             occupancy[i][0] += 60 * 60 * 1000;
 
+        for (var j = 0; j < total.length; ++j)
+            total[j][0] += 60 * 60 * 1000;
+
         // and plot all we got
         plot = $.plot($("#placeholder"), [
-            { data: occupancy, label: "Belegung"}
+            { data: occupancy, label: "Belegt", color: "rgb(200, 20, 30)" },
+            { data: total, label: "Verf&uuml;gbar", color: "rgb(30, 180, 20)" }
         ], options);
 
-        smallPlot = $.plot($("#overview"), [occupancy], {
-            series: {
-                lines: { show: true, lineWidth: 1, fill: 0.25 },
-                shadowSize: 0
-            },
-            xaxis: { ticks: [], mode: "time" },
-            yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
-            selection: { mode: "x" }
-        });
+        smallPlot = $.plot($("#overview"), [
+            { data: occupancy, color: "rgb(200, 20, 30)" },
+            { data: total, color: "rgb(30, 180, 20)" }
+        ],
+                {
+                    series: {
+                        lines: { show: true, lineWidth: 1, fill: true },
+                        shadowSize: 0,
+                        stack: true
+                    },
+                    xaxis: { ticks: [], mode: "time" },
+                    yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
+                    selection: { mode: "x" }
+                });
 
         $("#placeholder").bind("plotselected", function (event, ranges) {
             // do the zooming
             plot = $.plot($("#placeholder"), [
-                { data: occupancy, label: "Belegung"}
+                { data: occupancy, label: "Belegt", color: "rgb(30, 180, 20)" },
+                { data: total, label: "Verf&uuml;gbar", color: "rgb(200, 20, 30)" }
             ],
                     $.extend(true, {}, options, {
                         xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
@@ -168,10 +187,11 @@ $(function () {
     function fetchData(parking) {
         // reset data
         occupancy = [];
+        total = [];
 
         $.ajax({
-            url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
-            //url: 'http://localhost:8080/json/history/' + parking,
+            //url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
+            url: 'http://localhost:8080/json/history/' + parking,
             method: 'GET',
             dataType: 'json',
             success: onDataReceived,
