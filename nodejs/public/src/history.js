@@ -163,18 +163,14 @@ $(function () {
 
     function onNoDataRecieved() {
         plot = $.plot($("#placeholder"), [
-            { data: [], label: "Belegung"}
+            { data: [], label: "Belegt", color: "rgb(200, 20, 30)" },
+            { data: [], label: "Verf&uuml;gbar", color: "rgb(30, 180, 20)" }
         ], options);
 
-        smallPlot = $.plot($("#overview"), [], {
-            series: {
-                lines: { show: true, lineWidth: 1, fill: 0.25 },
-                shadowSize: 0
-            },
-            xaxis: { ticks: [], mode: "time" },
-            yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
-            selection: { mode: "x" }
-        });
+        smallPlot = $.plot($("#overview"), [
+            { data: [], color: "rgb(200, 20, 30)" },
+            { data: [], color: "rgb(30, 180, 20)" }
+        ], smallOptions);
 
         $('<div id="tooltip">' + 'Keine Daten verf&uuml;gbar!' + '</div>').css({
             position: 'absolute',
