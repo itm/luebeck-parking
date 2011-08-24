@@ -22,6 +22,7 @@ exports.fetch = (callback) ->
             (err, window) ->
                 # Seite verarbeiten
                 processPage(window, (result) ->
+                    #util.log JSON.stringify(result)
                     callback(err, result)
                 )
   
@@ -37,7 +38,7 @@ processPage = (window, callback) ->
     num  = $(rows).size()
 
     rows.each (i, row) ->
-        if i > 1 and i isnt num - 1 # Kopf und Fußzeile abschneiden
+        if i > 0 and i isnt num - 1 # Kopf und Fußzeile abschneiden
             processRow($, row, (item, city) ->
                 result.parkings.push(item) if item?
                 result.cities.push(city) if city?
@@ -46,14 +47,13 @@ processPage = (window, callback) ->
 
 processRow = ($, row, callback) ->
     elements  = $(row).children('td')
-    item      = new Object()
-    city      = new Object()
+    item      = {}
+    city      = null
     nameStr   = elements?.eq(0).html()
-    nameStr  ?= "" #falls es keine elements gibt
+    nameStr  ?= "" # Falls es keine elements gibt
     item.kind = nameStr.substring 0, 2
     item.name = nameStr.substring 3
     item.geo  = geo.data[nameStr]
-    item.city = currentCity
   
     if elements.size() > 2
         free   = elements?.eq(2).html()
@@ -68,8 +68,12 @@ processRow = ($, row, callback) ->
         # Orte (z.B. "Parkplätze Travemünde" Überschrift)
         header = $(row).children().first().html()
         currentCity = header.split(' ')[1]
+        city      = {}
         city.name = currentCity
-        city.geo = geo.cities[currentCity]
+        city.geo  = geo.cities[currentCity]
+
+    item.city = currentCity
+    if item.name is "" or not item.name? then item = null
 
     callback(item, city)
 

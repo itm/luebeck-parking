@@ -65,9 +65,9 @@ $(function () {
             spaces = parseInt(parkingData.spaces);
         }
 
-        jQuery.each(parkingData.occupancy, function(i, parking) {
-            var millis = parseInt(parking.timestamp);
-            var occupied = spaces - parseInt(parking.free);
+        jQuery.each(parkingData.timeline, function(i, t) {
+            var millis = parseInt(t.timestamp);
+            var occupied = spaces - parseInt(t.free);
             occupancy.push([millis, occupied]);
             total.push([millis, spaces - occupied]); // avoid stacking
         });
@@ -189,7 +189,7 @@ $(function () {
         }).appendTo("body").fadeIn(200);
     }
 
-    var parking = "Falkenstrasse";
+    var parking = "Falkenstrasse"; // default
 
     $("#parkings").change(function() {
         parking = $(this).val();

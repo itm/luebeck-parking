@@ -1,4 +1,4 @@
-scraper  = require './lib/scraper'
+scraper = require './lib/scraper'
 history = require './lib/history'
 url     = require 'url'
 util    = require 'util'
@@ -7,7 +7,7 @@ util    = require 'util'
 process.on('uncaughtException', (err) ->
     if err?
         util.trace err
-        # Exit
+        # Im Falle eines unerwarteten Fehlers => Server beenden
         process.exit(1)
 )
 process.on('exit', () ->
@@ -30,12 +30,13 @@ cacheJson = () ->
 handleHistory = () ->
     parkings = data?.parkings
     if parkings?
-        history.storeHistory(parkings, () ->
-            util.log 'Daten historisiert (' + parkings.length + ' Eintraege)'
+        history.storeHistory(parkings,
+            () ->
+                util.log 'Daten historisiert (' + parkings.length + ' Eintraege)'
         )
 
 # Alle delay ms die Daten erneut von der KWL holen
-scrapeDelay      = 3 * 30 * 1000 # 3 Minuten
+scrapeDelay      = 2 * 60 * 1000 # 2 Minuten
 scrapeIntervalId = setInterval cacheJson, scrapeDelay
 
 # Alle historyDelay ms die Daten in die Historie speichern
@@ -91,14 +92,14 @@ app.get('/json/history/:name', (req, res) ->
 
     console.time 'Ausgeliefert: /json/history/' + name
 
-    history.findAll(name, (occupancy, spaces) ->
-        obj           = new Object()
+    history.findTimelineByName(name, (timeline, spaces) ->
+        obj           = {}
         obj.name      = name ? 'no data'
         obj.spaces    = spaces ? -1
-        obj.occupancy = occupancy ? []
+        obj.timeline  = timeline ? []
         json          = JSON.stringify(obj)
 
-        if not occupancy? or occupancy?.length < 1
+        if not timeline? or timeline?.length < 1
             res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.', 404) # Status 404 senden
         else
             res.send(json) # Status 200, alles OK
