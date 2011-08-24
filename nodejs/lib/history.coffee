@@ -36,7 +36,8 @@ parkingSet = "parkings"
 # Stammdaten sind Daten, die sich selten ändern wie z.B. die Anzahl
 # der verfügbaren Stellplätze auf einem Parkplatz.
 #
-# Als Bewegungsdaten werden die häufig anfallenden Parkplatzbelegungen bezeichnet.
+# Als Bewegungsdaten werden die anfallenden Parkplatzbelegungen bezeichnet,
+# die sich häufig über die Zeit ändern.
 #
 # Alle Redis-Befehle sind als Callbacks verkettet um Nodes asnychronem
 # Charakter Rechnung zu tragen. Zudem werden auf diese Weise keine weiteren
@@ -72,7 +73,7 @@ storeHistoryItem = (row, timestamp) ->
     #
     # Bewegungsdaten
     #
-    if row? and row.name? and row.free? and row.status?
+    if row? and row.name? and row.free? and row.status? and timestamp?
         db.hset parkingName, "timeline", timelineBaseName(row.name)
         # Lege Liste mit Belegungen an für aktuellen Parkplatz
         timelineName = timelineBaseName(row.name) + ':' + timestamp
@@ -83,14 +84,14 @@ storeHistoryItem = (row, timestamp) ->
                 throw err if err?
 
 #
-# Sucht die Timeline zu dem gegebenen Parkplatznamen
+# Sucht die Timeline zu dem gegebenen Parkplatznamen. Es werden die Werte der letzten zwei Wochen zurückgegeben.
 #
 exports.findTimelineByName = (name, callback) ->
     theTimeline = []
     db.hgetall parkingBaseName(name), (err, parking) ->
         throw err if err?
         if parking? and parking.timeline? and parking.spaces?
-            twoWeeks = 672 # 24 * 2 * 14
+            twoWeeks = 672 # 24 * 2 * 14, Werte von zwei Wochen bei einem Speicherintervall von 30 Minuten
             db.lrange parking.timeline, -twoWeeks, -1, (err, entries) ->
                 throw err if err?
                 asyncCounter = entries.length
