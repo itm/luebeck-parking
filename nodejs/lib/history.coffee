@@ -8,49 +8,36 @@ db.on 'error',
         util.log err if err?
 
 #
-# Generiert einheitlich den Schlüssel-Präfix für einen DB-Eintrag.
 # Alle Sonderzeichen werden aus dem Namen entfernt.
 #
+filterName = (name) ->
+    name.replace(/[^a-zA-Z0-9 ]/g, "").replace(" ", "_") if name?
+
+#
+# Erzeugt einen als Schlüssel verwendbaren Namen aus einem Parkplatznamen
+#
 parkingBaseName = (name) ->
-    "parking:" + name.replace(/[^a-zA-Z0-9 ]/g, "") if name?
+    "parking:" + filterName(name)
+
+#
+# Erzeugt einen als Schlüssel verwendbaren Namen aus einem Parkplatznamen
+#
+timelineBaseName = (name) ->
+    "timeline:" + filterName(name)
+
+#
+# Name der Menge von Parkplätzen
+#
+parkingSet = "parkings"
 
 #
 # ABSPEICHERN DER HISTORIE
 #
 # Stammdaten sind Daten, die sich selten ändern wie z.B. die Anzahl
-# der verfügbaren Stellplätze auf einem Parkplatz. Sie werden hier mit
-# Redis als Keys gespeichert, die wie folgt aufgebaut sind: 
+# der verfügbaren Stellplätze auf einem Parkplatz.
 #
-#    "parking:<Parkplatzname>:spaces"
-#
-# Als Redis-Befehl also:
-#
-#    SET "parking:Parkhaus Falkenstraße:spaces" 100
-#
-# um die Kapazität des Parkhauses Falkenstraße als 100 zu speichern. 
-# Damit der Wert nicht immer wieder überschrieben werden muss, wird der 
-# Befehl "SETNX" verwendet, der einen Key nur überschreibt, falls er noch nicht
-# existiert. (Mehr Redis-Befehle gibt es hier: http://redis.io/commands)
-#
-#    SETNX "parking:Parkhaus Falkenstraße:spaces" 100
-#
-# Bewegungsdaten sind Daten, die sich ständig ändern, z.B. die Parkplatzbelegung
-# und der Zeitpunkt zu dem eine bestimmte Belegung vorlag. Daher haben die
-# Bewegungsdaten eine fortlaufende ID im Key unter dem sie gespeichert werden.
-#
-#    INCR "parking:Parkhaus Falkenstraße"
-#
-# Dieser Redis-Befehl ist eine atomare Operation und erhöht die ID für den Key
-# des Parkhauses Falkenstraße um 1. So können wir dann neue Bewegungsdaten
-# mit einer neuen ID im Key speichern.
-#
-# Aufbau z.B: "parking:Parkhaus Falkenstraße:<ID>:free".
-#
-#    SET "parking:Parkhaus Falkenstraße:2:free" 50
-#    SET "parking:Parkhaus Falkenstraße:2:timestamp" <aktueller Zeitstempel>
-#
-# Speichert die Anzahl freier Plätze 50 für das Parkhaus Falkenstraße zum
-# aktuellen Zeitpunkt mit der ID 2.
+# Als Bewegungsdaten werden die anfallenden Parkplatzbelegungen bezeichnet,
+# die sich häufig über die Zeit ändern.
 #
 # Alle Redis-Befehle sind als Callbacks verkettet um Nodes asnychronem
 # Charakter Rechnung zu tragen. Zudem werden auf diese Weise keine weiteren
@@ -59,83 +46,70 @@ parkingBaseName = (name) ->
 # Diese Methode benötigt ein Array mit den gelesenen Parkplatzdaten als Eingabe.
 #
 exports.storeHistory = (rows, callback) ->
-    if not rows? then return
-                    
-    storeHistoryItem(row) for row in rows
+    if rows?
+        now       = new Date()
+        timestamp = now.getTime()
+        storeHistoryItem(row, timestamp) for row in rows
 
     callback()
 
-storeHistoryItem = (row) ->
-    if not row? or not row.name? or not row.free? or not row.spaces? then return
-
+storeHistoryItem = (row, timestamp) ->
     #
     # Stammdaten
     #
-    parkingId = parkingBaseName(row.name)
-
-    # Speichere absolute Anzahl vorhandener Stellplätze für diesen Parkplatz
-    db.setnx parkingId + ":spaces", row.spaces, (err) ->
-        throw err if err?
-
-        #
-        # Bewegungsdaten
-        #
-        db.incr parkingId, (err, id) ->
+    if row? and row.name? and row.spaces? #and row.city?
+        parkingName = parkingBaseName(row.name)
+        # Speichere Parkplatz in Menge von Parkplätzen falls noch nicht vorhanden
+        db.sismember parkingSet, parkingName, (err, isMember) ->
             throw err if err?
-            if not id? then return
+            if isMember is 0
+                db.sadd parkingSet, parkingName, (err) ->
+                    throw err if err?
 
-            # Speichere Zeitstempel und zu diesem Zeitpunkt Anzahl freier Stellplätze für diesen Parkplatz
-            db.mset parkingId + ":" + id + ":timestamp", new Date().getTime(), parkingId + ":" + id + ":free", row.free
+        # Speichere Stammdaten (verfügbare Parkplätze und Stadt)
+        util.log('HMSET ' + parkingName + ' name: ' + row.name + ', spaces: ' + row.spaces )#+ ', city: ' + row.city)
+        db.hmset parkingName, "name", row.name, "spaces", row.spaces, (err) ->#, "city", row.city, (err) ->
+            throw err if err?
 
-#
-# Sucht einen Parkplatz-Eintrag zu dem gegebenen Namen und der gegebenen ID.
-#
-findParking = (name, id, callback) ->
-    parking     = new Object()
-    freeId      = parkingBaseName(name) + ":" + id + ":free"
-    timestampId = parkingBaseName(name) + ":" + id + ":timestamp"
+    else
+      util.log 'Unsufficient data for historization! ' + JSON.stringify(row)
 
-    db.get freeId, (err, free) ->
-        throw err if err?
-        parking.free = free ? -1
-
-        db.get timestampId, (err, timestamp) ->
-            throw err if err
-            parking.timestamp = timestamp ? -1
-            callback(parking)
-
-#
-# Sucht alle Parkplatz-Einträge aus der Redis-DB zu dem gegebenen Namen.
-#
-exports.findAll = (name, callback) ->
-    parkingSpaces = -1
-    allParkings   = new Array()
-
-    if not name? then callback(allParkings, parkingSpaces)
-
-    spacesId  = parkingBaseName(name) + ":" + "spaces"
-    parkingId = parkingBaseName(name)
-
-    db.get spacesId, (err, spaces) ->
-        throw err if err?
-        parkingSpaces = spaces ? -1
-
-        db.get parkingId,
-            (err, dbId) ->
+    #
+    # Bewegungsdaten
+    #
+    if row? and row.name? and row.free? and row.status? and timestamp?
+        util.log('HSET timeline ' + timelineBaseName(row.name))
+        db.hset parkingName, "timeline", timelineBaseName(row.name)
+        # Lege Liste mit Belegungen an für aktuellen Parkplatz
+        timelineName = timelineBaseName(row.name) + ':' + timestamp
+        db.lpush timelineBaseName(row.name), timelineName, (err) ->
+            throw err if err?
+            # Speichere Bewegungsdaten (Zeitstempel, Anzahl freier Parkplätze)
+            util.log('HMSET timestamp: ' + timstamp + ', free: ' + row.free, ', status: ' + row.status)
+            db.hmset timelineName, "timestamp", timestamp, "free", row.free, "status", row.status, (err) ->
                 throw err if err?
 
-                if not dbId?
-                    callback(allParkings, parkingSpaces)
-                    return
+#
+# Sucht die Timeline zu dem gegebenen Parkplatznamen. Es werden die Werte der letzten zwei Wochen zurückgegeben.
+#
+exports.findTimelineByName = (name, callback) ->
+    theTimeline = []
+    util.log('HGETALL ' + parkingBaseName(name))
+    db.hgetall parkingBaseName(name), (err, parking) ->
+        throw err if err?
+        if parking? and parking.timeline? and parking.spaces?
+            twoWeeks = 672 # 24 * 2 * 14, Werte von zwei Wochen bei einem Speicherintervall von 30 Minuten
+            db.lrange parking.timeline, (twoWeeks * -1), -1, (err, entries) ->
+                throw err if err?
+                asyncCounter = entries.length
+                for key in entries
+                    db.hgetall key, (err, result) ->
+                        throw err if err?
+                        theTimeline.push(result)
+                        asyncCounter--
+                        if asyncCounter is 0 then callback(theTimeline, parking.spaces)
+        else
+            callback([], 0)
 
-                asyncResultCounter = dbId
-
-                for parkingId in [1..dbId]
-                    findParking(name, parkingId,
-                        (parking) ->
-                            allParkings.push(parking) if parking.free? and parking.timestamp?
-                            asyncResultCounter--
-                            callback(allParkings, parkingSpaces) if asyncResultCounter is 0
-                    )
 
           
