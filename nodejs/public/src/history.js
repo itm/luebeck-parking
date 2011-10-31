@@ -188,8 +188,7 @@ $(function () {
     var parking = "Falkenstrasse"; // default
 
     $("#parkings").change(function() {
-        parking = $(this).val();
-        fetchData(parking);
+        fetchData($(this).val());
     });
 
     $("#reset").click(function() {
