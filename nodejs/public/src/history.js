@@ -18,6 +18,17 @@ $(function () {
         grid: { hoverable: true, clickable: true, markings: weekendAreas }
     };
 
+    var smallOptions = {
+        series: {
+            lines: { show: true, lineWidth: 1, fill: true },
+            shadowSize: 0,
+            stack: true
+        },
+        xaxis: { ticks: [], mode: "time" },
+        yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
+        selection: { mode: "x" }
+    };
+
     // Returns the weekends in a period
     function weekendAreas(axes) {
         var markings = [];
@@ -54,15 +65,16 @@ $(function () {
             spaces = parseInt(parkingData.spaces);
         }
 
-        jQuery.each(parkingData.occupancy, function(i, parking) {
-            var millis   = parseInt(parking.timestamp);
-            var occupied = spaces - parseInt(parking.free);
+        jQuery.each(parkingData.timeline, function(i, t) {
+            var millis = parseInt(t.timestamp);
+            var occupied = spaces - parseInt(t.free);
             occupancy.push([millis, occupied]);
             total.push([millis, spaces - occupied]); // avoid stacking
         });
 
         // set maximum für y-axis
         options.yaxis.max = spaces;
+        smallOptions.yaxis.max = spaces;
 
         // first correct the timestamps - they are recorded as the daily
         // midnights in UTC+0100, but Flot always displays dates in UTC
@@ -82,17 +94,7 @@ $(function () {
         smallPlot = $.plot($("#overview"), [
             { data: occupancy, color: "rgb(200, 20, 30)" },
             { data: total, color: "rgb(30, 180, 20)" }
-        ],
-                {
-                    series: {
-                        lines: { show: true, lineWidth: 1, fill: true },
-                        shadowSize: 0,
-                        stack: true
-                    },
-                    xaxis: { ticks: [], mode: "time" },
-                    yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
-                    selection: { mode: "x" }
-                });
+        ], smallOptions);
 
         $("#placeholder").bind("plotselected", function (event, ranges) {
             // do the zooming
@@ -100,9 +102,9 @@ $(function () {
                 { data: occupancy, label: "Belegt", color: "rgb(200, 20, 30)" },
                 { data: total, label: "Verf&uuml;gbar", color: "rgb(30, 180, 20)" }
             ],
-                    $.extend(true, {}, options, {
-                        xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
-                    }));
+                $.extend(true, {}, options, {
+                    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                }));
 
             // don't fire event on the overview to prevent eternal loop
             smallPlot.setSelection(ranges, true);
@@ -117,11 +119,22 @@ $(function () {
                     previousPoint = item.dataIndex;
 
                     $("#tooltip").remove();
-                    var x = item.datapoint[0].toFixed(2),
-                            y = item.datapoint[1].toFixed(2);
+                    var x = item.datapoint[0].toFixed(2);
+                    var y = item.datapoint[1].toFixed(2);
+
+                    var timestamp = new Date();
+                    timestamp.setTime(x - 60 * 60 * 1000);
 
                     showTooltip(item.pageX, item.pageY,
-                            item.series.label + ": " + parseInt(y) + " / " + spaces);
+                        "<b>"
+                            + item.series.label
+                            + ":</b> "
+                            + parseInt(y)
+                            + " / "
+                            + spaces
+                            + "; <b>Zeitpunkt:</b> "
+                            + timestamp
+                    );
                 }
             }
             else {
@@ -150,23 +163,19 @@ $(function () {
 
     function onNoDataRecieved() {
         plot = $.plot($("#placeholder"), [
-            { data: [], label: "Belegung"}
+            { data: [], label: "Belegt", color: "rgb(200, 20, 30)" },
+            { data: [], label: "Verf&uuml;gbar", color: "rgb(30, 180, 20)" }
         ], options);
 
-        smallPlot = $.plot($("#overview"), [], {
-            series: {
-                lines: { show: true, lineWidth: 1, fill: 0.25 },
-                shadowSize: 0
-            },
-            xaxis: { ticks: [], mode: "time" },
-            yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
-            selection: { mode: "x" }
-        });
+        smallPlot = $.plot($("#overview"), [
+            { data: [], color: "rgb(200, 20, 30)" },
+            { data: [], color: "rgb(30, 180, 20)" }
+        ], smallOptions);
 
         $('<div id="tooltip">' + 'Keine Daten verf&uuml;gbar!' + '</div>').css({
             position: 'absolute',
             display: 'none',
-            top: 300,
+            top: 400,
             left: 350,
             border: '3px solid red',
             color: 'red',
@@ -176,12 +185,19 @@ $(function () {
         }).appendTo("body").fadeIn(200);
     }
 
-    var parking = "Falkenstrasse";
+    var parking = "Falkenstrasse"; // default
 
     $("#parkings").change(function() {
-        parking = $(this).val();
+        fetchData($(this).val());
+    });
+
+    $("#reset").click(function() {
         fetchData(parking);
     });
+
+    var host = 'enterprise-it.corona.itm.uni-luebeck.de';
+    //var host = 'localhost';
+    var port = 8080;
 
     function fetchData(parking) {
         // reset data
@@ -189,8 +205,7 @@ $(function () {
         total = [];
 
         $.ajax({
-            url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
-            //url: 'http://localhost:8080/json/history/' + parking,
+            url: 'http://' + host + ':' + port + '/json/history/' + parking,
             method: 'GET',
             dataType: 'json',
             success: onDataReceived,
