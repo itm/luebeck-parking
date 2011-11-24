@@ -3,4 +3,6 @@ media
 .idea
 *.iml
 *.log
-dump.rdb
+*.rdb
+redis.out
+

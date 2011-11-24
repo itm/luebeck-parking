@@ -1,32 +1,32 @@
 $(function () {
 
     var options = {
-        series: {
-            stack: true,
-            lines: { show: true, fill: true },
-            points: { show: false },
-            shadowSize: 0
+        series:{
+            stack:true,
+            lines:{ show:true, fill:true },
+            points:{ show:false },
+            shadowSize:0
         },
         xaxis:{
-            mode: "time",
-            tickLength: 5
+            mode:"time",
+            tickLength:5
         },
-        yaxis: {
-            min: 0
+        yaxis:{
+            min:0
         },
-        selection: { mode: "x" },
-        grid: { hoverable: true, clickable: true, markings: weekendAreas }
+        selection:{ mode:"x" },
+        grid:{ hoverable:true, clickable:true, markings:weekendAreas }
     };
 
     var smallOptions = {
-        series: {
-            lines: { show: true, lineWidth: 1, fill: true },
-            shadowSize: 0,
-            stack: true
+        series:{
+            lines:{ show:true, lineWidth:1, fill:true },
+            shadowSize:0,
+            stack:true
         },
-        xaxis: { ticks: [], mode: "time" },
-        yaxis: { ticks: [], min: 0, autoscaleMargin: 0.1 },
-        selection: { mode: "x" }
+        xaxis:{ ticks:[], mode:"time" },
+        yaxis:{ ticks:[], min:0, autoscaleMargin:0.1 },
+        selection:{ mode:"x" }
     };
 
     // Returns the weekends in a period
@@ -42,7 +42,7 @@ $(function () {
         do {
             // when we don't set yaxis, the rectangle automatically
             // extends to infinity upwards and downwards
-            markings.push({ xaxis: { from: i, to: i + 2 * 24 * 60 * 60 * 1000 } });
+            markings.push({ xaxis:{ from:i, to:i + 2 * 24 * 60 * 60 * 1000 } });
             i += 7 * 24 * 60 * 60 * 1000;
         } while (i < axes.xaxis.max);
 
@@ -65,7 +65,7 @@ $(function () {
             spaces = parseInt(parkingData.spaces);
         }
 
-        jQuery.each(parkingData.timeline, function(i, t) {
+        jQuery.each(parkingData.timeline, function (i, t) {
             var millis = parseInt(t.timestamp);
             var occupied = spaces - parseInt(t.free);
             occupancy.push([millis, occupied]);
@@ -87,24 +87,24 @@ $(function () {
 
         // and plot all we got
         plot = $.plot($("#placeholder"), [
-            { data: occupancy, label: "Belegt", color: "rgb(200, 20, 30)" },
-            { data: total, label: "Verf&uuml;gbar", color: "rgb(30, 180, 20)" }
+            { data:occupancy, label:"Belegt", color:"rgb(200, 20, 30)" },
+            { data:total, label:"Verf&uuml;gbar", color:"rgb(30, 180, 20)" }
         ], options);
 
         smallPlot = $.plot($("#overview"), [
-            { data: occupancy, color: "rgb(200, 20, 30)" },
-            { data: total, color: "rgb(30, 180, 20)" }
+            { data:occupancy, color:"rgb(200, 20, 30)" },
+            { data:total, color:"rgb(30, 180, 20)" }
         ], smallOptions);
 
         $("#placeholder").bind("plotselected", function (event, ranges) {
             // do the zooming
             plot = $.plot($("#placeholder"), [
-                { data: occupancy, label: "Belegt", color: "rgb(200, 20, 30)" },
-                { data: total, label: "Verf&uuml;gbar", color: "rgb(30, 180, 20)" }
+                { data:occupancy, label:"Belegt", color:"rgb(200, 20, 30)" },
+                { data:total, label:"Verf&uuml;gbar", color:"rgb(30, 180, 20)" }
             ],
-                $.extend(true, {}, options, {
-                    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
-                }));
+                          $.extend(true, {}, options, {
+                              xaxis:{ min:ranges.xaxis.from, max:ranges.xaxis.to }
+                          }));
 
             // don't fire event on the overview to prevent eternal loop
             smallPlot.setSelection(ranges, true);
@@ -126,14 +126,14 @@ $(function () {
                     timestamp.setTime(x - 60 * 60 * 1000);
 
                     showTooltip(item.pageX, item.pageY,
-                        "<b>"
-                            + item.series.label
-                            + ":</b> "
-                            + parseInt(y)
-                            + " / "
-                            + spaces
-                            + "; <b>Zeitpunkt:</b> "
-                            + timestamp
+                                "<b>"
+                                    + item.series.label
+                                    + ":</b> "
+                                    + parseInt(y)
+                                    + " / "
+                                    + spaces
+                                    + "; <b>Zeitpunkt:</b> "
+                                    + timestamp
                     );
                 }
             }
@@ -150,48 +150,48 @@ $(function () {
 
     function showTooltip(x, y, contents) {
         $('<div id="tooltip">' + contents + '</div>').css({
-            position: 'absolute',
-            display: 'none',
-            top: y + 5,
-            left: x + 5,
-            border: '1px solid #fdd',
-            padding: '2px',
-            'background-color': '#fee',
-            opacity: 0.80
-        }).appendTo("body").fadeIn(200);
+                                                              position:'absolute',
+                                                              display:'none',
+                                                              top:y + 5,
+                                                              left:x + 5,
+                                                              border:'1px solid #fdd',
+                                                              padding:'2px',
+                                                              'background-color':'#fee',
+                                                              opacity:0.80
+                                                          }).appendTo("body").fadeIn(200);
     }
 
     function onNoDataRecieved() {
         plot = $.plot($("#placeholder"), [
-            { data: [], label: "Belegt", color: "rgb(200, 20, 30)" },
-            { data: [], label: "Verf&uuml;gbar", color: "rgb(30, 180, 20)" }
+            { data:[], label:"Belegt", color:"rgb(200, 20, 30)" },
+            { data:[], label:"Verf&uuml;gbar", color:"rgb(30, 180, 20)" }
         ], options);
 
         smallPlot = $.plot($("#overview"), [
-            { data: [], color: "rgb(200, 20, 30)" },
-            { data: [], color: "rgb(30, 180, 20)" }
+            { data:[], color:"rgb(200, 20, 30)" },
+            { data:[], color:"rgb(30, 180, 20)" }
         ], smallOptions);
 
         $('<div id="tooltip">' + 'Keine Daten verf&uuml;gbar!' + '</div>').css({
-            position: 'absolute',
-            display: 'none',
-            top: 400,
-            left: 350,
-            border: '3px solid red',
-            color: 'red',
-            'font-weight': 'bold',
-            padding: '5px',
-            'background-color': 'white'
-        }).appendTo("body").fadeIn(200);
+                                                                                   position:'absolute',
+                                                                                   display:'none',
+                                                                                   top:400,
+                                                                                   left:350,
+                                                                                   border:'3px solid red',
+                                                                                   color:'red',
+                                                                                   'font-weight':'bold',
+                                                                                   padding:'5px',
+                                                                                   'background-color':'white'
+                                                                               }).appendTo("body").fadeIn(200);
     }
 
     var parking = "Falkenstrasse"; // default
 
-    $("#parkings").change(function() {
+    $("#parkings").change(function () {
         fetchData($(this).val());
     });
 
-    $("#reset").click(function() {
+    $("#reset").click(function () {
         fetchData(parking);
     });
 
@@ -205,14 +205,14 @@ $(function () {
         total = [];
 
         $.ajax({
-            url: 'http://' + host + ':' + port + '/json/history/' + parking,
-            method: 'GET',
-            dataType: 'json',
-            success: onDataReceived,
-            statusCode: {
-                404: onNoDataRecieved
-            }
-        });
+                   url:'http://' + host + ':' + port + '/json/history/' + parking,
+                   method:'GET',
+                   dataType:'json',
+                   success:onDataReceived,
+                   statusCode:{
+                       404:onNoDataRecieved
+                   }
+               });
     }
 
     fetchData(parking);
