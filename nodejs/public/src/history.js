@@ -86,8 +86,8 @@ $(function () {
 
         // and plot all we got
         plot = $.plot($("#placeholder"), [
-            { data:occupancy, label:"Belegt", color:"rgb(200, 20, 30)" },
-            { data:total, label:"Verf&uuml;gbar", color:"rgb(30, 180, 20)" }
+            { data:occupancy, color:"rgb(200, 20, 30)" },
+            { data:total, color:"rgb(30, 180, 20)" }
         ], options);
 
         smallPlot = $.plot($("#overview"), [
@@ -98,8 +98,8 @@ $(function () {
         $("#placeholder").bind("plotselected", function (event, ranges) {
             // do the zooming
             plot = $.plot($("#placeholder"), [
-                { data:occupancy, label:"Belegt", color:"rgb(200, 20, 30)" },
-                { data:total, label:"Verf&uuml;gbar", color:"rgb(30, 180, 20)" }
+                { data:occupancy, color:"rgb(200, 20, 30)" },
+                { data:total, color:"rgb(30, 180, 20)" }
             ],
                           $.extend(true, {}, options, {
                               xaxis:{ min:ranges.xaxis.from, max:ranges.xaxis.to }
@@ -126,10 +126,9 @@ $(function () {
 
                     showTooltip(item.pageX, item.pageY,
                                 "<b>"
-                                    + item.series.label
-                                    + ":</b> "
+                                    + "<b>Belegung: </b>"
                                     + parseInt(y)
-                                    + " / "
+                                    + "/"
                                     + spaces
                                     + "; <b>Zeitpunkt:</b> "
                                     + timestamp
@@ -162,8 +161,8 @@ $(function () {
 
     function onNoDataRecieved() {
         plot = $.plot($("#placeholder"), [
-            { data:[], label:"Belegt", color:"rgb(200, 20, 30)" },
-            { data:[], label:"Verf&uuml;gbar", color:"rgb(30, 180, 20)" }
+            { data:[], color:"rgb(200, 20, 30)" },
+            { data:[], color:"rgb(30, 180, 20)" }
         ], options);
 
         smallPlot = $.plot($("#overview"), [

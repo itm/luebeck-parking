@@ -53,7 +53,6 @@ app = express.createServer()
 app.configure () ->
   app.use(express.static(__dirname + '/public'))
 
-# Durch '/data' o.Ä. ersetzen?
 app.get '/json/current', (req, res) ->
   console.time 'Ausgeliefert: /json/current'
 
