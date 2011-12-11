@@ -1,6 +1,6 @@
 {
     "name": "jsdom",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "description": "A javascript implementation of the W3C DOM",
     "keywords": [
       "dom",
@@ -62,10 +62,6 @@
         "url":   "http://github.com/hij1nx"
       },
       {
-        "name":  "Daniel Cassidy",
-        "email": "mail@danielcassidy.me.uk"
-      },
-      {
         "name":  "Yonathan Randolph",
         "url":   "http://github.com/yonran"
       },
@@ -122,6 +118,11 @@
       {
         "name" : "Derek Lindahl",
         "url" : "https://github.com/dlindahl"
+      },
+      {
+        "name" : "Chris Roebuck",
+        "email" : "chris@quillu.com",
+        "url" : "http://www.quillu.com"
       }
     ],
     "bugs": {
@@ -144,10 +145,10 @@
         "http://www.w3.org/TR/REC-DOM-Level-1"
     ],
     "dependencies": {
-       "htmlparser" : ">=1.7.0",
-       "request"    : ">=1.0.0",
-       "cssom"      : ">=0.2.0",
-       "contextify" : ">=0.0.3"
+       "htmlparser" : "1.x",
+       "request"    : "2.x",
+       "cssom"      : "0.2.x",
+       "contextify" : "0.0.x"
     },
     "devDependencies" : {
       "nodeunit" : ">=0.5.x",

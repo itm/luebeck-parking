@@ -1,5 +1,4 @@
 $(function () {
-
     var options = {
         series:{
             stack:true,

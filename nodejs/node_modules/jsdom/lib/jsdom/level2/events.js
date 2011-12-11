@@ -4,8 +4,7 @@
  *
  */
 var core = require("./core").dom.level2.core,
-    utils = require("../utils"),
-    sys = require("sys");
+    utils = require("../utils");
 
 // modify cloned instance for more info check: https://github.com/tmpvar/jsdom/issues/325
 core = Object.create(core);
@@ -174,11 +173,19 @@ events.EventTarget = function() {};
 events.EventTarget.getListeners = function getListeners(target, type, capturing) {
     var listeners = target._listeners
             && target._listeners[type]
-            && target._listeners[type][capturing];
-    if (listeners && listeners.length) {
-        return listeners;
+            && target._listeners[type][capturing] || [];
+    if (!capturing) {
+        var traditionalHandler = target['on' + type];
+        if (traditionalHandler) {
+            var implementation = (target._ownerDocument ? target._ownerDocument.implementation
+                                                        : target.document.implementation);
+
+            if (implementation.hasFeature('ProcessExternalResources', 'script')) {
+                listeners.push(traditionalHandler);
+            }
+        }
     }
-    return [];
+    return listeners;
 };
 
 events.EventTarget.dispatch = function dispatch(event, iterator, capturing) {
@@ -194,7 +201,7 @@ events.EventTarget.dispatch = function dispatch(event, iterator, capturing) {
             try {
               listeners[currentListener].call(target, event);
             } catch (e) {
-              target.trigger(
+              target.raise(
                 'error', "Dispatching event '" + event._type + "' failed",
                 {error: e, event: event}
               );
@@ -283,21 +290,6 @@ events.EventTarget.prototype = {
         iterator = events.EventTarget.singleIterator(event._target);
         event._eventPhase = event.AT_TARGET;
         if (!events.EventTarget.dispatch(event, iterator, false)) return event._preventDefault;
-
-        var traditionalHandler = this["on" + event._type];
-        if (traditionalHandler) {
-          try {
-            if (traditionalHandler(event) === false) {
-              return true;
-            }
-          }
-          catch (e) {
-            event._target.trigger(
-              'error', "Dispatching event '" + event._type + "' failed.",
-              {error: e, event: event}
-            );
-          }
-        }
 
         if (event._bubbles && !event._stopPropagation) {
             var i = 0;

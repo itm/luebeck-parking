@@ -99,15 +99,14 @@ function HtmlToDom(parser) {
   } else {
 
     this.appendHtmlToElement = function(){
-      var sys = require('sys');
-      sys.puts('');
-      sys.puts('###########################################################');
-      sys.puts('#  WARNING: No HTML parser could be found.');
-      sys.puts('#  Element.innerHTML setter support has been disabled');
-      sys.puts('#  Element.innerHTML getter support will still function');
-      sys.puts('#  Download: http://github.com/tautologistics/node-htmlparser');
-      sys.puts('###########################################################');
-      sys.puts('');
+      console.log('');
+      console.log('###########################################################');
+      console.log('#  WARNING: No HTML parser could be found.');
+      console.log('#  Element.innerHTML setter support has been disabled');
+      console.log('#  Element.innerHTML getter support will still function');
+      console.log('#  Download: http://github.com/tautologistics/node-htmlparser');
+      console.log('###########################################################');
+      console.log('');
     };
 
   }
@@ -130,7 +129,7 @@ function setChild(parent, node) {
           newNode.sourceLocation.file = parent.sourceLocation.file;
         }
       } catch (err) {
-        currentDocument.trigger('error', 'invalid markup', {
+        currentDocument.raise('error', 'invalid markup', {
           exception: err,
           node : node
         });

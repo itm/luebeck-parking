@@ -1,5 +1,4 @@
-var sys           = require('sys'),
-    http          = require('http'),
+var http          = require('http'),
     URL           = require('url'),
     HtmlToDom     = require('./htmltodom').HtmlToDom,
     domToHtml     = require('./domtohtml').domToHtml,
@@ -12,8 +11,8 @@ var sys           = require('sys'),
 function NOT_IMPLEMENTED(target) {
   return function() {
     if (!jsdom.debugMode) {
-      var trigger = target ? target.trigger : this.trigger;
-      trigger.call(this, 'error', 'NOT IMPLEMENTED');
+      var raise = target ? target.raise : this.raise;
+      raise.call(this, 'error', 'NOT IMPLEMENTED');
     }
   };
 }
@@ -140,8 +139,8 @@ exports.createWindow = function(dom, options) {
     this.dispatchEvent = function() {
       dom.Node.prototype.dispatchEvent.apply(window, arguments);
     };
-    this.trigger = function(){
-      dom.Node.prototype.trigger.apply(window.document, arguments);
+    this.raise = function(){
+      dom.Node.prototype.raise.apply(window.document, arguments);
     };
 
     this.setTimeout = function (fn, ms) { return startTimer(setTimeout, clearTimeout, fn, ms); };
@@ -212,10 +211,10 @@ exports.createWindow = function(dom, options) {
       return cs;
     },
     console: {
-      log:   function(message) { this._window.trigger('log',   message) },
-      info:  function(message) { this._window.trigger('info',  message) },
-      warn:  function(message) { this._window.trigger('warn',  message) },
-      error: function(message) { this._window.trigger('error', message) }
+      log:   function(message) { this._window.raise('log',   message) },
+      info:  function(message) { this._window.raise('info',  message) },
+      warn:  function(message) { this._window.raise('warn',  message) },
+      error: function(message) { this._window.raise('error', message) }
     },
     navigator: {
       userAgent: 'Node.js (' + process.platform + '; U; rv:' + process.version + ')',
@@ -386,8 +385,17 @@ var browserAugmentation = exports.browserAugmentation = function(dom, options) {
   });
 
   dom.Element.prototype.__defineGetter__('innerHTML', function() {
+
+    if (this._tagName === 'script' &&
+        this._attributes.length > 0 &&
+        typeof(this._attributes._nodes.type) !== "undefined" &&
+        this._attributes._nodes.type._nodeValue.indexOf("text") === 0) {
+        return domToHtml(this._childNodes, true, true);
+    }
+
     return domToHtml(this._childNodes, true);
   });
+
   dom.Element.prototype.__defineSetter__('doctype', function() {
     throw new core.DOMException(NO_MODIFICATION_ALLOWED_ERR);
   });

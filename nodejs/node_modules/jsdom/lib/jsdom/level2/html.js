@@ -907,7 +907,7 @@ define('HTMLTextAreaElement', {
   proto: {
     _initDefaultValue: function() {
       if (this._defaultValue === undefined) {
-        this._defaultValue = this.innerHTML;
+        this._defaultValue = this.textContent;
       }
       return this._defaultValue;
     },
@@ -918,11 +918,11 @@ define('HTMLTextAreaElement', {
       return this._initDefaultValue();
     },
     get value() {
-      return this.innerHTML;
+      return this.textContent;
     },
     set value(val) {
       this._initDefaultValue();
-      this.innerHTML = val;
+      this.textContent = val;
     },
     get type() {
       return 'textarea';
@@ -1671,8 +1671,10 @@ define('HTMLFrameElement', {
     //  iframe attributes for the first time."
     //  (http://dev.w3.org/html5/spec/Overview.html#the-iframe-element)
     this._initInsertListener = this.addEventListener('DOMNodeInsertedIntoDocument', function () {
-      // Calling contentWindow getter will create the frame's Document and
-      // DOMWindow.
+      var parentDoc = self._ownerDocument;
+      // Calling contentDocument creates the Document if it doesn't exist.
+      var doc = self.contentDocument;
+      applyDocumentFeatures(doc, parentDoc.implementation._features);
       var window = self.contentWindow;
       window.parent = parent;
       window.top = parent.top;
