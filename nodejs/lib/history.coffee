@@ -60,12 +60,13 @@ storeHistoryItem = (row, timestamp) ->
   if row? and row.name? and row.spaces?
     parkingName = parkingBaseName(row.name)
     # Speichere Parkplatz in Menge von Parkplaetzen falls noch nicht vorhanden
-    db.sadd parkingSet, parkingName, (err) ->
+    db.sadd parkingSet, parkingName, (err, result) ->
       throw err if err?
-      # Speichere Stammdaten (verfuegbare Parkplaetze und Stadt)
-      util.log "HMSET #{parkingName} name: '#{row.name} spaces: #{row.spaces}"
-      db.hmset parkingName, "name", row.name, "spaces", row.spaces, (err) ->
-        throw err if err?
+      if result == 1
+        # Speichere Stammdaten (verfuegbare Parkplaetze und Stadt)
+        util.log "HMSET #{parkingName} name: '#{row.name} spaces: #{row.spaces}"
+        db.hmset parkingName, "name", row.name, "spaces", row.spaces, (err) ->
+          throw err if err?
   else
     util.log "Unsufficient data for historization: #{JSON.stringify(row)}"
 

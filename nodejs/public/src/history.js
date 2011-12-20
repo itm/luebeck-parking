@@ -101,13 +101,15 @@ $(function () {
                 { data:occupancy, color:"rgb(200, 20, 30)" },
                 { data:total, color:"rgb(30, 180, 20)" }
             ],
-                          $.extend(true, {}, options, {
-                              xaxis:{ min:ranges.xaxis.from, max:ranges.xaxis.to }
-                          }));
+                $.extend(true, {}, options, {
+                    xaxis:{ min:ranges.xaxis.from, max:ranges.xaxis.to }
+                }));
 
             // don't fire event on the overview to prevent eternal loop
             smallPlot.setSelection(ranges, true);
         });
+
+        var previousPoint = null;
 
         $("#placeholder").bind("plothover", function (event, pos, item) {
             $("#x").text(pos.x.toFixed(2));
@@ -118,20 +120,18 @@ $(function () {
                     previousPoint = item.dataIndex;
 
                     $("#tooltip").remove();
-                    var x = item.datapoint[0].toFixed(2);
-                    var y = item.datapoint[1].toFixed(2);
-
+                    var parkingOccupation = item.datapoint[1].toFixed(2);
+                    var parkingTimestamp = item.datapoint[2].toFixed(2);
                     var timestamp = new Date();
-                    timestamp.setTime(x - 60 * 60 * 1000);
+                    timestamp.setTime(parkingTimestamp - 60 * 60 * 1000);
 
                     showTooltip(item.pageX, item.pageY,
-                                "<b>"
-                                    + "<b>Belegung: </b>"
-                                    + parseInt(y)
-                                    + "/"
-                                    + spaces
-                                    + "; <b>Zeitpunkt:</b> "
-                                    + timestamp
+                        "<b>Belegung: </b>"
+                            + parseInt(parkingOccupation)
+                            + "/"
+                            + spaces
+                            + "; <b>Zeitpunkt:</b> "
+                            + timestamp
                     );
                 }
             }
@@ -147,16 +147,17 @@ $(function () {
     }
 
     function showTooltip(x, y, contents) {
+        $('tooltip').twipsy({ html:'<div>' + contents + '</div>', animate:true });
         $('<div id="tooltip">' + contents + '</div>').css({
-                                                              position:'absolute',
-                                                              display:'none',
-                                                              top:y + 5,
-                                                              left:x + 5,
-                                                              border:'1px solid #fdd',
-                                                              padding:'2px',
-                                                              'background-color':'#fee',
-                                                              opacity:0.80
-                                                          }).appendTo("body").fadeIn(200);
+            position:'absolute',
+            display:'none',
+            top:y + 5,
+            left:x + 5,
+            border:'1px solid #fdd',
+            padding:'2px',
+            'background-color':'#fee',
+            opacity:0.80
+        }).appendTo("body").fadeIn(200);
     }
 
     function onNoDataRecieved() {
@@ -170,31 +171,33 @@ $(function () {
             { data:[], color:"rgb(30, 180, 20)" }
         ], smallOptions);
 
-        $('<div id="tooltip">' + 'Keine Daten verf&uuml;gbar!' + '</div>').css({
-                                                                                   position:'absolute',
-                                                                                   display:'none',
-                                                                                   top:400,
-                                                                                   left:350,
-                                                                                   border:'3px solid red',
-                                                                                   color:'red',
-                                                                                   'font-weight':'bold',
-                                                                                   padding:'5px',
-                                                                                   'background-color':'white'
-                                                                               }).appendTo("body").fadeIn(200);
+        $('<div class="alert-message error">' +
+            '<a class="close" href="#">×</a>' +
+            '<p><strong>F&uuml;r diesen Parkplatz sind keine Daten verf&uuml;gbar!</strong></p>' +
+            '</div>').css({
+               position:'absolute',
+               left:20,
+               top:-75,
+               width:'75%',
+               margin:'auto',
+               padding:10,
+               'font-size':14
+            }).appendTo('#placeholder').alert().fadeIn(200);
     }
 
     var parking = "Falkenstrasse"; // default
 
     $("#parkings").change(function () {
-        fetchData($(this).val());
+        parking = $(this).val();
+        fetchData(parking);
     });
 
     $("#reset").click(function () {
         fetchData(parking);
     });
 
-    var host = 'enterprise-it.corona.itm.uni-luebeck.de';
-    //var host = 'localhost';
+    //var host = 'enterprise-it.corona.itm.uni-luebeck.de';
+    var host = 'localhost';
     var port = 8080;
 
     function fetchData(parking) {
@@ -203,14 +206,14 @@ $(function () {
         total = [];
 
         $.ajax({
-                   url:'http://' + host + ':' + port + '/json/history/' + parking,
-                   method:'GET',
-                   dataType:'json',
-                   success:onDataReceived,
-                   statusCode:{
-                       404:onNoDataRecieved
-                   }
-               });
+            url:'http://' + host + ':' + port + '/json/history/' + parking,
+            method:'GET',
+            dataType:'json',
+            success:onDataReceived,
+            statusCode:{
+                404:onNoDataRecieved
+            }
+        });
     }
 
     fetchData(parking);

@@ -10,7 +10,7 @@ jqueryUrl = 'http://code.jquery.com/jquery.min.js'
 processRow = ($, row, callback) ->
   #util.log "processRow"
   elements = $(row).children('td')
-  item = {kind:"", name:"", geo:{}, free:0, spaces:0, status:"", city:{}}
+  item = {}
   city = null
   nameStr = elements?.eq(0).html()
   nameStr ?= ""

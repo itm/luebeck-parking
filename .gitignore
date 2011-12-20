@@ -6,3 +6,5 @@ media
 *.rdb
 redis.out
 
+
+nodejs/server.js
