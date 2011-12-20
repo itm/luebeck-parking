@@ -196,8 +196,8 @@ $(function () {
         fetchData(parking);
     });
 
-    //var host = 'enterprise-it.corona.itm.uni-luebeck.de';
-    var host = 'localhost';
+    var host = 'enterprise-it.corona.itm.uni-luebeck.de';
+    //var host = 'localhost';
     var port = 8080;
 
     function fetchData(parking) {
