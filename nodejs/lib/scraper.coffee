@@ -7,8 +7,6 @@ scrapeURL   = 'http://kwlpls.adiwidjaja.com/index.php'
 jqueryUrl   = 'http://code.jquery.com/jquery-1.6.1.min.js'
 scrapeDivId = "cc-m-externalsource-container-m8a3ae44c30fa9708"
 
-currentCity = ""
-
 exports.fetch = (callback) ->
     # Den Inhalt der KWL Seite holen
     request { uri: scrapeURL }, (error, response, body) ->
@@ -28,10 +26,9 @@ exports.fetch = (callback) ->
   
 processPage = (window, callback) ->
     # alte Daten löschen
-    result           = new Object()
-    result.cities    = new Array()
-    result.parkings  = new Array()
-    currentCity      = ""
+    result           = {}
+    result.cities    = []
+    result.parkings  = []
   
     $    = window.jQuery
     rows = $('table').children()
@@ -42,6 +39,8 @@ processPage = (window, callback) ->
             processRow($, row, (item, city) ->
                 result.parkings.push(item) if item?
                 result.cities.push(city) if city?
+                item = null
+                city = null
                 callback(result) if i is num - 2 # Fertig
             )
 
@@ -56,8 +55,8 @@ processRow = ($, row, callback) ->
     item.geo  = geo.data[nameStr]
   
     if elements.size() > 2
-        free   = elements?.eq(2).html()
-        spaces = elements?.eq(1).html()
+        free           = elements?.eq(2).html()
+        spaces         = elements?.eq(1).html()
         item.free      = free
         item.spaces    = spaces
         item.status    = "open"
@@ -66,15 +65,19 @@ processRow = ($, row, callback) ->
         item.status    = "closed"
     else
         # Orte (z.B. "Parkplätze Travemünde" Überschrift)
-        header = $(row).children().first().html()
+        header      = $(row).children().first().html()
         currentCity = header.split(' ')[1]
-        city      = {}
-        city.name = currentCity
-        city.geo  = geo.cities[currentCity]
+        city        = {}
+        city.name   = currentCity
+        city.geo    = geo.cities[currentCity]
 
     item.city = currentCity
     if item.name is "" or not item.name? then item = null
 
+    # Aufraeumen
+    elements = null
+    $ = null
+    
     callback(item, city)
 
 

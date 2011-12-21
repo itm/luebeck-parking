@@ -102,9 +102,9 @@ $(function () {
                 { data: occupancy, label: "Belegt", color: "rgb(200, 20, 30)" },
                 { data: total, label: "Verf&uuml;gbar", color: "rgb(30, 180, 20)" }
             ],
-                    $.extend(true, {}, options, {
-                        xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
-                    }));
+                $.extend(true, {}, options, {
+                    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                }));
 
             // don't fire event on the overview to prevent eternal loop
             smallPlot.setSelection(ranges, true);
@@ -126,14 +126,14 @@ $(function () {
                     timestamp.setTime(x - 60 * 60 * 1000);
 
                     showTooltip(item.pageX, item.pageY,
-                            "<b>"
-                                    + item.series.label
-                                    + ":</b> "
-                                    + parseInt(y)
-                                    + " / "
-                                    + spaces
-                                    + "; <b>Zeitpunkt:</b> "
-                                    + timestamp
+                        "<b>"
+                            + item.series.label
+                            + ":</b> "
+                            + parseInt(y)
+                            + " / "
+                            + spaces
+                            + "; <b>Zeitpunkt:</b> "
+                            + timestamp
                     );
                 }
             }
@@ -188,13 +188,16 @@ $(function () {
     var parking = "Falkenstrasse"; // default
 
     $("#parkings").change(function() {
-        parking = $(this).val();
-        fetchData(parking);
+        fetchData($(this).val());
     });
 
     $("#reset").click(function() {
         fetchData(parking);
     });
+
+    var host = 'enterprise-it.corona.itm.uni-luebeck.de';
+    //var host = 'localhost';
+    var port = 8080;
 
     function fetchData(parking) {
         // reset data
@@ -202,8 +205,7 @@ $(function () {
         total = [];
 
         $.ajax({
-            url: 'http://enterprise-it.corona.itm.uni-luebeck.de:8080/json/history/' + parking,
-            //url: 'http://localhost:8080/json/history/' + parking,
+            url: 'http://' + host + ':' + port + '/json/history/' + parking,
             method: 'GET',
             dataType: 'json',
             success: onDataReceived,

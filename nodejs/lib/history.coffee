@@ -57,7 +57,7 @@ storeHistoryItem = (row, timestamp) ->
     #
     # Stammdaten
     #
-    if row? and row.name? and row.spaces? and row.city?
+    if row? and row.name? and row.spaces? #and row.city?
         parkingName = parkingBaseName(row.name)
         # Speichere Parkplatz in Menge von Parkplätzen falls noch nicht vorhanden
         db.sismember parkingSet, parkingName, (err, isMember) ->
@@ -67,42 +67,55 @@ storeHistoryItem = (row, timestamp) ->
                     throw err if err?
 
         # Speichere Stammdaten (verfügbare Parkplätze und Stadt)
-        db.hmset parkingName, "name", row.name, "spaces", row.spaces, "city", row.city, (err) ->
+        util.log('HMSET ' + parkingName + ' name: ' + row.name + ', spaces: ' + row.spaces )#+ ', city: ' + row.city)
+        db.hmset parkingName, "name", row.name, "spaces", row.spaces, (err) ->#, "city", row.city, (err) ->
             throw err if err?
+
+    else
+      util.log 'Unsufficient data for historization! ' + JSON.stringify(row)
 
     #
     # Bewegungsdaten
     #
+    if row? and row.status? and row.status == 'closed'
+          util.log(row.name + ' currently closed.')
+          
     if row? and row.name? and row.free? and row.status? and timestamp?
+        util.log('HSET timeline ' + timelineBaseName(row.name))
         db.hset parkingName, "timeline", timelineBaseName(row.name)
         # Lege Liste mit Belegungen an für aktuellen Parkplatz
         timelineName = timelineBaseName(row.name) + ':' + timestamp
         db.lpush timelineBaseName(row.name), timelineName, (err) ->
             throw err if err?
             # Speichere Bewegungsdaten (Zeitstempel, Anzahl freier Parkplätze)
+            util.log('HMSET timestamp: ' + timstamp + ', free: ' + row.free, ', status: ' + row.status)
             db.hmset timelineName, "timestamp", timestamp, "free", row.free, "status", row.status, (err) ->
                 throw err if err?
+    else
+      util.log('Could not store timeline for: ' + JSON.stringify(row))
+
 
 #
 # Sucht die Timeline zu dem gegebenen Parkplatznamen. Es werden die Werte der letzten zwei Wochen zurückgegeben.
 #
 exports.findTimelineByName = (name, callback) ->
     theTimeline = []
+    util.log('HGETALL ' + parkingBaseName(name))
     db.hgetall parkingBaseName(name), (err, parking) ->
         throw err if err?
         if parking? and parking.timeline? and parking.spaces?
             twoWeeks = 672 # 24 * 2 * 14, Werte von zwei Wochen bei einem Speicherintervall von 30 Minuten
-            db.lrange parking.timeline, -twoWeeks, -1, (err, entries) ->
+            util.log('LRANGE ' + parking.timeline + ' ' + (twoWeeks * -1) + ' ' + -1)
+            db.lrange parking.timeline, (twoWeeks * -1), -1, (err, entries) ->
                 throw err if err?
                 asyncCounter = entries.length
                 for key in entries
+                    util.log('HGETALL ' + key)
                     db.hgetall key, (err, result) ->
                         throw err if err?
                         theTimeline.push(result)
                         asyncCounter--
                         if asyncCounter is 0 then callback(theTimeline, parking.spaces)
         else
-            callback([], 0)
+            callback([], 0) # parking konnte nicht gefunden werden
 
-
-          

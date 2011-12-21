@@ -36,7 +36,7 @@ handleHistory = () ->
         )
 
 # Alle delay ms die Daten erneut von der KWL holen
-scrapeDelay      = 2 * 60 * 1000 # 2 Minuten
+scrapeDelay      = 3 * 60 * 1000 # 3 Minuten
 scrapeIntervalId = setInterval cacheJson, scrapeDelay
 
 # Alle historyDelay ms die Daten in die Historie speichern

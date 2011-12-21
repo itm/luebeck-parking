@@ -28,51 +28,56 @@
             margin-top: 20px;
         }
     </style>
+    <!--link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css"-->
 </head>
 <body>
-<h1>Parkplatzbelegung in L&uuml;beck</h1>
+<div class="container">
+    <h1>Parkplatzbelegung in L&uuml;beck</h1>
 
-<div id="chooser">
-    <label for="parkings">Parkplatz/Parkhaus: </label>
-    <select id="parkings" name="parkings">
-        <option value="Falkenstrasse">Falkenstrasse</option>
-        <option value="St%20Marien">St. Marien</option>
-        <option value="Lastadie%20P3">Lastadie P3</option>
-        <option value="Lastadie%20P4">Lastadie P4</option>
-        <option value="Lastadie%20P5">Lastadie P5</option>
-        <option value="MuK">MuK</option>
-        <option value="Radisson%20Hotel">Radisson Hotel</option>
-        <option value="Am%20Burgtor">Am Burgtor</option>
-        <option value="Huexstrasse">Huexstrasse</option>
-        <option value="Kanalstrasse%201-5">Kanalstrasse 1-5</option>
-        <option value="Linden%20Arcaden">Linden Arcaden</option>
-        <option value="Haerder-Center">Haerder-Center</option>
-        <option value="Karstadt">Karstadt</option>
-        <option value="Mitte">Mitte</option>
-        <option value="Pferdemarkt">Pferdemarkt</option>
-        <option value="Am%20Holstentor">Am Holstentor</option>
-        <option value="Radisson%20Hotel">Radisson Hotel</option>
-        <option value="Kowitzberg">Kowitzberg</option>
-        <option value="Backbord">Backbord</option>
-        <option value="Godewind">Godewind</option>
-        <option value="Maritim">Maritim</option>
-        <option value="Am%20Leuchtturm">Am Leuchtturm</option>
-        <option value="Leuchtenfeld">Leuchtenfeld</option>
-        <option value="Hafenbahnhof">Hafenbahnhof</option>
-        <option value="Baggersand%201">Baggersand 1</option>
-        <option value="Baggersand%202">Baggersand 2</option>
-    </select>
+    <div id="chooser">
+        <label for="parkings">Parkplatz/Parkhaus: </label>
+        <select id="parkings" name="parkings">
+            <option value="Falkenstrasse">Falkenstrasse</option>
+            <option value="St%20Marien">St. Marien</option>
+            <option value="Lastadie%20P3">Lastadie P3</option>
+            <option value="Lastadie%20P4">Lastadie P4</option>
+            <option value="Lastadie%20P5">Lastadie P5</option>
+            <option value="MuK">MuK</option>
+            <option value="Radisson%20Hotel">Radisson Hotel</option>
+            <option value="Am%20Burgtor">Am Burgtor</option>
+            <option value="Huexstrasse">Huexstrasse</option>
+            <option value="Kanalstrasse%201-5">Kanalstrasse 1-5</option>
+            <option value="Linden%20Arcaden">Linden Arcaden</option>
+            <option value="Haerder-Center">Haerder-Center</option>
+            <option value="Karstadt">Karstadt</option>
+            <option value="Mitte">Mitte</option>
+            <option value="Pferdemarkt">Pferdemarkt</option>
+            <option value="Am%20Holstentor">Am Holstentor</option>
+            <option value="Radisson%20Hotel">Radisson Hotel</option>
+            <option value="Kowitzberg">Kowitzberg</option>
+            <option value="Backbord">Backbord</option>
+            <option value="Godewind">Godewind</option>
+            <option value="Maritim">Maritim</option>
+            <option value="Am%20Leuchtturm">Am Leuchtturm</option>
+            <option value="Leuchtenfeld">Leuchtenfeld</option>
+            <option value="Hafenbahnhof">Hafenbahnhof</option>
+            <option value="Baggersand%201">Baggersand 1</option>
+            <option value="Baggersand%202">Baggersand 2</option>
+        </select>
+    </div>
+
+    <h3>&Uuml;bersicht (zoomen m&ouml;glich)</h3>
+
+    <div id="overview"></div>
+
+    <h3>Detailliert (zoomen m&ouml;glich)</h3>
+
+    <div id="placeholder"></div>
+
+
+    <div id="reset"><input type="button" name="reset" value="Zur&uuml;cksetzen" class="btn"/></div>
+
 </div>
-
-<h3>&Uuml;bersicht (zoomen m&ouml;glich)</h3>
-
-<div id="overview"></div>
-
-<h3>Detailliert (zoomen m&ouml;glich)</h3>
-
-<div id="placeholder"></div>
-
-<div id="reset"><input type="button" name="reset" value="Zur&uuml;cksetzen"/></div>
 
 </body>
 <script language="javascript" type="text/javascript" src="lib/flot/jquery.js"></script>
