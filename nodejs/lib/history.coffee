@@ -94,7 +94,6 @@ storeHistoryItem = (row, timestamp) ->
     else
       util.log('Could not store timeline for: ' + JSON.stringify(row))
 
-
 #
 # Sucht die Timeline zu dem gegebenen Parkplatznamen. Es werden die Werte der letzten zwei Wochen zurückgegeben.
 #
