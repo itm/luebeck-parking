@@ -1,7 +1,8 @@
-scraper = require './lib/scraper'
-history = require './lib/history'
+path = require 'path'
 url = require 'url'
 util = require 'util'
+scraper = require path.join __dirname, 'lib', 'scraper'
+history = require path.join __dirname, 'lib', 'history'
 
 # Fehlerbehandlung für unerwartete Exceptions
 process.on 'uncaughtException', (err) ->
@@ -57,7 +58,7 @@ app.get '/json/current', (req, res) ->
   console.time 'Ausgeliefert: /json/current'
 
   if _data?
-    res.send(JSON.stringify(_data))
+    res.json(_data)
   else
     res.send('Derzeit keine Daten verf&uuml;gbar.', 404)
 
@@ -78,7 +79,7 @@ app.get '/json/history/:name', (req, res) ->
 
     if timeline? and timeline?.length > 0
       # Status 200, alles OK
-      res.send(JSON.stringify(feedback))
+      res.json(feedback)
     else
       # Status 404 senden
       res.send('Derzeit keine Daten f&uuml;r Parkplatz "' + name + '" verf&uuml;gbar.', 404)
