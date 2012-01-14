@@ -5,6 +5,4 @@ media
 *.log
 *.rdb
 redis.out
-
-
 nodejs/server.js
