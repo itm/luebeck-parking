@@ -1,86 +1,82 @@
-(function() {
-  var async, geo, jqueryUrl, jsdom, processPage, processRow, request, scrapeURL, util;
-  request = require('request');
-  jsdom = require('jsdom');
-  async = require('async');
-  util = require('util');
-  geo = require('./geo');
-  scrapeURL = 'http://kwlpls.adiwidjaja.com/index.php';
-  jqueryUrl = 'http://code.jquery.com/jquery.min.js';
-  processRow = function($, row, callback) {
-    var city, currentCity, elements, free, header, item, nameStr, spaces;
-    elements = $(row).children('td');
-    item = {};
-    city = null;
-    nameStr = elements != null ? elements.eq(0).html() : void 0;
-        if (nameStr != null) {
-      nameStr;
-    } else {
-      nameStr = "";
-    };
+var request = require('request');
+var jsdom = require('jsdom');
+var async = require('async');
+var path = require('path');
+var util = require('util');
+var geo = require(path.join(__dirname, 'geo'));
+
+var scrapeURL = 'http://kwlpls.adiwidjaja.com/index.php';
+var jqueryUrl = 'http://code.jquery.com/jquery.min.js';
+
+function processRow($, row, callback) {
+    var elements = $(row).children('td');
+    var item = {};
+    var city = null;
+    var nameStr = elements != null ? elements.eq(0).html() : "";
     item.kind = nameStr.substring(0, 2);
     item.name = nameStr.substring(3);
     item.geo = geo.data[nameStr];
     if (elements.size() > 2) {
-      free = elements != null ? elements.eq(2).html() : void 0;
-      spaces = elements != null ? elements.eq(1).html() : void 0;
-      item.free = free;
-      item.spaces = spaces;
-      item.status = "open";
+        var free = elements != null ? elements.eq(2).html() : void 0;
+        var spaces = elements != null ? elements.eq(1).html() : void 0;
+        item.free = free;
+        item.spaces = spaces;
+        item.status = "open";
     } else if (elements.size() > 0) {
-      item.status = "closed";
+        item.status = "closed";
     } else {
-      header = $(row).children().first().html();
-      currentCity = header.split(' ')[1];
-      city = {
-        name: "",
-        geo: {}
-      };
-      city.name = currentCity;
-      city.geo = geo.cities[currentCity];
+        var header = $(row).children().first().html();
+        var currentCity = header.split(' ')[1];
+        city = {
+            name:"",
+            geo:{}
+        };
+        city.name = currentCity;
+        city.geo = geo.cities[currentCity];
     }
     item.city = currentCity;
-    if (item.name === "" || !(item.kind === "PP" || item.kind === "PH")) {
-      item = null;
+    if (item.name == "" || !(item.kind == "PP" || item.kind == "PH")) {
+        item = null;
     }
-    return callback(item, city);
-  };
-  processPage = function(window, returnResult) {
-    var $, result, rows;
-    result = {
-      cities: [],
-      parkings: []
+    callback(item, city);
+}
+
+function processPage(window, returnResult) {
+    var result = {
+        cities:[],
+        parkings:[]
     };
-    $ = window.$;
-    rows = $("table").children();
-    return async.forEach(rows, (function(row, done) {
-      return processRow($, row, function(item, city) {
-        if (item != null) {
-          result.parkings.push(item);
-        }
-        if (city != null) {
-          result.cities.push(city);
-        }
-        return done();
-      });
-    }), (function(err) {
-      return returnResult(err, result);
-    }));
-  };
-  exports.fetch = function(callback) {
-    return request({
-      uri: scrapeURL
-    }, function(error, response, page) {
-      if (error && response && response.statusCode !== 200) {
-        return util.log('Error when contacting #{scrapeURL}');
-      } else {
-        return jsdom.env(page, [jqueryUrl], function(err, window) {
-          if (err != null) {
-            throw err;
-          }
-          return processPage(window, callback);
+    var $ = window.$;
+    var rows = $("table").children();
+    return async.forEach(rows, (function (row, done) {
+        return processRow($, row, function (item, city) {
+            if (item != null) {
+                result.parkings.push(item);
+            }
+            if (city != null) {
+                result.cities.push(city);
+            }
+            return done();
         });
-      }
+    }), (function (err) {
+        returnResult(err, result);
+    }));
+}
+
+exports.fetch = function (callback) {
+    return request({
+        uri:scrapeURL
+    }, function (error, response, page) {
+        if (error && response && response.statusCode !== 200) {
+            util.log('Error when contacting #{scrapeURL}');
+        } else {
+            jsdom.env(page, [jqueryUrl], function (err, window) {
+                if (err != null) {
+                    throw err;
+                }
+                processPage(window, callback);
+            });
+        }
     });
-  };
-}).call(this);
+};
+

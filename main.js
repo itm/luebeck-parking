@@ -1,8 +1,10 @@
-var modules_dir = 'modules';
 var path = require('path');
 var util = require('util');
+var _ = require('underscore');
+var modules_dir = 'modules';
 var scraper = require(path.join(__dirname, modules_dir, 'scraper'));
 var history = require(path.join(__dirname, modules_dir, 'history'));
+
 
 process.on('uncaughtException', function (err) {
     if (err) {
@@ -51,8 +53,18 @@ port = 8080;
 app = express.createServer();
 
 app.configure(function () {
-    return app.use(express.static(__dirname + '/public'));
+    app.use(express.methodOverride());
+    app.use(express.bodyParser());
+    app.use(app.router);
+    app.use(express.static(__dirname + '/public'));
+    app.use(express.errorHandler({ dumpExceptions:true, showStack:true }));
 });
+
+//app.configure('production', function () {
+//    var oneYear = 31557600000;
+//    app.use(express.static(__dirname + '/public', { maxAge:oneYear }));
+//    app.use(express.errorHandler());
+//});
 
 app.get('/json/current', function (req, res) {
     console.time('Ausgeliefert: /json/current');
