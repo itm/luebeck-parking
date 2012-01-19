@@ -21,7 +21,7 @@ _data = []
 
 cacheJson = () ->
   util.log "Starte scraping..."
-  scraper.fetch (err, result) ->
+  scraper.scrape (err, result) ->
     throw err if err?
     _data = result
     util.log "Daten geholt (#{_data?.parkings?.length} Eintraege)"

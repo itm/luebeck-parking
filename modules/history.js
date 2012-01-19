@@ -1,9 +1,9 @@
-var redis = require('redis');
-var util = require('util');
-var async = require('async');
+var redis = require("redis");
+var util = require("util");
+var async = require("async");
 var db = redis.createClient();
 
-db.on('error', function (err) {
+db.on("error", function (err) {
     if (err != null) {
         return util.log(err);
     }
@@ -49,7 +49,7 @@ var storeHistoryItem = function (row, timestamp) {
                 throw err;
             }
             if (result == 1) {
-                util.log("HMSET " + parkingName + " name: '" + row.name + " spaces: " + row.spaces);
+                util.log("HMSET " + parkingName + " name: " + row.name + " spaces: " + row.spaces);
                 db.hmset(parkingName, "name", row.name, "spaces", row.spaces, function (err) {
                     if (err != null) {
                         throw err;
@@ -60,13 +60,13 @@ var storeHistoryItem = function (row, timestamp) {
     } else {
         util.log("Unsufficient data for historization: " + (JSON.stringify(row)));
     }
-    if ((row != null) && (row.status != null) && row.status == 'closed') {
-        util.log(row.name + ' currently closed.');
+    if ((row != null) && (row.status != null) && row.status == "closed") {
+        util.log(row.name + " currently closed.");
     }
     if ((row != null) && (row.name != null) && (row.free != null) && (timestamp != null)) {
         util.log("HSET " + parkingName + " timeline " + (timelineBaseName(row.name)));
         db.hset(parkingName, "timeline", timelineBaseName(row.name));
-        timelineName = timelineBaseName(row.name) + ':' + timestamp;
+        timelineName = timelineBaseName(row.name) + ":" + timestamp;
         util.log("LPUSH " + (timelineBaseName(row.name)) + " " + timelineName);
         db.lpush(timelineBaseName(row.name), timelineName, function (err) {
             if (err != null) {
