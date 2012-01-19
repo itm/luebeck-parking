@@ -1,8 +1,6 @@
-media
 .DS_Store
 .idea
 *.iml
 *.log
 *.rdb
 redis.out
-nodejs/server.js
