@@ -453,9 +453,9 @@ new Ext.Application({
             var occupation = getOccupation(parking);
             var info;
             if (parking.status == "open") {
-                info = "<b>Auslastung</b> "
+                info = "<b>Belegung</b> "
                         + "<br/>"
-                        + parking.free + " / " + parking.spaces
+                        + (parking.spaces-parking.free) + " von " + parking.spaces
                         + "<br/>"
                         + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
                         + occupation
