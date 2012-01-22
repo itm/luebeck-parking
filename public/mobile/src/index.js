@@ -7,7 +7,7 @@ Ext.jep.List = Ext.extend(Ext.List, {
     // the index in the handler (the display index) and the record index in the store.
     // this isn't always the same when you have a custom grouping function that causes
     // the store's to not sort identically to the display order (see bug report)
-    displayIndexToRecordIndex: function (targetIndex) {
+    displayIndexToRecordIndex:function (targetIndex) {
         if (this.grouped) {
             var groups = this.getStore().getGroups();
 
@@ -27,7 +27,7 @@ Ext.jep.List = Ext.extend(Ext.List, {
     // Use this to convert the store's record index to the display index
     // for using the list's nodes directly via list.all.elements[i] or
     // in calls to list.getNode.
-    recordIndexToDisplayIndex: function (targetIndex) {
+    recordIndexToDisplayIndex:function (targetIndex) {
         if (this.grouped) {
             var rec = this.getStore().getAt(targetIndex);
 
@@ -50,7 +50,7 @@ Ext.jep.List = Ext.extend(Ext.List, {
 
     // Fixes getNode so that if you pass it a store record, it will return the
     // proper node even when the grouping/sorting situations described above happen.
-    getNode: function (nodeInfo) {
+    getNode:function (nodeInfo) {
         if (Ext.isString(nodeInfo)) {
             return document.getElementById(nodeInfo);
         } else if (Ext.isNumber(nodeInfo)) {
@@ -64,12 +64,12 @@ Ext.jep.List = Ext.extend(Ext.List, {
 
     // Fixes getRecord so that it gets the proper store record even when the
     // grouping/sorting situations described above happen.
-    getRecord: function(node) {
+    getRecord:function (node) {
         return this.store.getAt(this.displayIndexToRecordIndex(node.viewIndex));
     },
 
     // Fix for groupTpl not being able to accept an XTemplate
-    initComponent : function() {
+    initComponent:function () {
         Ext.jep.List.superclass.initComponent.apply(this);
 
         if (this.grouped && this.groupTpl && this.groupTpl.html) {
@@ -78,12 +78,12 @@ Ext.jep.List = Ext.extend(Ext.List, {
     },
 
     // Allows for dynamically switching between grouped/non-grouped
-    setGrouped: function(grouped) {
+    setGrouped:function (grouped) {
         // we have to save the itemTpl user functions first, which are in different place depending on grouping
         var memberFnsCombo =
-                (!this.grouped && this.tpl && this.tpl.initialConfig)
-                        ? this.tpl.initialConfig
-                        : ((this.grouped && this.listItemTpl && this.listItemTpl.initialConfig) ? this.listItemTpl.initialConfig : {});
+            (!this.grouped && this.tpl && this.tpl.initialConfig)
+                ? this.tpl.initialConfig
+                : ((this.grouped && this.listItemTpl && this.listItemTpl.initialConfig) ? this.listItemTpl.initialConfig : {});
 
         this.grouped = !!grouped;
 
@@ -136,7 +136,7 @@ Ext.jep.List = Ext.extend(Ext.List, {
             this.refresh();
     },
 
-    updatePinHeaders: function() {
+    updatePinHeaders:function () {
         if (this.rendered)
             if (this.grouped && this.pinHeaders)
                 this.onScrollStart();
@@ -144,17 +144,17 @@ Ext.jep.List = Ext.extend(Ext.List, {
                 this.setActiveGroup();
     },
 
-    onScrollStart: function() {
+    onScrollStart:function () {
         if (this.grouped && this.pinHeaders && this.getStore().data.length)
             Ext.jep.List.superclass.onScrollStart.apply(this);
     },
 
-    onScroll: function(scroller, pos, options) {
+    onScroll:function (scroller, pos, options) {
         if (this.grouped && this.pinHeaders && this.getStore().data.length)
             Ext.jep.List.superclass.onScroll.apply(this, [scroller, pos, options]);
     },
 
-    setPinHeaders: function(pinHeaders) {
+    setPinHeaders:function (pinHeaders) {
         this.pinHeaders = pinHeaders;
         this.updatePinHeaders();
     }
@@ -164,29 +164,30 @@ Ext.reg('jeplist', Ext.jep.List);
 
 
 new Ext.Application({
-    launch: function() {
+    launch:function () {
 
         var jsonServer = 'http://141.83.151.102:8080/json/current';
+        //var jsonServer = 'http://localhost:8080/json/current';
 
         var lübeck = new google.maps.LatLng(53.867814, 10.687208); // default
-        var infoWindow = new google.maps.InfoWindow({maxWidth: 350}); // 350 is a hack to get autosizing working
+        var infoWindow = new google.maps.InfoWindow({maxWidth:350}); // 350 is a hack to get autosizing working
         var lastActiveItem = 0;
         var myPosition;
         var directionsDisplay = new google.maps.DirectionsRenderer();
         var map = new Ext.Map({
-            title: 'Map',
-            getLocation: true,
-            mapOptions: {
-                center: lübeck,
-                zoom: 15
+            title:'Map',
+            getLocation:true,
+            mapOptions:{
+                center:lübeck,
+                zoom:15
             }
         });
 
-        window.onbeforeunload = function() {
+        window.onbeforeunload = function () {
             return "Wirklich die Anwendung verlassen?";
         };
 
-        var getMarkerAt = function(position) {
+        var getMarkerAt = function (position) {
             for (var i = 0; i < map.markers.length; i++) {
                 var marker = map.markers[i];
                 if (marker.position.equals(position)) {
@@ -197,23 +198,23 @@ new Ext.Application({
 
         // --- Home Bildschirm ---
 
-        var infoHandler = function() {
+        var infoHandler = function () {
             if (!this.popup) {
                 this.popup = new Ext.Panel({
-                    floating: true,
-                    modal: true,
-                    centered: true,
-                    width: 300,
-                    height: 200,
-                    styleHtmlContent: true,
-                    scroll: 'vertical',
-                    html: '<p>Entwickelt im Rahmen des Projekts SmartLübeck.'
-                            + '<br/>Verwendet das Parkleitsystem der KWL.</p>',
-                    dockedItems: [
+                    floating:true,
+                    modal:true,
+                    centered:true,
+                    width:300,
+                    height:200,
+                    styleHtmlContent:true,
+                    scroll:'vertical',
+                    html:'<p>Entwickelt im Rahmen des Projekts SmartLübeck.'
+                        + '<br/>Verwendet das Parkleitsystem der KWL.</p>',
+                    dockedItems:[
                         {
-                            dock: 'top',
-                            xtype: 'toolbar',
-                            title: 'Info'
+                            dock:'top',
+                            xtype:'toolbar',
+                            title:'Info'
                         }
                     ]
                 });
@@ -222,44 +223,44 @@ new Ext.Application({
         };
 
         var pnlHome = new Ext.Panel({
-            dockedItems : [
-                {xtype: 'toolbar', dock : 'top', title: 'SmartLübeck Parking'}
+            dockedItems:[
+                {xtype:'toolbar', dock:'top', title:'SmartLübeck Parking'}
             ],
-            layout: {
-                type: 'vbox',
-                pack: 'center'
+            layout:{
+                type:'vbox',
+                pack:'center'
             },
-            defaults: {
-                xtype:  'button',
-                width:  300,
-                style:  'margin: 0.5em;'
+            defaults:{
+                xtype:'button',
+                width:300,
+                style:'margin: 0.5em;'
             },
-            items:  [
+            items:[
                 {
-                    text: 'Karte',
-                    iconMask: true,
-                    iconCls: 'maps',
-                    handler: function() {
+                    text:'Karte',
+                    iconMask:true,
+                    iconCls:'maps',
+                    handler:function () {
                         lastActiveItem = 0;
                         main.setActiveItem(1);
                         loadData();
                     }
                 },
                 {
-                    text: 'Liste',
-                    iconMask: true,
-                    iconCls: 'bookmarks',
-                    handler: function() {
+                    text:'Liste',
+                    iconMask:true,
+                    iconCls:'bookmarks',
+                    handler:function () {
                         lastActiveItem = 2;
                         main.setActiveItem(2);
                         store.load();
                     }
                 },
                 {
-                    text: 'Info',
-                    iconMask: true,
-                    iconCls: 'info',
-                    handler: infoHandler
+                    text:'Info',
+                    iconMask:true,
+                    iconCls:'info',
+                    handler:infoHandler
                 }
             ]
         });
@@ -267,73 +268,72 @@ new Ext.Application({
         // --- Kartenansicht ---
 
         var btnBack = {
-            ui: 'back',
-            text: 'Zurück',
-            handler: function() {
+            ui:'back',
+            text:'Zurück',
+            handler:function () {
                 console.log(lastActiveItem);
                 main.setActiveItem(lastActiveItem);
             }
         };
 
         var bar = new Ext.Toolbar({
-            dock        : 'top',
-            items       : [btnBack]
+            dock:'top',
+            items:[btnBack]
         });
 
         var pnlMap = new Ext.Panel({
-            dockedItems: [bar],
-            items      : [map]
+            dockedItems:[bar],
+            items:[map]
         });
 
         // --- Model, Store und Liste ---
 
         Ext.regModel('Parking', {
-            fields: ['kind', 'name', 'status', {name:'free', type:'int'}, {name:'spaces', type:'int'}, "city"]
+            fields:['kind', 'name', 'status', {name:'free', type:'int'}, {name:'spaces', type:'int'}, "city"]
         });
 
         var store = new Ext.data.JsonStore({
-            model : 'Parking',
+            model:'Parking',
             //autoLoad: true,
-            sorters: 'name',
-            proxy: {
-                type: 'scripttag',
-                url : jsonServer,
-                reader: {
-                    type: 'json',
-                    root: 'parkings'
+            proxy:{
+                type:'scripttag',
+                url:jsonServer,
+                reader:{
+                    type:'json',
+                    root:'current'
                 },
-                callbackParam: 'callback'
+                callbackParam:'callback'
             },
-            sorters: [
+            sorters:[
                 {
-                    property : 'city',
-                    direction: 'ASC'
+                    property:'city',
+                    direction:'ASC'
                 }
             ],
-            getGroupString : function(record) {
+            getGroupString:function (record) {
                 return record.get('city');
             }
         });
 
         var tpl = new Ext.XTemplate(
-                '<div>{kind} <b>{name}</b></div><div>{[this.getInfo(values)]}</div>',
-                {
-                    compiled: true,
-                    getInfo: function(value) {
-                        if (value.status == "closed") {
-                            return "geschlossen";
-                        } else {
-                            return value.free + " von " + value.spaces + " frei."
-                                    + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
-                                    + getOccupation(value)
-                                    + "%;\"></div></div>";
-                        }
+            '<div>{kind} <b>{name}</b></div><div>{[this.getInfo(values)]}</div>',
+            {
+                compiled:true,
+                getInfo:function (value) {
+                    if (value.status == "closed") {
+                        return "geschlossen";
+                    } else {
+                        return value.free + " von " + value.spaces + " frei."
+                            + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
+                            + getOccupation(value)
+                            + "%;\"></div></div>";
                     }
                 }
+            }
         );
 
         var list = new Ext.jep.List({
-            onItemDisclosure: function (record) {
+            onItemDisclosure:function (record) {
                 var city = record.raw;
                 main.setActiveItem(1);
                 loadData();
@@ -345,39 +345,39 @@ new Ext.Application({
                 map.map.setZoom(15);
                 createRoute(position);
             },
-            itemTpl : tpl,
-            grouped : true,
-            store: store
+            itemTpl:tpl,
+            grouped:true,
+            store:store
         });
 
-        var sortHandler = function() {
+        var sortHandler = function () {
             if (!this.actions) {
                 this.actions = new Ext.ActionSheet({
-                    items: [
+                    items:[
                         {
-                            text: 'Name',
-                            handler : function() {
+                            text:'Name',
+                            handler:function () {
                                 store.sort('name');
                             }
                         },
                         {
-                            text : 'Freie Plätze',
-                            handler : function() {
+                            text:'Freie Plätze',
+                            handler:function () {
                                 store.sort('free');
                                 list.refresh();
                             }
                         },
                         {
-                            text : 'Gesamt Plätze',
-                            handler : function() {
+                            text:'Gesamt Plätze',
+                            handler:function () {
                                 store.sort('spaces');
                             }
                         },
                         {
-                            text : 'Zurück',
-                            ui: 'decline',
-                            scope : this,
-                            handler : function() {
+                            text:'Zurück',
+                            ui:'decline',
+                            scope:this,
+                            handler:function () {
                                 this.actions.hide();
                             }
                         }
@@ -388,45 +388,45 @@ new Ext.Application({
         };
 
         var btnSort = {
-            text: 'Sortieren',
-            handler: sortHandler
+            text:'Sortieren',
+            handler:sortHandler
         };
 
         var btnHome = {
-            ui: 'back',
-            text: 'Zurück',
-            handler: function() {
+            ui:'back',
+            text:'Zurück',
+            handler:function () {
                 main.setActiveItem(0);
             }
         };
 
         var pnlList = new Ext.Panel({
-            layout: 'fit',
-            items       : [list],
-            dockedItems : [
-                {xtype: 'toolbar', dock: 'top', items: [btnHome,{xtype:'spacer'},btnSort] }
+            layout:'fit',
+            items:[list],
+            dockedItems:[
+                {xtype:'toolbar', dock:'top', items:[btnHome, {xtype:'spacer'}, btnSort] }
             ]
         });
 
         // --- Haupt Panel ---
 
         var main = new Ext.Panel({
-            fullscreen: true,
-            layout:     'card',
-            items:      [pnlHome, pnlMap, pnlList],
-            cardSwitchAnimation: 'slide'
+            fullscreen:true,
+            layout:'card',
+            items:[pnlHome, pnlMap, pnlList],
+            cardSwitchAnimation:'slide'
         });
         main.setActiveItem(0);
 
-        var createRoute = function(destination) {
+        var createRoute = function (destination) {
             var directionsService = new google.maps.DirectionsService();
 
             var request = {
-                origin: myPosition,
-                destination: destination,
-                travelMode: google.maps.TravelMode["DRIVING"]
+                origin:myPosition,
+                destination:destination,
+                travelMode:google.maps.TravelMode["DRIVING"]
             };
-            directionsService.route(request, function(response, status) {
+            directionsService.route(request, function (response, status) {
                 if (status == google.maps.DirectionsStatus.OK) {
                     directionsDisplay.setDirections(response);
                 }
@@ -434,8 +434,8 @@ new Ext.Application({
 
         };
 
-        var tabButtonHandler = function(button, event) {
-            Ext.each(theData.cities, function(city) {
+        var tabButtonHandler = function (button, event) {
+            Ext.each(current.cities, function (city) {
                 if (city.name == button.id) {
                     map.map.panTo(new google.maps.LatLng(city.geo.lat, city.geo.lng));
                     map.map.setZoom(13);
@@ -445,49 +445,49 @@ new Ext.Application({
         };
 
         // for debugging while there's no api
-        var getOccupation = function(parking) {
+        var getOccupation = function (parking) {
             return Math.floor(100 - ((parking.free * 100) / parking.spaces));
         };
 
-        var createParkingInfoWindow = function(parking) {
+        var createParkingInfoWindow = function (parking) {
             var occupation = getOccupation(parking);
             var info;
             if (parking.status == "open") {
                 info = "<b>Auslastung</b> "
-                        + "<br/>"
-                        + parking.free + " / " + parking.spaces
-                        + "<br/>"
-                        + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
-                        + occupation
-                        + "%;\"></div></div>";
+                    + "<br/>"
+                    + parking.free + " / " + parking.spaces
+                    + "<br/>"
+                    + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
+                    + occupation
+                    + "%;\"></div></div>";
             } else {
                 info = "vorrübergehend geschlossen";
             }
 
             return "<div class=\"parkingInfoWindow\">"
-                    + "<b>" + parking.name + "</b> (" + parking.kind + ")</b>"
-                    + "<br/>"
-                    + info
-                    + "</div>"
+                + "<b>" + parking.name + "</b> (" + parking.kind + ")</b>"
+                + "<br/>"
+                + info
+                + "</div>"
         };
 
-        var loadData = function() {
-            map.markers = new Array();
+        var loadData = function () {
+            map.markers = [];
             bar.removeAll();
             bar.add(btnBack);
             // Add points to the map
-            Ext.each(theData.cities, function(city) {
+            Ext.each(current.cities, function (city) {
                 bar.add({
-                    text: city.name,
-                    id  : city.name,
-                    handler: tabButtonHandler
+                    text:city.name,
+                    id:city.name,
+                    handler:tabButtonHandler
                 });
             });
             //bar.add({xtype:'spacer'});
 
             bar.doLayout();
             //console.log(city);
-            Ext.each(theData.parkings, function(parking) {
+            Ext.each(current.parkings, function (parking) {
                 if (typeof parking.geo !== 'undefined') {
                     var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
                     addMarker(parking, position, infoWindow);
@@ -504,22 +504,21 @@ new Ext.Application({
         };
 
         // These are all Google Maps APIs
-        var addMarker = function(parking, position, infowindow) {
+        var addMarker = function (parking, position, infowindow) {
             var image;
             switch (parking.kind) {
                 case "PP":
-                    image = "images/parking.png"
+                    image = "img/parking.png";
                     break;
                 case "PH":
-                    image = "images/parking.png"
+                    image = "img/parking.png";
                     break;
             }
-            ;
 
             var marker = new google.maps.Marker({
-                map: map.map,
-                position: position,
-                icon: image
+                map:map.map,
+                position:position,
+                icon:image
             });
             marker.title = parking.name;
             marker.parking = parking;
@@ -527,7 +526,7 @@ new Ext.Application({
             // Sencha Touch has problems with the maps handlers...
             // click wont work on mobile devices
             // see http://www.sencha.com/forum/showthread.php?117876-OPEN-642-map-on-1.0.1-not-responding-to-click-events-on-iPhone-Android/
-            var evListener = function() {
+            var evListener = function () {
                 infowindow.setContent(createParkingInfoWindow(parking));
                 infoWindow.open(map.map, marker);
             };
@@ -536,15 +535,15 @@ new Ext.Application({
             google.maps.event.addListener(marker, 'click', evListener);
         };
 
-        var getMyPosition = function() {
+        var getMyPosition = function () {
             if (typeof(navigator.geolocation) != 'undefined') {
-                navigator.geolocation.getCurrentPosition(function(position) {
+                navigator.geolocation.getCurrentPosition(function (position) {
                     var lat = position.coords.latitude;
                     var lng = position.coords.longitude;
                     myPosition = new google.maps.LatLng(lat, lng);
                     var marker = new google.maps.Marker({
-                        map: map.map,
-                        position: myPosition
+                        map:map.map,
+                        position:myPosition
                     });
                     marker.title = "Ihre Position";
                 });

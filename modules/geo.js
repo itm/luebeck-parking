@@ -1,47 +1,58 @@
 exports.data = {
-    'PH Radisson Hotel':{
+    'Radisson Hotel':{
         lat:53.868184,
-        lng:10.676839
+        lng:10.676839,
+        city:'Lübeck'
     },
-    'PP MuK':{
+    'MuK':{
         lat:53.869319,
-        lng:10.676662
+        lng:10.676662,
+        city:'Lübeck'
     },
-    'PP Kanalstrasse 1-5':{
+    'Kanalstrasse 1-5':{
         lat:53.869882,
-        lng:10.695727
+        lng:10.695727,
+        city:'Lübeck'
     },
-    'PH Am Burgtor':{
+    'Am Burgtor':{
         lat:53.873614,
-        lng:10.692959
+        lng:10.692959,
+        city:'Lübeck'
     },
-    'PH Falkenstrasse':{
+    'Falkenstrasse':{
         lat:53.869389,
-        lng:10.698441
+        lng:10.698441,
+        city:'Lübeck'
     },
-    'PH Haerder-Center':{
+    'Haerder-Center':{
         lat:53.86559,
-        lng:10.68538
+        lng:10.68538,
+        city:'Lübeck'
     },
-    'PH Mitte':{
+    'Mitte':{
         lat:53.865277,
-        lng:10.68339
+        lng:10.68339,
+        city:'Lübeck'
     },
-    'PP Kowitzberg':{
+    'Kowitzberg':{
         lat:53.975279,
-        lng:10.875177
+        lng:10.875177,
+        city:'Lübeck'
     },
-    'PH Maritim':{
+    'Maritim':{
         lat:53.960706,
-        lng:10.87786
+        lng:10.87786,
+        city:'Lübeck'
     },
-    'PP Leuchtenfeld':{
+    'Leuchtenfeld':{
         lat:53.960990,
-        lng:10.88074
+        lng:10.88074,
+        city:'Lübeck'
     },
-    'PP Godewind':{
+    'Godewind':{
         lat:53.965958,
-        lng:10.87521
+        lng:10.87521,
+        city:'Lübeck'
     }
 };
 

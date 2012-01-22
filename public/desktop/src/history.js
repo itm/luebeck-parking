@@ -39,7 +39,7 @@ $(function () {
         d.setUTCHours(0);
         var i = d.getTime();
         do {
-            // when we don't set yaxis, the rectangle automatically
+            // when we don"t set yaxis, the rectangle automatically
             // extends to infinity upwards and downwards
             markings.push({ xaxis:{ from:i, to:i + 2 * 24 * 60 * 60 * 1000 } });
             i += 7 * 24 * 60 * 60 * 1000;
@@ -101,11 +101,11 @@ $(function () {
                 { data:occupancy, color:"rgb(200, 20, 30)" },
                 { data:total, color:"rgb(30, 180, 20)" }
             ],
-                $.extend(true, {}, options, {
-                    xaxis:{ min:ranges.xaxis.from, max:ranges.xaxis.to }
-                }));
+            $.extend(true, {}, options, {
+                xaxis:{ min:ranges.xaxis.from, max:ranges.xaxis.to }
+            }));
 
-            // don't fire event on the overview to prevent eternal loop
+            // don"t fire event on the overview to prevent eternal loop
             smallPlot.setSelection(ranges, true);
         });
 
@@ -147,15 +147,15 @@ $(function () {
     }
 
     function showTooltip(x, y, contents) {
-        $('tooltip').twipsy({ html:'<div>' + contents + '</div>', animate:true });
-        $('<div id="tooltip">' + contents + '</div>').css({
-            position:'absolute',
-            display:'none',
+        $("tooltip").twipsy({ html:"<div>" + contents + "</div>", animate:true });
+        $("<div id=\"tooltip\">" + contents + "</div>").css({
+            position:"absolute",
+            display:"none",
             top:y + 5,
             left:x + 5,
-            border:'1px solid #fdd',
-            padding:'2px',
-            'background-color':'#fee',
+            border:"1px solid #fdd",
+            padding:"2px",
+            "background-color":"#fee",
             opacity:0.80
         }).appendTo("body").fadeIn(200);
     }
@@ -171,18 +171,18 @@ $(function () {
             { data:[], color:"rgb(30, 180, 20)" }
         ], smallOptions);
 
-        $('<div class="alert-message error">' +
-            '<a class="close" href="#">×</a>' +
-            '<p><strong>F&uuml;r diesen Parkplatz sind keine Daten verf&uuml;gbar!</strong></p>' +
-            '</div>').css({
-               position:'absolute',
+        $("<div class=\"alert-message error\">" +
+            "<a class=\"close\" href=\"#\">×</a>" +
+            "<p><strong>F&uuml;r diesen Parkplatz sind keine Daten verf&uuml;gbar!</strong></p>" +
+            "</div>").css({
+               position:"absolute",
                left:20,
                top:-75,
-               width:'75%',
-               margin:'auto',
+               width:"75%",
+               margin:"auto",
                padding:10,
-               'font-size':14
-            }).appendTo('#placeholder').alert().fadeIn(200);
+               "font-size":14
+            }).appendTo("#placeholder").alert().fadeIn(200);
     }
 
     var parking = "Falkenstrasse"; // default
@@ -196,8 +196,8 @@ $(function () {
         fetchData(parking);
     });
 
-    //var host = 'enterprise-it.corona.itm.uni-luebeck.de';
-    var host = 'localhost';
+    var host = "enterprise-it.corona.itm.uni-luebeck.de";
+    //var host = "localhost";
     var port = 8080;
 
     function fetchData(parking) {
@@ -206,9 +206,9 @@ $(function () {
         total = [];
 
         $.ajax({
-            url:'http://' + host + ':' + port + '/json/history/' + parking,
-            method:'GET',
-            dataType:'json',
+            url:"http://" + host + ":" + port + "/json/history/" + parking,
+            method:"GET",
+            dataType:"json",
             success:onDataReceived,
             statusCode:{
                 404:onNoDataRecieved

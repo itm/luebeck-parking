@@ -4,73 +4,57 @@ var async = require("async");
 var path = require("path");
 var util = require("util");
 var geo = require(path.join(__dirname, "geo"));
-var _ = require("underscore");
+//var _ = require("underscore");
 
 var scrapeURL = "http://kwlpls.adiwidjaja.com/index.php";
 var jqueryUrl = "http://code.jquery.com/jquery.min.js";
 
-function tr($, $tr, callback) {
-    var $ths = $($tr).children($("th"));
-    var $tds = $($tr).children($("td"));
-    var nameStr = $tds.eq(0).html();
 
-    var parking = {};
-    var city = null;
-
-    parking.kind = nameStr.substring(0, 2);
-    parking.name = nameStr.substring(3);
-    parking.geo = geo.data[nameStr];
-
-    if ($tds.size() > 2) {
-        parking.free = $tds.eq(2).html();
-        parking.spaces = $tds.eq(1).html();
-        parking.status = "open";
-    }
-    else if ($tds.size() > 0) {
-        parking.status = "closed";
-    }
-    // TODO
-    else if (typeof $ths !== "undefined" && $ths !== null) {
-        var header = $($ths).first().html();
-        var currentCity = header.split(" ")[1];
-        city = {
-            name:currentCity,
-            geo:geo.cities[currentCity]
-        };
-    }
-
-    parking.city = currentCity;
-    if (parking.kind != "PP" && parking.kind != "PH") {
-        parking = null;
-    }
-
-    callback(parking, city);
-}
-
-function table(window, callback) {
-    var result = {
-        cities:[],
-        parkings:[]
-    };
-
+function parseParkings(window, callback) {
     var $ = window.$;
-    var $trs = $("table").children();
+    var $trs = $("table tr");
+    var cities = [];
+    var parkings = [];
 
     async.forEach(
         $trs,
         function ($tr, done) {
-            tr($, $tr, function (item, city) {
-                if (typeof item !== "undefined" && item !== null) {
-                    result.parkings.push(item);
-                }
-                if (typeof city !== "undefined" && city !== null) {
-                    result.cities.push(city);
-                }
+            var tmpCityName = null;
+            var $tmpTds = $($tr).children();
+            var $tmpThs = $($tr).children("th.head1");
+
+            if ($($tmpThs).size() > 0) {
+                tmpCityName = $($tmpThs).text().split(" ")[1];
+                cities.push(tmpCityName);
                 done();
-            });
+            }
+
+            var tmpParking = {};
+            var tmpText = $($tmpTds).eq(0).html();
+            var tmpPrefix = tmpText.substring(0, 2);
+
+            if (tmpPrefix === "PP" || tmpPrefix === "PH") {
+                tmpParking.kind = tmpPrefix;
+                tmpParking.name = tmpText.substring(3);
+
+                if ($($tmpTds).size() > 2) {
+                    tmpParking.spaces = $($tmpTds).eq(1).html();
+                    tmpParking.free = $($tmpTds).eq(2).html();
+                    tmpParking.status = "open";
+                }
+                else if ($($tmpTds).size() > 0) {
+                    tmpParking.status = "closed";
+                }
+                tmpParking.geo = geo.data[tmpParking.name];
+                parkings.push(tmpParking);
+            }
+            done();
         },
         function (err) {
-            callback(err, result);
+            if (typeof err !== "undefined" && err !== null) {
+                callback(err, null);
+            }
+            callback(null, {"current":{"cities":cities, "parkings":parkings}});
         }
     );
 }
@@ -84,6 +68,7 @@ exports.scrape = function (callback) {
             if (typeof error !== "undefined" && error !== null) {
                 throw error;
             }
+
             if (response.statusCode !== 200) {
                 util.log("Error contacting " + scrapeURL);
             }
@@ -92,7 +77,7 @@ exports.scrape = function (callback) {
                     if (typeof err !== "undefined" && err !== null) {
                         throw err;
                     }
-                    table(window, callback);
+                    parseParkings(window, callback);
                 });
             }
         }
