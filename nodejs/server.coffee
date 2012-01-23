@@ -51,6 +51,8 @@ port = 8080
 
 app = express.createServer()
 
+app.enable "jsonp callback"
+
 app.configure () ->
   app.use(express.static(__dirname + '/public'))
 
