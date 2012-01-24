@@ -13,9 +13,7 @@ var _data = {"current":{"cities":[], "parkings":[]}};
 function onScrape() {
     util.log("Scrape...");
     return scraper.scrape(function (err, result) {
-        if (err != null) {
-            throw err;
-        }
+        if (typeof err !== "undefined" && err !== null) throw err;
         if (typeof result !== "undefined" && result !== null) {
             _data = result;
             util.log("#" + _data.current.parkings.length + " parkings returned.");
@@ -46,19 +44,19 @@ var port = 8080;
 
 app = express.createServer();
 
-//app.configure(function () {
-//    app.use(express.methodOverride());
-//    app.use(express.bodyParser());
-//    app.use(app.router);
-//    app.use(express.static(__dirname + "/public"));
-//    app.use(express.errorHandler({ dumpExceptions:true, showStack:true }));
-//});
-
-app.configure("production", function () {
-    var oneYear = 31557600000;
-    app.use(express.static(__dirname + "/public", { maxAge:oneYear }));
-    app.use(express.errorHandler());
+app.configure(function () {
+    app.use(express.methodOverride());
+    app.use(express.bodyParser());
+    app.use(app.router);
+    app.use(express.static(__dirname + "/public"));
+    app.use(express.errorHandler({ dumpExceptions:true, showStack:true }));
 });
+
+//app.configure("production", function () {
+//    var oneYear = 31557600000;
+//    app.use(express.static(__dirname + "/public", { maxAge:oneYear }));
+//    app.use(express.errorHandler());
+//});
 
 app.get("/json/current", function (req, res) {
     console.time("Delivered: /json/current");

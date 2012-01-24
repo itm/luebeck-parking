@@ -4,11 +4,34 @@ var async = require("async");
 var path = require("path");
 var util = require("util");
 var geo = require(path.join(__dirname, "geo"));
-//var _ = require("underscore");
 
-var scrapeURL = "http://kwlpls.adiwidjaja.com/index.php";
-var jqueryUrl = "http://code.jquery.com/jquery.min.js";
+var SCRAPE_URL = "http://kwlpls.adiwidjaja.com/index.php";
+var JQUERY_URL = "http://code.jquery.com/jquery.min.js";
 
+exports.scrape = function (callback) {
+    request(
+        {
+            uri:SCRAPE_URL
+        },
+        function (error, response, page) {
+            if (typeof error !== "undefined" && error !== null) {
+                throw error;
+            }
+
+            if (response.statusCode !== 200) {
+                util.log("Error contacting " + SCRAPE_URL);
+            }
+            else {
+                jsdom.env(page, [JQUERY_URL], function (err, window) {
+                    if (typeof err !== "undefined" && err !== null) {
+                        throw err;
+                    }
+                    parseParkings(window, callback);
+                });
+            }
+        }
+    );
+};
 
 function parseParkings(window, callback) {
     var $ = window.$;
@@ -58,29 +81,4 @@ function parseParkings(window, callback) {
         }
     );
 }
-
-exports.scrape = function (callback) {
-    request(
-        {
-            uri:scrapeURL
-        },
-        function (error, response, page) {
-            if (typeof error !== "undefined" && error !== null) {
-                throw error;
-            }
-
-            if (response.statusCode !== 200) {
-                util.log("Error contacting " + scrapeURL);
-            }
-            else {
-                jsdom.env(page, [jqueryUrl], function (err, window) {
-                    if (typeof err !== "undefined" && err !== null) {
-                        throw err;
-                    }
-                    parseParkings(window, callback);
-                });
-            }
-        }
-    );
-};
 

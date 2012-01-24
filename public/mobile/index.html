@@ -1,23 +1,31 @@
 <!DOCTYPE html>
-
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>ParkingApp</title>
-    <!-- Sencha Touch CSS -->
-    <link rel="stylesheet" href="lib/touch/resources/css/sencha-touch.css" type="text/css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <title>Parken in Luebeck</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css"/>
+    <link rel="stylesheet" href="css/index.css"/>
 </head>
-<body></body>
-<!-- Google Maps JS -->
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<!-- Sencha Touch JS -->
-<script type="text/javascript" src="lib/touch/sencha-touch.js"></script>
-<!--script type="text/javascript" src="lib/touch/sencha-touch-debug.js"></script-->
-<!-- Application JS -->
+<body>
+
+<div data-role="page">
+
+    <div data-role="header">
+        <h1>Parken in L&uuml;beck</h1>
+    </div>
+    <!-- /header -->
+
+    <div data-role="content">
+        <ul id="parkings" data-role="listview" data-inset="true" data-filter="true">
+        </ul>
+    </div>
+    <!-- /content -->
+
+</div>
+<!-- /page -->
+
+</body>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 <script type="text/javascript" src="src/index.js"></script>
-<!-- Static Parking Configuration JS -->
-<script type="text/javascript" src="src/parkings.js"></script>
-<script type="text/javascript" src="http://141.83.151.102:8080/json/current?field=theData"></script>
 </html>
