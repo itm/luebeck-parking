@@ -23,7 +23,7 @@ function onScrape() {
 
 function onHistory() {
     var parkings = _data.current.parkings;
-    if (typeof parkings !== "undefined" && parkings != null) {
+    if (typeof parkings !== "undefined" && parkings !== null) {
         history.storeHistory(parkings, function () {
             util.log("#" + _data.current.parkings.length + " parkings historized.");
         });
@@ -108,5 +108,3 @@ app.get("/json/history/:name", function (req, res) {
 app.listen(port, host);
 
 util.log("Server running: http://" + host + ":" + port + "/");
-
-
