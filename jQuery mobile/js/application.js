@@ -10,7 +10,8 @@ function resizeMap() {
 	$('#map-canvas').css('height', mapHeight+'px');
 }
 
-$( document ).delegate("#map", "pageshow", function() {
+// jquery mobile way of document ready
+$(document).delegate("#map", "pageshow", function() {
 
 	var myOptions = {
 		zoom : 14,
