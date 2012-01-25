@@ -6,3 +6,27 @@
 #map-canvas, #map-wrapper {
 	padding: 0;
 }
+
+#city-labels {
+	position: absolute;
+	top: 0;
+	left: 60px;
+}
+
+#city-labels .ui-btn-inner {
+	padding: 0.2em 25px;
+}
+
+.park-stats {
+	margin-bottom: 0;
+}
+
+.free {
+	background-color: #ff4500;
+	width: 100px;
+}
+
+.occupied {
+	background-color: #adff2f;
+	height: 10px;
+}
