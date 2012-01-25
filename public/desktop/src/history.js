@@ -1,0 +1,221 @@
+$(function () {
+    var options = {
+        series:{
+            stack:true,
+            lines:{ show:true, fill:true },
+            points:{ show:false },
+            shadowSize:0
+        },
+        xaxis:{
+            mode:"time",
+            tickLength:5
+        },
+        yaxis:{
+            min:0
+        },
+        selection:{ mode:"x" },
+        grid:{ hoverable:true, clickable:true, markings:weekendAreas }
+    };
+
+    var smallOptions = {
+        series:{
+            lines:{ show:true, lineWidth:1, fill:true },
+            shadowSize:0,
+            stack:true
+        },
+        xaxis:{ ticks:[], mode:"time" },
+        yaxis:{ ticks:[], min:0, autoscaleMargin:0.1 },
+        selection:{ mode:"x" }
+    };
+
+    // Returns the weekends in a period
+    function weekendAreas(axes) {
+        var markings = [];
+        var d = new Date(axes.xaxis.min);
+        // go to the first Saturday
+        d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 1) % 7));
+        d.setUTCSeconds(0);
+        d.setUTCMinutes(0);
+        d.setUTCHours(0);
+        var i = d.getTime();
+        do {
+            // when we don"t set yaxis, the rectangle automatically
+            // extends to infinity upwards and downwards
+            markings.push({ xaxis:{ from:i, to:i + 2 * 24 * 60 * 60 * 1000 } });
+            i += 7 * 24 * 60 * 60 * 1000;
+        } while (i < axes.xaxis.max);
+
+        return markings;
+    }
+
+    var occupancy = [];
+    var total = [];
+    var spaces = 0;
+
+    var plot = null;
+    var smallPlot = null;
+
+    function onDataReceived(parkingData) {
+        if ($("#tooltip")) $("#tooltip").remove();
+
+        //if (console && console.log) console.log(JSON.stringify(parkingData));
+
+        if (parkingData && parkingData.spaces) {
+            spaces = parseInt(parkingData.spaces);
+        }
+
+        jQuery.each(parkingData.timeline, function (i, t) {
+            var millis = parseInt(t.timestamp);
+            var occupied = spaces - parseInt(t.free);
+            occupancy.push([millis, occupied]);
+            total.push([millis, spaces - occupied]); // avoid stacking
+        });
+
+        // set maximum für y-axis
+        options.yaxis.max = spaces;
+        smallOptions.yaxis.max = spaces;
+
+        // first correct the timestamps - they are recorded as the daily
+        // midnights in UTC+0100, but Flot always displays dates in UTC
+        // so we have to add one hour to hit the midnights in the plot
+        for (var i = 0; i < occupancy.length; ++i)
+            occupancy[i][0] += 60 * 60 * 1000;
+
+        for (var j = 0; j < total.length; ++j)
+            total[j][0] += 60 * 60 * 1000;
+
+        // and plot all we got
+        plot = $.plot($("#placeholder"), [
+            { data:occupancy, color:"rgb(200, 20, 30)" },
+            { data:total, color:"rgb(30, 180, 20)" }
+        ], options);
+
+        smallPlot = $.plot($("#overview"), [
+            { data:occupancy, color:"rgb(200, 20, 30)" },
+            { data:total, color:"rgb(30, 180, 20)" }
+        ], smallOptions);
+
+        $("#placeholder").bind("plotselected", function (event, ranges) {
+            // do the zooming
+            plot = $.plot($("#placeholder"), [
+                { data:occupancy, color:"rgb(200, 20, 30)" },
+                { data:total, color:"rgb(30, 180, 20)" }
+            ],
+            $.extend(true, {}, options, {
+                xaxis:{ min:ranges.xaxis.from, max:ranges.xaxis.to }
+            }));
+
+            // don"t fire event on the overview to prevent eternal loop
+            smallPlot.setSelection(ranges, true);
+        });
+
+        var previousPoint = null;
+
+        $("#placeholder").bind("plothover", function (event, pos, item) {
+            $("#x").text(pos.x.toFixed(2));
+            $("#y").text(pos.y.toFixed(2));
+
+            if (item) {
+                if (previousPoint != item.dataIndex) {
+                    previousPoint = item.dataIndex;
+
+                    $("#tooltip").remove();
+                    var parkingOccupation = item.datapoint[1].toFixed(2);
+                    var parkingTimestamp = item.datapoint[2].toFixed(2);
+                    var timestamp = new Date();
+                    timestamp.setTime(parkingTimestamp - 60 * 60 * 1000);
+
+                    showTooltip(item.pageX, item.pageY,
+                        "<b>Belegung: </b>"
+                            + parseInt(parkingOccupation)
+                            + "/"
+                            + spaces
+                            + "; <b>Zeitpunkt:</b> "
+                            + timestamp
+                    );
+                }
+            }
+            else {
+                $("#tooltip").remove();
+                previousPoint = null;
+            }
+        });
+
+        $("#overview").bind("plotselected", function (event, ranges) {
+            plot.setSelection(ranges);
+        });
+    }
+
+    function showTooltip(x, y, contents) {
+        $("tooltip").twipsy({ html:"<div>" + contents + "</div>", animate:true });
+        $("<div id=\"tooltip\">" + contents + "</div>").css({
+            position:"absolute",
+            display:"none",
+            top:y + 5,
+            left:x + 5,
+            border:"1px solid #fdd",
+            padding:"2px",
+            "background-color":"#fee",
+            opacity:0.80
+        }).appendTo("body").fadeIn(200);
+    }
+
+    function onNoDataRecieved() {
+        plot = $.plot($("#placeholder"), [
+            { data:[], color:"rgb(200, 20, 30)" },
+            { data:[], color:"rgb(30, 180, 20)" }
+        ], options);
+
+        smallPlot = $.plot($("#overview"), [
+            { data:[], color:"rgb(200, 20, 30)" },
+            { data:[], color:"rgb(30, 180, 20)" }
+        ], smallOptions);
+
+        $("<div class=\"alert-message error\">" +
+            "<a class=\"close\" href=\"#\">×</a>" +
+            "<p><strong>F&uuml;r diesen Parkplatz sind keine Daten verf&uuml;gbar!</strong></p>" +
+            "</div>").css({
+               position:"absolute",
+               left:20,
+               top:-75,
+               width:"75%",
+               margin:"auto",
+               padding:10,
+               "font-size":14
+            }).appendTo("#placeholder").alert().fadeIn(200);
+    }
+
+    var parking = "Falkenstrasse"; // default
+
+    $("#parkings").change(function () {
+        parking = $(this).val();
+        fetchData(parking);
+    });
+
+    $("#reset").click(function () {
+        fetchData(parking);
+    });
+
+    //var host = "enterprise-it.corona.itm.uni-luebeck.de";
+    var host = "localhost";
+    var port = 8080;
+
+    function fetchData(parking) {
+        // reset data
+        occupancy = [];
+        total = [];
+
+        $.ajax({
+            url:"http://" + host + ":" + port + "/json/history/" + parking,
+            method:"GET",
+            dataType:"json",
+            success:onDataReceived,
+            statusCode:{
+                404:onNoDataRecieved
+            }
+        });
+    }
+
+    fetchData(parking);
+
+});
