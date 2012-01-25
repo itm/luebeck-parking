@@ -80,6 +80,8 @@ app.get("/json/current", function (req, res) {
 //            res.write(JSON.stringify(_data));
 //        }
 //        res.end("\n");
+		res.header("Access-Control-Allow-Origin","*");
+		res.header("Access-Control-Allow-Headers", "x-requested-with");
         res.json(_data);
     }
     console.timeEnd("Delivered: /json/current");
