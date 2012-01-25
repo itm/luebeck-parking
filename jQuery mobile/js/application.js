@@ -1,3 +1,9 @@
+var data = {};
+
+function saveJSON(d) {
+	data = d;
+}
+
 function resizeMap() {
 	//resize map to fit height
 	var mapHeight = $(window).height()-$(".ui-header:first").outerHeight();
