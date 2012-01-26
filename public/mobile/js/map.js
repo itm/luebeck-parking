@@ -122,11 +122,9 @@ $(document).delegate("#map", "pageshow", function() {
 	map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 	map.markers = [];
 	infoWindow = new google.maps.InfoWindow();
-	resizeMap();
 	initMarkers();
 });
 
-// does this really work for someone?
-$( document ).bind( "orientationchange resize", function( event, data ){
+$( document ).bind( "orientationchange resize pageload", function(){
 	resizeMap();
 });
