@@ -22,9 +22,7 @@ function createList() {
 
 // dynamically created dom needs to be inserted here
 $(document).bind("pagebeforechange", function(e, d) {
-	log(d.toPage);
 	if ( d && d.toPage && $(d.toPage).attr('id') == 'list-page' ) {
-		log("list open");
 		$('#parkings-list').empty();
 		createList();
 	}
