@@ -28,7 +28,7 @@ $(document).bind("pagebeforechange", function(e, d) {
 	}
 });
 
-$(document).delegate("#list-page", "pageshow", function() {
+$(document).delegate("#list-page", "pagebeforeshow", function() {
 	// enhance dynamically injected items
 	$('#parkings-list').listview('refresh');
 });
