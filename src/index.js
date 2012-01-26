@@ -183,8 +183,8 @@ new Ext.Application({
         });
 
         window.onbeforeunload = function() {
-            return "Wirklich die Anwendung verlassen?";
-        };
+          return "Wirklich die Anwendung verlassen?";
+    };
 
         var getMarkerAt = function(position) {
             for (var i = 0; i < map.markers.length; i++) {
@@ -505,13 +505,34 @@ new Ext.Application({
 
         // These are all Google Maps APIs
         var addMarker = function(parking, position, infowindow) {
-            var image;
+            var image, util, utilFrac;
+ 
+            if(parking.spaces == 0) {
+                util = "100";
+            } else {
+                utilFrac = parking.free / parking.spaces;
+                if(utilFrac == 0)
+                    util = "100";
+                else if(utilFrac < 0.2)
+                    util = "80";
+                else if(utilFrac < 0.5)
+                    util = "60";
+                else if(utilFrac < 0.6)
+                    util = "40";
+                else if(utilFrac < 0.8)
+                    util = "20";
+                else
+                    util = "0";
+            };
+
+
+            
             switch (parking.kind) {
                 case "PP":
-                    image = "images/parking.png"
+                    image = "images/pp_u_" + util + ".png";
                     break;
                 case "PH":
-                    image = "images/parking.png"
+                    image = "images/ph_u_" + util + ".png";
                     break;
             }
             ;
