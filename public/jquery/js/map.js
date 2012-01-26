@@ -14,8 +14,73 @@ var getMarkerAt = function(position) {
 	}
 };
 
-function initMarkers(infowindow) {
-	// TODO iterate over data and place markers including click handlers for infowindow
+function createParkingInfoWindow(parking) {
+  var occupation = getOccupation(parking);
+  var info;
+  if (parking.status == "open") {
+    info = "<b>Belegung</b> "
+            + "<br/>"
+            + (parking.spaces-parking.free) + " von " + parking.spaces
+            + "<br/>"
+            + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
+            + occupation
+            + "%;\"></div></div>";
+  } else {
+    info = "vorrübergehend geschlossen";
+  }
+
+  return "<div class=\"parkingInfoWindow\">"
+          + "<b>" + parking.name + "</b> (" + parking.kind + ")</b>"
+          + "<br/>"
+          + info
+          + "</div>"
+}
+
+var addMarker = function(parking, position, infowindow) {
+  var image;
+  switch (parking.kind) {
+    case "PP":
+      image = "images/parking.png"
+      break;
+    case "PH":
+      image = "images/parking.png"
+      break;
+  };
+
+  var marker = new google.maps.Marker({
+      map: map,
+      position: position,
+      icon: image
+  });
+  marker.title = parking.name;
+  marker.parking = parking;
+
+  var evListener = function() {
+      infowindow.setContent(createParkingInfoWindow(parking));
+      infoWindow.open(map, marker);
+  };
+  map.markers.push(marker);
+  google.maps.event.addListener(marker, 'mousedown', evListener);
+  google.maps.event.addListener(marker, 'click', evListener);
+};
+
+function clearMarkers() {
+	if ( map.markers ) {
+		$.each(map.markers, function(i, marker) {
+			marker.setMap(null);
+		});
+	} else {
+		map.markers = [];
+	}
+}
+
+function initMarkers() {
+	$.each(data.parkings, function(i, parking) {
+		if (typeof parking.geo !== 'undefined') {
+      var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
+      addMarker(parking, position, infoWindow);
+    }
+	});
 }
 
 function buttonHandler(event) {
@@ -56,9 +121,9 @@ $(document).delegate("#map", "pageshow", function() {
 	};
 	map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 	map.markers = [];
-	var infowindow = new google.maps.InfoWindow();
+	infoWindow = new google.maps.InfoWindow();
 	resizeMap();
-	initMarkers(infowindow);
+	initMarkers();
 });
 
 // does this really work for someone?

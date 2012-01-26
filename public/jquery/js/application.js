@@ -1,6 +1,7 @@
 var serverUrl = "http://141.83.151.102:8080/json/current",
 //var serverURL = "http://localhost:8080/json/current",
 		data = {},
+		infoWindow = {},
 		map = {};
 
 function saveJSON(d) {
@@ -10,7 +11,6 @@ function saveJSON(d) {
 function jsonError() {
 	log("Couldn't get JSON from Server: 404");
 }
-
 
 function updateData(callback) {
 	$.ajax({
@@ -38,7 +38,8 @@ function log(text) {
 updateData(saveJSON);
 
 $(document).bind("mobileinit", function(){
- $.mobile.listview.prototype.options.filterPlaceholder = "Suchen... ";    
+	// replace standard search in the listview filter input field
+	$.mobile.listview.prototype.options.filterPlaceholder = "Suchen... ";    
 });
 
 
