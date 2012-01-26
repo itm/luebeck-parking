@@ -33,6 +33,51 @@ exports.data =
   'PP Godewind':
     lat : 53.965958
     lng : 10.87521
+  'PH St. Marien':
+    lat : 53.86942
+    lng : 10.684921
+  'PP Lastadie P3':
+    lat : 53.871671
+    lng : 10.679751
+  'PP Lastadie P4':
+    lat : 53.871593
+    lng : 10.678692
+  'PP Lastadie P5':
+    lat : 53.872157
+    lng : 10.680624
+  'PP Radisson Hotel':
+    lat : 53.867902
+    lng : 10.67769
+  'PH Huexstrasse':
+    lat : 53.86527
+    lng : 10.693749
+  'PH Linden Arcaden':
+    lat : 53.866985
+    lng : 10.672594
+   'PH Karstadt':
+    lat : 53.866093
+    lng : 10.681853
+  'PH Pferdemarkt':
+    lat : 53.863837
+    lng : 10.684348
+  'PH Am Holstentor':
+    lat: 53.864669
+    lng: 10.678398
+  'PP Backbord':
+    lat : 53.970189
+    lng : 10.880369
+  'PP AmLeuchtturm':
+    lat : 53.960992
+    lng : 10.880649
+  'PP Hafenbahnhof':
+    lat : 53.95854
+    lng : 10.864928
+  'PP Baggersand 1':
+    lat : 53.956325
+    lng : 10.859007
+  'PP Baggersand 2':
+    lat : 53.956433
+    lng : 10.860316
     
 exports.cities = 
   'Lübeck':
