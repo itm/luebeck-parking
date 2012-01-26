@@ -32,3 +32,9 @@ function log(text) {
 /* -- start of application code -- */
 
 updateData(saveJSON);
+
+$(document).bind("mobileinit", function(){
+ $.mobile.listview.prototype.options.filterPlaceholder = "Suchen... ";    
+});
+
+
