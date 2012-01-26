@@ -1,30 +1,34 @@
-var data = {};
+var serverUrl = "http://141.83.151.102:8080/json/current",
+//var serverURL = "http://localhost:8080/json/current",
+		data = {},
+		map = {};
 
 function saveJSON(d) {
 	data = d;
 }
 
-function resizeMap() {
-	//resize map to fit height
-	var mapHeight = $(window).height()-$(".ui-header:first").outerHeight();
-	$('#map-canvas').css('height', mapHeight+'px');
+function jsonError() {
+	log("Couldn't get JSON from Server: 404");
 }
 
-// jquery mobile way of document ready
-$(document).delegate("#map", "pageshow", function() {
 
-	var myOptions = {
-		zoom : 14,
-		center : new google.maps.LatLng(53.890582, 10.701184),
-		mapTypeId: google.maps.MapTypeId.ROADMAP,
-		disableDefaultUI: true
-	};
-	var map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
-	var infowindow = new google.maps.InfoWindow();
-	resizeMap();
-	
-});
+function updateData(callback) {
+	$.ajax({
+		  url: serverUrl,
+		  method:"GET",
+		  dataType:"json",
+		  success:callback,
+		  statusCode:{
+		      404:jsonError
+		  }
+	});
+}
 
-$( document ).bind( "orientationchange", function( event, data ){
-	resizeMap();
-});
+function log(text) {
+	console && console.log &&
+	console.log(text);
+}
+
+/* -- start of application code -- */
+
+updateData(saveJSON);
