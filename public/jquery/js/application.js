@@ -24,6 +24,10 @@ function updateData(callback) {
 	});
 }
 
+function calculateOccupation(parking) {
+	return Math.floor((parking.free * 100) / parking.spaces);
+}
+
 function log(text) {
 	console && console.log &&
 	console.log(text);
