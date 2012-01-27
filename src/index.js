@@ -461,7 +461,7 @@ new Ext.Application({
                         + occupation
                         + "%;\"></div></div>";
             } else {
-                info = "vorrübergehend geschlossen";
+                info = "geschlossen";
             }
 
             return "<div class=\"parkingInfoWindow\">"
@@ -507,7 +507,7 @@ new Ext.Application({
         var addMarker = function(parking, position, infowindow) {
             var image, util, utilFrac;
  
-            if(parking.spaces == 0) {
+            if(parking.spaces == 0 || parking.status != "open") {
                 util = "100";
             } else {
                 utilFrac = parking.free / parking.spaces;
