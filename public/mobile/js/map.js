@@ -7,61 +7,80 @@ function resizeMap() {
 
 var getMarkerAt = function(position) {
 	for (var i = 0; i < map.markers.length; i++) {
-	  var marker = map.markers[i];
-	  if (marker.position.equals(position)) {
-	     return marker;
-	  }
+		var marker = map.markers[i];
+		if (marker.position.equals(position)) {
+			return marker;
+		}
 	}
 };
 
 function createParkingInfoWindow(parking) {
-  var occupation = getOccupation(parking);
-  var info;
-  if (parking.status == "open") {
-    info = "<b>Belegung</b> "
-            + "<br/>"
-            + (parking.spaces-parking.free) + " von " + parking.spaces
-            + "<br/>"
-            + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
-            + occupation
-            + "%;\"></div></div>";
-  } else {
-    info = "vorrübergehend geschlossen";
-  }
+	var occupation = getOccupation(parking);
+	var info;
+	if (parking.status == "open") {
+		info = "<b>Belegung</b> "
+					+ "<br/>"
+					+ (parking.spaces-parking.free) + " von " + parking.spaces
+					+ "<br/>"
+					+ "<div class=\"free\"><div class=\"occupied\" style=\"width: "
+					+ occupation
+					+ "%;\"></div></div>";
+	} else {
+		info = "vorrübergehend geschlossen";
+	}
 
-  return "<div class=\"parkingInfoWindow\">"
-          + "<b>" + parking.name + "</b> (" + parking.kind + ")</b>"
-          + "<br/>"
-          + info
-          + "</div>"
+	return "<div class=\"parkingInfoWindow\">"
+				+ "<b>" + parking.name + "</b> (" + parking.kind + ")</b>"
+				+ "<br/>"
+				+ info
+				+ "</div>"
 }
 
 var addMarker = function(parking, position, infowindow) {
-  var image;
-  switch (parking.kind) {
-    case "PP":
-      image = "images/parking.png"
-      break;
-    case "PH":
-      image = "images/parking.png"
-      break;
-  };
+	var image, util, utilFrac;
 
-  var marker = new google.maps.Marker({
-      map: map,
-      position: position,
-      icon: image
-  });
-  marker.title = parking.name;
-  marker.parking = parking;
+	if (parking.spaces == 0) {
+		util = "100";
+	} else {
+		utilFrac = parking.free / parking.spaces;
+		if (utilFrac == 0)
+			util = "100";
+		else if (utilFrac < 0.2)
+			util = "80";
+		else if (utilFrac < 0.5)
+			util = "60";
+		else if (utilFrac < 0.6)
+			util = "40";
+		else if (utilFrac < 0.8)
+			util = "20";
+		else
+			util = "0";
+	};
 
-  var evListener = function() {
-      infowindow.setContent(createParkingInfoWindow(parking));
-      infoWindow.open(map, marker);
-  };
-  map.markers.push(marker);
-  google.maps.event.addListener(marker, 'mousedown', evListener);
-  google.maps.event.addListener(marker, 'click', evListener);
+	switch (parking.kind) {
+		case "PP":
+			image = "img/pp_u_" + util + ".png";
+			break;
+		case "PH":
+			image = "img/ph_u_" + util + ".png";
+			break;
+	};
+
+	var marker = new google.maps.Marker({
+		map: map,
+		position: position,
+		icon: image
+	});
+	marker.title = parking.name;
+	marker.parking = parking;
+
+	var evListener = function() {
+		infowindow.setContent(createParkingInfoWindow(parking));
+		infoWindow.open(map, marker);
+	};
+	map.markers.push(marker);
+	google.maps.event.addListener(marker, 'mousedown', evListener);
+	google.maps.event.addListener(marker, 'click', evListener);
 };
 
 function clearMarkers() {
@@ -77,20 +96,20 @@ function clearMarkers() {
 function initMarkers() {
 	$.each(data.parkings, function(i, parking) {
 		if (typeof parking.geo !== 'undefined') {
-      var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
-      addMarker(parking, position, infoWindow);
-    }
+			var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
+			addMarker(parking, position, infoWindow);
+		}
 	});
 }
 
 function buttonHandler(event) {
 	var cityName = $(event.currentTarget).find('.ui-btn-text').html();
 	$.each(data.cities, function(i, city) {
-	  if (city.name == cityName) {
-      map.panTo(new google.maps.LatLng(city.geo.lat, city.geo.lng));
-      map.setZoom(14);
-      return false;
-	  }
+	if (city.name == cityName) {
+		map.panTo(new google.maps.LatLng(city.geo.lat, city.geo.lng));
+		map.setZoom(14);
+		return false;
+	}
 	});
 	// TODO set theme for clicked button to b and the others to a
 }
