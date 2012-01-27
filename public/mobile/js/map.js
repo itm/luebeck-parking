@@ -28,7 +28,7 @@ function createParkingInfoWindow(parking) {
 					+ occupation
 					+ "%;\"></div></div>";
 	} else {
-		info = "vorrübergehend geschlossen";
+		info = "geschlossen";
 	}
 
 	return "<div class=\"parkingInfoWindow\">"
@@ -41,7 +41,7 @@ function createParkingInfoWindow(parking) {
 var addMarker = function(parking, position, infowindow) {
 	var image, util, utilFrac;
 
-	if (parking.spaces == 0) {
+	if (parking.spaces == 0 || parking.status != "open") {
 		util = "100";
 	} else {
 		utilFrac = parking.free / parking.spaces;
