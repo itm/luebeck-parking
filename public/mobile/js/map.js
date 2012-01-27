@@ -1,4 +1,7 @@
-
+var translate = {
+	'PH': 'Parkhaus',
+	'PP': 'Parkplatz'
+}
 function resizeMap() {
 	//resize map to fit height
 	var mapHeight = $(window).height()-$(".ui-header:first").outerHeight();
@@ -18,10 +21,9 @@ function createParkingInfoWindow(parking) {
 	var occupation = calculateOccupation(parking);
 	var info;
 	if (parking.status == "open") {
-		info = "<b>Belegung</b> "
-					+ "<br/>"
-					+ (parking.spaces-parking.free) + " von " + parking.spaces
-					+ "<br/>"
+		info = "<small><b>"
+					+ parking.free + " von " + parking.spaces
+					+ " frei</small></b> <br/>"
 					+ "<div class=\"free\"><div class=\"occupied\" style=\"width: "
 					+ occupation
 					+ "%;\"></div></div>";
@@ -30,7 +32,7 @@ function createParkingInfoWindow(parking) {
 	}
 
 	return "<div class=\"parkingInfoWindow\">"
-				+ "<b>" + parking.name + "</b> (" + parking.kind + ")</b>"
+				+ "<b>" + parking.name + "</b><small> (" + translate[parking.kind] + ")</small>"
 				+ "<br/>"
 				+ info
 				+ "</div>"
@@ -114,6 +116,8 @@ function buttonHandler(event) {
 	}
 	});
 	// TODO set theme for clicked button to b and the others to a
+	$("#city-labels a").removeClass("ui-btn-up-b").addClass("ui-btn-up-a");
+	$(event.currentTarget).addClass("ui-btn-up-b");
 }
 // dynamically created dom needs to be inserted here
 $(document).bind("pagebeforechange", function(e, d) {
@@ -136,7 +140,7 @@ $(document).delegate("#map", "pageshow", function() {
 	/* -- map initialization -- */
 	var myOptions = {
 		zoom : 14,
-		center : new google.maps.LatLng(53.890582, 10.701184),
+		center : new google.maps.LatLng(53.867814, 10.687208),
 		mapTypeId: google.maps.MapTypeId.ROADMAP,
 		disableDefaultUI: true
 	};
@@ -144,6 +148,7 @@ $(document).delegate("#map", "pageshow", function() {
 	map.markers = [];
 	infoWindow = new google.maps.InfoWindow();
 	initMarkers();
+	$("#city-labels a:first").trigger('click');
 });
 
 $( document ).bind( "orientationchange resize pageload", function(){
