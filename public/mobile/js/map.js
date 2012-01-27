@@ -15,7 +15,7 @@ var getMarkerAt = function(position) {
 };
 
 function createParkingInfoWindow(parking) {
-	var occupation = getOccupation(parking);
+	var occupation = calculateOccupation(parking);
 	var info;
 	if (parking.status == "open") {
 		info = "<b>Belegung</b> "
@@ -75,7 +75,7 @@ var addMarker = function(parking, position, infowindow) {
 	marker.parking = parking;
 
 	var evListener = function() {
-		infowindow.setContent(createParkingInfoWindow(parking));
+		infoWindow.setContent(createParkingInfoWindow(parking));
 		infoWindow.open(map, marker);
 	};
 	map.markers.push(marker);
