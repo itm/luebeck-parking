@@ -20,7 +20,6 @@ exports.data =
   'PH Mitte':
     lat : 53.865277
     lng : 10.68339
-
   'PP Kowitzberg':  
     lat : 53.975279
     lng : 10.875177
