@@ -4,3 +4,5 @@
 *.log
 *.rdb
 redis.out
+luebeck-parking.sublime-project
+luebeck-parking.sublime-workspace
