@@ -4,19 +4,24 @@ function createList() {
 	var parkings = data.parkings;
 	$.each(parkings, function(i, parking) {
 		if (parking.status == "open") {
-		  $('#parkings-list').append('<li><a href="#">'
+		  	$('#parkings-list').append('<li><a href="#">'
 		  		+ '<p>'+parking.kind+' <strong>'+parking.name+'</strong></p>'
-		      + '<p class="park-stats">'+parking.free+' von '+parking.spaces+' frei</p>'
-		      + '<div class="free"><div class="occupied" style="width: '
-		      + calculateOccupation(parking)
-		      + '%;"></div></div>'
-		      + '</a></li>');
+				+ '<p class="park-stats">'+parking.free+' von '+parking.spaces+' frei</p>'
+				+ '<div class="free"><div class="occupied" style="width: '
+				+ calculateOccupation(parking)
+				+ '%;"></div></div>'
+				+ '</a></li>');
 		} else {
 			$('#parkings-list').append('<li><a href="#">'
 		  		+ '<p>'+parking.kind+' <strong>'+parking.name+'</strong></p>'
-		      + '<p>GESCHLOSSEN</p>'
-		      + '</a></li>');
+		     	+ '<p>GESCHLOSSEN</p>'
+		     	+ '</a></li>');
 		}
+		// click handler
+		$('#parkings-list a:last').bind('click', function() {
+			showInfoOnLoad(parking);
+			$.mobile.changePage('map.html');
+		});
 	});
 }
 

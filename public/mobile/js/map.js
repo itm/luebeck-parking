@@ -2,20 +2,30 @@ var translate = {
 	'PH': 'Parkhaus',
 	'PP': 'Parkplatz'
 }
+
 function resizeMap() {
 	//resize map to fit height
 	var mapHeight = $(window).height()-$(".ui-header:first").outerHeight();
 	$('#map-canvas').css('height', mapHeight+'px');
 }
 
-var getMarkerAt = function(position) {
+function getMarkerAt(position) {
 	for (var i = 0; i < map.markers.length; i++) {
 		var marker = map.markers[i];
 		if (marker.position.equals(position)) {
 			return marker;
 		}
 	}
-};
+}
+
+function showInfoOnLoad(parking) {
+	var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
+	$(document).bind('mapLoaded', function() {
+		var marker = getMarkerAt(position);
+		infoWindow.setContent(createParkingInfoWindow(parking));
+		infoWindow.open(map, map.markers[0]);
+	});
+}
 
 function createParkingInfoWindow(parking) {
 	var occupation = calculateOccupation(parking);
@@ -119,8 +129,10 @@ function buttonHandler(event) {
 	$("#city-labels a").removeClass("ui-btn-up-b").addClass("ui-btn-up-a");
 	$(event.currentTarget).addClass("ui-btn-up-b");
 }
-// dynamically created dom needs to be inserted here
+
+// dynamically created dom will be inserted here
 $(document).bind("pagebeforechange", function(e, d) {
+	// if we are about to switch to the map view
 	if ( $(d.toPage).attr('id') == 'map' ) {
 		/* -- add city buttons -- */
 		$("#city-labels").empty();
@@ -134,9 +146,8 @@ $(document).bind("pagebeforechange", function(e, d) {
 	}
 });
 
-// jquery mobile way of document ready
+// if the page is ready and containing #map item
 $(document).delegate("#map", "pageshow", function() {
-
 	/* -- map initialization -- */
 	var myOptions = {
 		zoom : 14,
@@ -149,8 +160,11 @@ $(document).delegate("#map", "pageshow", function() {
 	infoWindow = new google.maps.InfoWindow();
 	initMarkers();
 	$("#city-labels a:first").trigger('click');
+	// triggerHandler is a lightweight equivalent to trigger
+	$(document).trigger('mapLoaded');
 });
 
+// if screen size changes reize the map
 $( document ).bind( "orientationchange resize pageload", function(){
 	resizeMap();
 });
