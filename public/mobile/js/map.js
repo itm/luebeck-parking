@@ -23,7 +23,7 @@ function showInfoOnLoad(parking) {
 	var handler = function() {
 		var marker = getMarkerAt(position);
 		infoWindow.setContent(createParkingInfoWindow(parking));
-		infoWindow.open(map, map.markers[0]);
+		infoWindow.open(map, marker);
 		// only open this once
 		$(document).unbind('mapLoaded', handler);
 	};
