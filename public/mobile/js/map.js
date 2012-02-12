@@ -20,11 +20,14 @@ function getMarkerAt(position) {
 
 function showInfoOnLoad(parking) {
 	var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
-	$(document).bind('mapLoaded', function() {
+	var handler = function() {
 		var marker = getMarkerAt(position);
 		infoWindow.setContent(createParkingInfoWindow(parking));
 		infoWindow.open(map, map.markers[0]);
-	});
+		// only open this once
+		$(document).unbind('mapLoaded', handler);
+	};
+	$(document).bind('mapLoaded', handler);
 }
 
 function createParkingInfoWindow(parking) {

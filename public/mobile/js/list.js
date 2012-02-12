@@ -1,7 +1,10 @@
 
+// create the list of parkings
 function createList() {
+	// stop if we have no data
 	if (typeof data === "undefined" || data === null) return;
 	var parkings = data.parkings;
+	// iterate over available parkings to create info markup
 	$.each(parkings, function(i, parking) {
 		if (parking.status == "open") {
 		  	$('#parkings-list').append('<li><a href="#">'
@@ -17,7 +20,7 @@ function createList() {
 		     	+ '<p>GESCHLOSSEN</p>'
 		     	+ '</a></li>');
 		}
-		// click handler
+		// click handler for list items opens the map and shows the corresponding infoWindow
 		$('#parkings-list a:last').bind('click', function() {
 			showInfoOnLoad(parking);
 			$.mobile.changePage('map.html');
