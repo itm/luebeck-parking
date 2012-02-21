@@ -51,9 +51,10 @@ function createParkingInfoWindow(parking) {
 				+ "</div>"
 }
 
+// prepare a marker ( place it at position, init onClick handler showing the parking info)
 var addMarker = function(parking, position, infowindow) {
 	var image, util, utilFrac;
-
+	// calculate utilization and map it to one of 6 states
 	if (parking.spaces == 0 || parking.status != "open") {
 		util = "100";
 	} else {
@@ -71,7 +72,7 @@ var addMarker = function(parking, position, infowindow) {
 		else
 			util = "0";
 	};
-
+	// get icon for the parking type and utilization
 	switch (parking.kind) {
 		case "PP":
 			image = "img/pp_u_" + util + ".png";
@@ -80,24 +81,28 @@ var addMarker = function(parking, position, infowindow) {
 			image = "img/ph_u_" + util + ".png";
 			break;
 	};
-
+	// place marker on the map with our icon
 	var marker = new google.maps.Marker({
 		map: map,
 		position: position,
 		icon: image
 	});
 	marker.title = parking.name;
+	// save the parking info under ``marker.parking``
 	marker.parking = parking;
+	// save the marker info under ``map.markers``
+	map.markers.push(marker);
 
+	//
 	var evListener = function() {
 		infoWindow.setContent(createParkingInfoWindow(parking));
 		infoWindow.open(map, marker);
 	};
-	map.markers.push(marker);
 	google.maps.event.addListener(marker, 'mousedown', evListener);
 	google.maps.event.addListener(marker, 'click', evListener);
 };
 
+//deletes all markers from the map
 function clearMarkers() {
 	if ( map.markers ) {
 		$.each(map.markers, function(i, marker) {
@@ -108,6 +113,7 @@ function clearMarkers() {
 	}
 }
 
+// adds markers to the map for each parking
 function initMarkers() {
 	$.each(data.parkings, function(i, parking) {
 		if (typeof parking.geo !== 'undefined') {
@@ -119,21 +125,25 @@ function initMarkers() {
 	});
 }
 
+// handler for clicking the buttons on top ( Lübeck | Travemünde )
 function buttonHandler(event) {
+	// get current city name
 	var cityName = $(event.currentTarget).find('.ui-btn-text').html();
+	// get the geocoordinates from the selected city and pan the map to them
 	$.each(data.cities, function(i, city) {
-	if (city.name == cityName) {
-		map.panTo(new google.maps.LatLng(city.geo.lat, city.geo.lng));
-		map.setZoom(14);
-		return false;
-	}
+		if (city.name == cityName) {
+			map.panTo(new google.maps.LatLng(city.geo.lat, city.geo.lng));
+			map.setZoom(14);
+			return false;
+		}
 	});
-	// TODO set theme for clicked button to b and the others to a
+	// set all buttons to not selected (theme a)
 	$("#city-labels a").removeClass("ui-btn-up-b").addClass("ui-btn-up-a");
+	// active button is set to theme b
 	$(event.currentTarget).addClass("ui-btn-up-b");
 }
 
-// dynamically created dom will be inserted here
+// before changing the page insert dynamically created dom elements
 $(document).bind("pagebeforechange", function(e, d) {
 	// if we are about to switch to the map view
 	if ( $(d.toPage).attr('id') == 'map' ) {
@@ -149,7 +159,7 @@ $(document).bind("pagebeforechange", function(e, d) {
 	}
 });
 
-// if the page is ready and containing #map item
+// when the page is ready and contains #map item
 $(document).delegate("#map", "pageshow", function() {
 	/* -- map initialization -- */
 	var myOptions = {
@@ -167,7 +177,7 @@ $(document).delegate("#map", "pageshow", function() {
 	$(document).trigger('mapLoaded');
 });
 
-// if screen size changes reize the map
+// when screen size changes reize the map
 $( document ).bind( "orientationchange resize pageload", function(){
 	resizeMap();
 });
