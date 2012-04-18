@@ -1,5 +1,5 @@
-var serverUrl = "http://141.83.151.102:8080/json/current",
-		data = {},
+var serverUrl = "http://141.83.151.102:8080/json/current?callback=?",
+		data = undefined,
 		infoWindow = {},
 		map = {};
 
@@ -12,14 +12,8 @@ function jsonError() {
 }
 
 function updateData(callback) {
-	$.ajax({
-		  url: serverUrl,
-		  method:"GET",
-		  dataType:"json",
-		  success:callback,
-		  statusCode:{
-		      404:jsonError
-		  }
+	$.getJSON('http://141.83.151.102:8080/json/current?callback=?', function(data) {
+    	callback(data); 
 	});
 }
 

@@ -7,6 +7,7 @@ function resizeMap() {
 	//resize map to fit height
 	var mapHeight = $(window).height()-$(".ui-header:first").outerHeight();
 	$('#map-canvas').css('height', mapHeight+'px');
+	google.maps.event.trigger(map, 'resize');
 }
 
 function getMarkerAt(position) {
@@ -143,19 +144,25 @@ function buttonHandler(event) {
 	$(event.currentTarget).addClass("ui-btn-up-b");
 }
 
+function init(d) {
+	data = d;
+	// add city buttons
+	$("#city-labels").empty();
+	$.each(data.cities, function(i, city) {
+		$('<a href="#" data-role="button" data-inline="true" data-theme="a">'+city.name+'</a>')
+			.click(buttonHandler)
+			.appendTo("#city-labels");
+	});
+	// enhance dynamically injected items
+	$("#map").trigger('create');
+}
+
 // before changing the page insert dynamically created dom elements
 $(document).bind("pagebeforechange", function(e, d) {
 	// if we are about to switch to the map view
 	if ( $(d.toPage).attr('id') == 'map' ) {
-		/* -- add city buttons -- */
-		$("#city-labels").empty();
-		$.each(data.cities, function(i, city) {
-			$('<a href="#" data-role="button" data-inline="true" data-theme="a">'+city.name+'</a>')
-				.click(buttonHandler)
-				.appendTo("#city-labels");
-		});
-		// enhance dynamically injected items
-		$("#map").trigger('create');
+		if ( data === undefined )
+			updateData(init);
 	}
 });
 
@@ -171,9 +178,21 @@ $(document).delegate("#map", "pageshow", function() {
 	map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 	map.markers = [];
 	infoWindow = new google.maps.InfoWindow();
-	initMarkers();
-	$("#city-labels a:first").trigger('click');
+
+	if ( data === undefined ) {
+		updateData( function(d) {
+			data = d;
+			initMarkers();
+			$("#city-labels a:first").trigger('click');
+		});
+	} else {
+		initMarkers();
+		$("#city-labels a:first").trigger('click');
+	}
+	
 	// triggerHandler is a lightweight equivalent to trigger
+	// without the resize event, the map stays grey
+	resizeMap();
 	$(document).trigger('mapLoaded');
 });
 
