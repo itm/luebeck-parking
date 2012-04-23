@@ -53,6 +53,81 @@ exports.data = {
         lat:53.965958,
         lng:10.87521,
         city:'Lübeck'
+    },
+    'St. Marien': {
+        lat : 53.86942,
+        lng : 10.684921,
+        city:'Lübeck'
+    },
+    'Lastadie P3':{
+        lat : 53.871671,
+        lng : 10.679751,
+        city:'Lübeck'
+    },
+    'Lastadie P4':{
+        lat : 53.871593,
+        lng : 10.678692,
+        city:'Lübeck'
+    },
+    'Lastadie P5':{
+        lat : 53.872157,
+        lng : 10.680624,
+        city:'Lübeck'
+    },
+    'Radisson Hotel':{
+        lat : 53.867902,
+        lng : 10.67769,
+        city:'Lübeck'
+    },
+    'Huexstrasse':{
+        lat : 53.86527,
+        lng : 10.693749,
+        city:'Lübeck'
+    },
+    'Linden Arcaden':{
+        lat : 53.866985,
+        lng : 10.672594,
+        city:'Lübeck'
+    },
+    'Karstadt':{
+        lat : 53.866093,
+        lng : 10.681853,
+        city:'Lübeck'
+    },
+    'Pferdemarkt':{
+        lat : 53.863837,
+        lng : 10.684348,
+        city:'Lübeck'
+    },
+    'Am Holstentor':{
+        lat: 53.864669,
+        lng: 10.678398,
+        city:'Lübeck'
+    },
+    'Backbord':{
+        lat : 53.970189,
+        lng : 10.880369,
+        city:'Travemünde'
+    },
+    'AmLeuchtturm':{
+        lat : 53.960992,
+        lng : 10.880649,
+        city:'Travemünde'
+    },
+    'Hafenbahnhof':{
+        lat : 53.95854,
+        lng : 10.864928,
+        city:'Travemünde'
+    },
+    'Baggersand 1':{
+        lat : 53.956325,
+        lng : 10.859007,
+        city:'Travemünde'
+    },
+    'Baggersand 2':{
+        lat : 53.956433,
+        lng : 10.860316,
+        city:'Travemünde'
     }
 };
 
@@ -66,3 +141,4 @@ exports.cities = {
         lng:10.870457
     }
 };
+
