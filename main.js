@@ -8,7 +8,7 @@ var history = require(path.join(__dirname, modules_dir, "history"));
 
 // ----------------------------------------------------------------------------
 
-var _data = {"current":{"cities":[], "parkings":[]}};
+var _data = {"cities":[], "parkings":[]};
 
 function onScrape() {
     util.log("Scrape...");
@@ -110,3 +110,4 @@ app.get("/json/history/:name", function (req, res) {
 app.listen(port, host);
 
 util.log("Server running: http://" + host + ":" + port + "/");
+onScrape();
