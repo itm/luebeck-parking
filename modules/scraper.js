@@ -47,8 +47,10 @@ function parseParkings(window, callback) {
             var $tmpThs = $($tr).children("th.head1");
 
             if ($($tmpThs).size() > 0) {
-                tmpCityName = $($tmpThs).text().split(" ")[1];
-                cities.push(tmpCityName);
+                tmpCity = {};
+                tmpCity.name = $($tmpThs).text().split(" ")[1];
+                tmpCity.geo = geo.cities[tmpCity.name];
+                cities.push(tmpCity);
                 done();
             }
 
@@ -77,7 +79,7 @@ function parseParkings(window, callback) {
             if (typeof err !== "undefined" && err !== null) {
                 callback(err, null);
             }
-            callback(null, {"current":{"cities":cities, "parkings":parkings}});
+            callback(null, {"cities":cities, "parkings":parkings});
         }
     );
 }
