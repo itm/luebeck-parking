@@ -1,4 +1,4 @@
-var serverUrl = "http://141.83.151.102:8080/json/current?callback=?",
+var serverUrl = "http://smartluebeck.de/parking/json/current",
 		data = undefined,
 		infoWindow = {},
 		map = {};
@@ -12,7 +12,7 @@ function jsonError() {
 }
 
 function updateData(callback) {
-	$.getJSON('http://141.83.151.102:8080/json/current?callback=?', function(data) {
+	$.getJSON(serverUrl, function(data) {
     	callback(data); 
 	});
 }

@@ -163,6 +163,8 @@ $(document).bind("pagebeforechange", function(e, d) {
 	if ( $(d.toPage).attr('id') == 'map' ) {
 		if ( data === undefined )
 			updateData(init);
+		else
+			init(data);
 	}
 });
 
