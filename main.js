@@ -16,16 +16,16 @@ function onScrape() {
         if (typeof err !== "undefined" && err !== null) throw err;
         if (typeof result !== "undefined" && result !== null) {
             _data = result;
-            util.log("#" + _data.current.parkings.length + " parkings returned.");
+            util.log("#" + _data.parkings.length + " parkings returned.");
         }
     });
 }
 
 function onHistory() {
-    var parkings = _data.current.parkings;
+    var parkings = _data.parkings;
     if (typeof parkings !== "undefined" && parkings !== null) {
         history.storeHistory(parkings, function () {
-            util.log("#" + _data.current.parkings.length + " parkings historized.");
+            util.log("#" + _data.parkings.length + " parkings historized.");
         });
     }
 }
