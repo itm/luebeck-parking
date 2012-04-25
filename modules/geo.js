@@ -109,7 +109,7 @@ exports.data = {
         lng : 10.880369,
         city:'Travemünde'
     },
-    'AmLeuchtturm':{
+    'Am Leuchtturm':{
         lat : 53.960992,
         lng : 10.880649,
         city:'Travemünde'
