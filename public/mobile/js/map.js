@@ -116,6 +116,7 @@ function clearMarkers() {
 
 // adds markers to the map for each parking
 function initMarkers() {
+    clearMarkers();
 	$.each(data.parkings, function(i, parking) {
 		if (typeof parking.geo !== 'undefined') {
 			var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
@@ -144,8 +145,7 @@ function buttonHandler(event) {
 	$(event.currentTarget).addClass("ui-btn-up-b");
 }
 
-function init(d) {
-	data = d;
+function init() {
 	// add city buttons
 	$("#city-labels").empty();
 	$.each(data.cities, function(i, city) {
@@ -161,10 +161,15 @@ function init(d) {
 $(document).bind("pagebeforechange", function(e, d) {
 	// if we are about to switch to the map view
 	if ( $(d.toPage).attr('id') == 'map' ) {
-		if ( data === undefined )
-			updateData(init);
-		else
-			init(data);
+        if ( data === undefined )
+			updateData(function (mydata){
+                data = mydata;
+                init();
+            });
+        else{
+               data = undefined;
+        }
+
 	}
 });
 

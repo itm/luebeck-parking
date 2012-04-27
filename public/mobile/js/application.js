@@ -29,9 +29,6 @@ function log(text) {
 
 // ### start of application code
 
-// get data from the server via ajax and save response in the ``data`` field
-updateData(saveJSON);
-
 $(document).bind("mobileinit", function(){
 	// replace standard search in the listview filter input field
 	$.mobile.listview.prototype.options.filterPlaceholder = "Suchen... ";    

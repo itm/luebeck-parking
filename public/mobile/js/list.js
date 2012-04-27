@@ -35,6 +35,7 @@ function createList() {
 // dynamically created dom needs to be inserted here
 $(document).bind("pagebeforechange", function(e, d) {
 	if ( d && d.toPage && $(d.toPage).attr('id') == 'list-page' ) {
+        data = null;
 		$('#parkings-list').empty();
 		createList();
 	}
