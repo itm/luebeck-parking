@@ -17,6 +17,15 @@ function updateData(callback) {
 	});
 }
 
+function updateSSPData(callback){
+    console.log("updateSSPData");
+
+    $.getJSON("http://dialyse:8080/be-0001/Luebeck", function(data) {
+        callback(data);
+        console.log(data);
+    });
+}
+
 function calculateOccupation(parking) {
 	return Math.floor((parking.free * 100) / parking.spaces);
 }
