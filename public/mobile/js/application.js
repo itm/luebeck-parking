@@ -47,13 +47,25 @@ function convertSSPData(sspData){
         var formattedData = {};
         var isParkingArea = false;
 
+
+        formattedData.status = "closed"
+        formattedData.geo = {};
+
         for(var p in parking){
             if(parking.hasOwnProperty(p)){
 
                 if (p=="http://spitfire-project.eu/cc/parkingid") {
                     formattedData.name = parking[p][0].value;
                     isParkingArea = true;
-                    console.log(p+'='+parking[p][0].value);
+//                    console.log(p+'='+parking[p][0].value);
+                }
+
+                if (p =="http://www.w3.org/2003/01/geo/wgs84_pos#lat"){
+                    formattedData.geo.lat = parking[p][0].value;
+                }
+
+                if (p =="http://www.w3.org/2003/01/geo/wgs84_pos#long"){
+                    formattedData.geo.lng = parking[p][0].value;
                 }
 
                 if (p=="http://www.w3.org/1999/02/22-rdf-syntax-ns#type") {
@@ -64,13 +76,17 @@ function convertSSPData(sspData){
                     }
                 }
 
+
                 if (p=="http://spitfire-project.eu/cc/parkingareaStatus") {
-                    setUpOccupationLevels(parking[p][0].value);
+                    setUpOccupationLevels(parking[p][0].value,formattedData, null);
 
                 }
+
+                // this data is not available, yet
                 formattedData.spaces = 100;
-                formattedData.free = 20;
-                formattedData.status = "open"
+
+
+//                formattedData.free = 20;
             }
         }
         if(isParkingArea){
@@ -87,8 +103,35 @@ function convertSSPData(sspData){
 }
 
 
-function setUpOccupationLevels(data){
-    console.log("kkkkkkkkkkkkkkkkkkkkkkkkkkkk "+data);
+function setUpOccupationLevels(url, formattedData, levelData){
+    if (url.substring(0,5) =="http:"){
+        console.log("Ole");
+
+
+
+
+        /* The result is not fetched in time
+         * TODO: Fetch the data previously and store it in a lookup table
+        **/
+        if (typeof levelData === "undefined" || levelData === null) {
+               $.getJSON(url, function(jsonData) {
+                    console.log("llllllllllllllllllllllllllllllllllllllllll");
+                    for(var p in jsonData){
+                        var occupationLevel = jsonData[p]["http://www.loa-cnr.it/ontologies/DUL.owl#hasDataValue"][0].value;
+                        formattedData.free = formattedData.spaces * occupationLevel/100;
+                        console.log(formattedData.free);
+                    }
+                });
+
+        }
+
+        // TODO: Remove when the lookup table is in place (see above)
+        formattedData.free = url.substring(33,url.length);
+
+
+        formattedData.status = "open"
+
+    }
 }
 
 
