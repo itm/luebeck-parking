@@ -3,6 +3,10 @@ var serverUrl = "http://smartluebeck.de/parking/json/current",
 		infoWindow = {},
 		map = {};
 
+
+var occupationLevels = {};
+
+
 function saveJSON(d) {
 	data = d;
 }
@@ -29,6 +33,64 @@ function updateSSPData(callback){
 function calculateOccupation(parking) {
 	return Math.floor((parking.free * 100) / parking.spaces);
 }
+
+
+function convertSSPData(sspData){
+
+    var formattedParkings = [];
+
+
+    jQuery.each(sspData, function(i, parking){
+//        console.log(i);
+//        console.log(parking);
+
+        var formattedData = {};
+        var isParkingArea = false;
+
+        for(var p in parking){
+            if(parking.hasOwnProperty(p)){
+
+                if (p=="http://spitfire-project.eu/cc/parkingid") {
+                    formattedData.name = parking[p][0].value;
+                    isParkingArea = true;
+                    console.log(p+'='+parking[p][0].value);
+                }
+
+                if (p=="http://www.w3.org/1999/02/22-rdf-syntax-ns#type") {
+                    if (parking[p][0].value == "http://spitfire-project.eu/cc/parkingIndoorArea"){
+                        formattedData.kind = "PH";
+                    } else if (parking[p][0].value == "http://spitfire-project.eu/cc/parkingOutdoorArea"){
+                        formattedData.kind = "PP";
+                    }
+                }
+
+                if (p=="http://spitfire-project.eu/cc/parkingareaStatus") {
+                    setUpOccupationLevels(parking[p][0].value);
+
+                }
+                formattedData.spaces = 100;
+                formattedData.free = 20;
+                formattedData.status = "open"
+            }
+        }
+        if(isParkingArea){
+            formattedParkings.push(formattedData);
+        }
+//        console.log("\r\n----------\r\n");
+    });
+
+    console.log("formattedParkings:");
+    console.log(formattedParkings);
+
+    return formattedParkings;
+
+}
+
+
+function setUpOccupationLevels(data){
+    console.log("kkkkkkkkkkkkkkkkkkkkkkkkkkkk "+data);
+}
+
 
 // logging helper method (won't show an error if ``console.log()`` is not available)
 function log(text) {

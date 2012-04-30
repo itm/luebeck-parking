@@ -15,48 +15,8 @@ function createList() {
             createList();
         });
 
+    var parkings = convertSSPData(sspData);
 
-    var formattedParkings = [];
-
-
-    jQuery.each(sspData, function(i, parking){
-      console.log(i);
-      console.log(parking);
-
-        var formattedData = {};
-        var isParkingArea = false;
-
-        for(var p in parking){
-            if(parking.hasOwnProperty(p)){
-                console.log(p+'='+parking[p][0].value);
-                if (p=="http://spitfire-project.eu/cc/parkingid") {
-                    formattedData.name = parking[p][0].value;
-                    isParkingArea = true;
-                }
-
-                if (p=="http://www.w3.org/1999/02/22-rdf-syntax-ns#type") {
-                    if (parking[p][0].value == "http://spitfire-project.eu/cc/parkingIndoorArea"){
-                       formattedData.kind = "PH";
-                    } else if (parking[p][0].value == "http://spitfire-project.eu/cc/parkingOutdoorArea"){
-                        formattedData.kind = "PP";
-                    }
-                }
-
-                if (p=="http://spitfire-project.eu/cc/parkingareaStatus") {
-                    console.log("kkkkkkkkkkkkkkkkkkkkkkkkkkkk "+parking[p][0].value);
-                }
-                formattedData.spaces = 100;
-                formattedData.free = 20;
-                formattedData.status = "open"
-            }
-        }
-        if(isParkingArea){
-            formattedParkings.push(formattedData);
-        }
-        console.log("\r\n----------\r\n");
-    });
-
-    var parkings = formattedParkings;
     // iterate over available parkings to create info markup
     $.each(parkings, function(i, parking) {
         if (parking.status == "open") {
