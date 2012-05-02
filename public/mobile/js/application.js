@@ -126,7 +126,7 @@ function setUpOccupationLevels(url, formattedData, levelData){
         }
 
         // TODO: Remove when the lookup table is in place (see above)
-        formattedData.free = url.substring(33,url.length);
+        formattedData.free = formattedData.spaces-url.substring(33,url.length);
 
 
         formattedData.status = "open"
