@@ -167,6 +167,7 @@ $(document).bind("pagebeforechange", function(e, d) {
                 init();
             });
         else{
+               init();
                data = undefined;
         }
 
