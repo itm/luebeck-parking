@@ -41,8 +41,6 @@ function convertSSPData(sspData){
 
 
     jQuery.each(sspData, function(i, parking){
-//        console.log(i);
-//        console.log(parking);
 
         var formattedData = {};
         var isParkingArea = false;
@@ -52,7 +50,6 @@ function convertSSPData(sspData){
         formattedData.geo = {};
 
         for(var p in parking){
-            if(parking.hasOwnProperty(p)){
 
                 if (p=="http://spitfire-project.eu/cc/parkingid") {
                     formattedData.name = parking[p][0].value;
@@ -78,21 +75,26 @@ function convertSSPData(sspData){
 
 
                 if (p=="http://spitfire-project.eu/cc/parkingareaStatus") {
-                    setUpOccupationLevels(parking[p][0].value,formattedData, null);
+//                    setUpOccupationLevels(parking[p][0].value,formattedData, null);
+                    formattedData.status = parking[p][0].value;
 
                 }
 
                 // this data is not available, yet
-                formattedData.spaces = 100;
+                if (p=="http://spitfire-project.eu/cc/parkingsize") {
+                    formattedData.spaces = parking[p][0].value;
 
+                }
 
-//                formattedData.free = 20;
-            }
+                if (p=="http://spitfire-project.eu/cc/parkingfreeLots") {
+                    formattedData.free = parking[p][0].value;
+                }
+
         }
+
         if(isParkingArea){
             formattedParkings.push(formattedData);
         }
-//        console.log("\r\n----------\r\n");
     });
 
     console.log("formattedParkings:");

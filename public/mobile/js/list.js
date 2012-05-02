@@ -1,12 +1,17 @@
 
 // create the list of parkings
 function createList() {
+
+
 	// stop if we have no data
 	if (typeof data === "undefined" || data === null)
 		return updateData(function(d){
 			data = d;
 			createList();
 		});
+
+
+
 	var parkings = data.parkings;
 
     parkings.sort(function(a,b){
