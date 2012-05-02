@@ -15,20 +15,53 @@ function jsonError() {
 	log("Couldn't get JSON from Server: 404");
 }
 
-function updateData(callback) {
+function updateData_old(callback) {
 	$.getJSON(serverUrl, function(data) {
     	callback(data); 
 	});
 }
 
-function updateSSPData(callback){
-    console.log("updateSSPData");
+function updateData(callback) {
+    var data = {};
+    data.cities = [];
+    $.getJSON("http://dialyse:8080/be-0001/Luebeck", function(luebeckData) {
+        data.parkings = convertSSPData(luebeckData);
 
-    $.getJSON("http://dialyse:8080/be-0001/Luebeck", function(data) {
-        callback(data);
-        console.log(data);
+        fillinCities(data);
+
+            $.getJSON("http://dialyse:8080/be-0002/Santander", function(santanderData) {
+            data.parkings = data.parkings.concat(convertSSPData(santanderData));
+            callback(data);
+        });
     });
 }
+
+
+function fillinCities(data){
+
+    /* TODO: This should be done dynamically (based on data provided by SSP */
+    var city = {};
+    city.name = "Lübeck";
+    city.geo = {};
+    city.geo.lat = 53.867814;
+    city.geo.lng = 10.687208;
+    data.cities.push(city);
+
+    city = {};
+    city.name = "Travemünde";
+    city.geo = {};
+    city.geo.lat = 53.962246;
+    city.geo.lng = 10.870457;
+    data.cities.push(city);
+
+    city = {};
+    city.name = "Santander";
+    city.geo = {};
+    city.geo.lat = 43.46075;
+    city.geo.lng = -3.80811;
+    data.cities.push(city);
+}
+
 
 function calculateOccupation(parking) {
 	return Math.floor((parking.free * 100) / parking.spaces);

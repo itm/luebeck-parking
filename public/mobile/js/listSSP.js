@@ -5,13 +5,13 @@ var sspData = undefined;
 function createSSPList() {
 
     // stop if we have no data
-    if (typeof sspData === "undefined" || sspData === null)
-        return updateSSPData(function(d){
-            sspData = d;
+    if (typeof data === "undefined" || data === null)
+        return updateData(function(d){
+            data = d;
             createSSPList();
         });
 
-    var parkings = convertSSPData(sspData);
+    var parkings = data.parkings;
 
     parkings.sort(function(a,b){
         return  (a.name > b.name) ? 1 : ((a.name == b.name) ? 0 : -1);

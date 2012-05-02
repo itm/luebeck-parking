@@ -5,12 +5,10 @@ function createList() {
 
 	// stop if we have no data
 	if (typeof data === "undefined" || data === null)
-		return updateData(function(d){
+		return updateData_old(function(d){
 			data = d;
 			createList();
 		});
-
-
 
 	var parkings = data.parkings;
 
