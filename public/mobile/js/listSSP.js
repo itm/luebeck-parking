@@ -2,17 +2,13 @@ var sspData = undefined;
 
 
 // create the list of parkings
-function createList() {
+function createSSPList() {
+
     // stop if we have no data
-    if (typeof data === "undefined" || data === null)
-        return updateData(function(d){
-            data = d;
-            createList();
-        });
     if (typeof sspData === "undefined" || sspData === null)
         return updateSSPData(function(d){
             sspData = d;
-            createList();
+            createSSPList();
         });
 
     var parkings = convertSSPData(sspData);
@@ -49,7 +45,7 @@ $(document).bind("pagebeforechange", function(e, d) {
     if ( d && d.toPage && $(d.toPage).attr('id') == 'listSSP-page' ) {
         data = null;
         $('#parkings-list').empty();
-        createList();
+        createSSPList();
     }
 });
 
