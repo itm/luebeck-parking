@@ -8,6 +8,12 @@ function createList() {
 			createList();
 		});
 	var parkings = data.parkings;
+
+    parkings.sort(function(a,b){
+        return  (a.name > b.name) ? 1 : ((a.name == b.name) ? 0 : -1);
+    });
+
+
 	// iterate over available parkings to create info markup
 	$.each(parkings, function(i, parking) {
 		if (parking.status == "open") {
