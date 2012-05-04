@@ -1,4 +1,5 @@
 var serverUrl = "http://smartluebeck.de/parking/json/current",
+    sspURL = "http://smarthl.itm.uni-luebeck.de/ssp/",
 		data = undefined,
 		infoWindow = {},
 		map = {};
@@ -24,12 +25,12 @@ function updateData_old(callback) {
 function updateData(callback) {
     var data = {};
     data.cities = [];
-    $.getJSON("http://dialyse:8080/be-0001/Luebeck", function(luebeckData) {
+    $.getJSON(sspURL+"be-0001/Luebeck", function(luebeckData) {
         data.parkings = convertSSPData(luebeckData);
 
         fillinCities(data);
 
-            $.getJSON("http://dialyse:8080/be-0002/Santander", function(santanderData) {
+            $.getJSON(sspURL+"be-0002/Santander", function(santanderData) {
             data.parkings = data.parkings.concat(convertSSPData(santanderData));
             callback(data);
         });
@@ -87,7 +88,6 @@ function convertSSPData(sspData){
                 if (p=="http://spitfire-project.eu/cc/parkingid") {
                     formattedData.name = parking[p][0].value;
                     isParkingArea = true;
-//                    console.log(p+'='+parking[p][0].value);
                 }
 
                 if (p =="http://www.w3.org/2003/01/geo/wgs84_pos#lat"){
@@ -139,18 +139,14 @@ function convertSSPData(sspData){
 
 
 function setUpOccupationLevels(url, formattedData, levelData){
+
     if (url.substring(0,5) =="http:"){
         console.log("Ole");
-
-
-
-
         /* The result is not fetched in time
          * TODO: Fetch the data previously and store it in a lookup table
         **/
         if (typeof levelData === "undefined" || levelData === null) {
                $.getJSON(url, function(jsonData) {
-                    console.log("llllllllllllllllllllllllllllllllllllllllll");
                     for(var p in jsonData){
                         var occupationLevel = jsonData[p]["http://www.loa-cnr.it/ontologies/DUL.owl#hasDataValue"][0].value;
                         formattedData.free = formattedData.spaces * occupationLevel/100;
@@ -159,10 +155,6 @@ function setUpOccupationLevels(url, formattedData, levelData){
                 });
 
         }
-
-        // TODO: Remove when the lookup table is in place (see above)
-        formattedData.free = formattedData.spaces-url.substring(33,url.length);
-
 
         formattedData.status = "open"
 
