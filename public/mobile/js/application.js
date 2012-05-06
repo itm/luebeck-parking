@@ -1,5 +1,4 @@
-var serverUrl = "http://smartluebeck.de/parking/json/current",
-    sspURL = "http://smarthl.itm.uni-luebeck.de/ssp/",
+var sspURL = "http://smarthl.itm.uni-luebeck.de/ssp/",
 		data = undefined,
 		infoWindow = {},
 		map = {};
@@ -14,12 +13,6 @@ function saveJSON(d) {
 
 function jsonError() {
 	log("Couldn't get JSON from Server: 404");
-}
-
-function updateData_old(callback) {
-	$.getJSON(serverUrl, function(data) {
-    	callback(data); 
-	});
 }
 
 function updateData(callback) {

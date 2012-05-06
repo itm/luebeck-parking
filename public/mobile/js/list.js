@@ -5,7 +5,7 @@ function createList() {
 
 	// stop if we have no data
 	if (typeof data === "undefined" || data === null)
-		return updateData_old(function(d){
+		return updateData(function(d){
 			data = d;
 			createList();
 		});
