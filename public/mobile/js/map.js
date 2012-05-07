@@ -39,7 +39,7 @@ function createParkingInfoWindow(parking) {
 					+ occupation
 					+ "%;\"></div></div>";
 	} else {
-		info = "geschlossen";
+		info = translate['closed'];
 	}
 
 	return "<div class=\"parkingInfoWindow\">"
