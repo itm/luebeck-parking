@@ -91,6 +91,10 @@ function convertSSPData(sspData){
                     formattedData.geo.lng = parking[p][0].value;
                 }
 
+                if (p=="http://www.w3.org/2003/01/geo/wgs84_pos#location"){
+                    formattedData.city = parking[p][0].value;
+                }
+
                 if (p=="http://www.w3.org/1999/02/22-rdf-syntax-ns#type") {
                     if (parking[p][0].value == "http://spitfire-project.eu/cc/parkingIndoorArea"){
                         formattedData.kind = "PH";
@@ -134,7 +138,6 @@ function convertSSPData(sspData){
 function setUpOccupationLevels(url, formattedData, levelData){
 
     if (url.substring(0,5) =="http:"){
-        console.log("Ole");
         /* The result is not fetched in time
          * TODO: Fetch the data previously and store it in a lookup table
         **/
