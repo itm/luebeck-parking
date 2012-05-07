@@ -21,7 +21,7 @@ function createList() {
 		} else {
 			$('#parkings-list').append('<li><a href="#">'
 		  		+ '<p>'+parking.kind+' <strong>'+parking.name+'</strong></p>'
-		     	+ '<p>GESCHLOSSEN</p>'
+		     	+ '<p>'+translate['closed']+'</p>'
 		     	+ '</a></li>');
 		}
 		// click handler for list items opens the map and shows the corresponding infoWindow

@@ -4,6 +4,7 @@ var translate = {
 	'of': 'of',
 	'free': 'free',
 	'search': 'Search...',
+	'closed': 'CLOSED',
 
 	'btn-map': 'Map',
 	'btn-list': 'List',
