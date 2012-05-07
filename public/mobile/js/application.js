@@ -31,7 +31,13 @@ function log(text) {
 
 $(document).bind("mobileinit", function(){
 	// replace standard search in the listview filter input field
-	$.mobile.listview.prototype.options.filterPlaceholder = "Suchen... ";    
+	$.mobile.listview.prototype.options.filterPlaceholder = translate['search'];
 });
 
-
+$(document).delegate("#home", "pagebeforeshow", function() {
+    // translate buttons
+    toTranslate = ['btn-map', 'btn-list', 'btn-info'];
+    $.each(toTranslate, function(i, el) {
+        $('#'+el+' .ui-btn-text').html(translate[el]);
+    });
+});
