@@ -8,8 +8,21 @@ function createList() {
 			createList();
 		});
 	var parkings = data.parkings;
+
+    parkings.sort(function(a,b){
+        return  a.city === b.city ? ( (a.name > b.name) ? 1 : ((a.name == b.name) ? 0 : -1) ) : ( (a.city > b.city) ? 1 : -1 );
+    });
+
 	// iterate over available parkings to create info markup
+	var curCity = '';
 	$.each(parkings, function(i, parking) {
+		// add a divider if we start with parkings from another city
+		if ( parking.city !== curCity ) {
+			curCity = parking.city;
+			$('#parkings-list').append('<li data-role="list-divider">'
+		  		+ parking.city
+				+ '</li>');
+		}
 		if (parking.status == "open") {
 		  	$('#parkings-list').append('<li><a href="#">'
 		  		+ '<p>'+parking.kind+' <strong>'+parking.name+'</strong></p>'
