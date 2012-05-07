@@ -1,7 +1,3 @@
-var translate = {
-	'PH': 'Parkhaus',
-	'PP': 'Parkplatz'
-}
 
 function resizeMap() {
 	//resize map to fit height
@@ -36,8 +32,8 @@ function createParkingInfoWindow(parking) {
 	var info;
 	if (parking.status == "open") {
 		info = "<small><b>"
-					+ parking.free + " von " + parking.spaces
-					+ " frei</small></b> <br/>"
+					+ parking.free + " "+translate['of']+" " + parking.spaces
+					+ " "+translate['free']+"</small></b> <br/>"
 					+ "<div class=\"free\"><div class=\"occupied\" style=\"width: "
 					+ occupation
 					+ "%;\"></div></div>";
