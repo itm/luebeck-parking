@@ -18,6 +18,7 @@ function getMarkerAt(position) {
 function showInfoOnLoad(parking) {
 	var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
 	var handler = function() {
+		map.setCenter(position);
 		var marker = getMarkerAt(position);
 		infoWindow.setContent(createParkingInfoWindow(parking));
 		infoWindow.open(map, marker);
@@ -121,10 +122,14 @@ function initMarkers() {
 			log('No geo data for ' + parking.name);
 		}
 	});
+	$(document).trigger('mapLoaded');
 }
 
 // handler for clicking the buttons on top ( Lübeck | Travemünde )
 function buttonHandler(event) {
+	//this shouldn't happen
+	if ( data === null || data === 'undefined')
+		return;
 	// get current city name
 	var cityName = $(event.currentTarget).find('.ui-btn-text').html();
 	// get the geocoordinates from the selected city and pan the map to them
@@ -182,22 +187,17 @@ $(document).delegate("#map", "pageshow", function() {
 	map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 	map.markers = [];
 	infoWindow = new google.maps.InfoWindow();
-
 	if ( data === undefined ) {
 		updateData( function(d) {
 			data = d;
 			initMarkers();
-			$("#city-labels a:first").trigger('click');
 		});
 	} else {
 		initMarkers();
-		$("#city-labels a:first").trigger('click');
 	}
 	
-	// triggerHandler is a lightweight equivalent to trigger
 	// without the resize event, the map stays grey
 	resizeMap();
-	$(document).trigger('mapLoaded');
 });
 
 // when screen size changes reize the map
