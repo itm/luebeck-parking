@@ -38,13 +38,19 @@ function createList() {
 			showInfoOnLoad(parking);
 			$.mobile.changePage('map.html');
 		});
+
+		// enhance dynamically injected items
+		$('#parkings-list').listview('refresh');
 	});
 }
 
 // dynamically created dom needs to be inserted here
 $(document).bind("pagebeforechange", function(e, d) {
 	if ( d && d.toPage && $(d.toPage).attr('id') == 'list-page' ) {
-        data = null;
+		// replace standard search in the listview filter input field
+		$.mobile.listview.prototype.options.filterPlaceholder = translate['search'];
+		// remove old data
+		data = null;
 		$('#parkings-list').empty();
 		createList();
 	}
