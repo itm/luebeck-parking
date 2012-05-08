@@ -1,3 +1,5 @@
+var zoomLevel = 0;
+
 
 function resizeMap() {
 	//resize map to fit height
@@ -122,6 +124,16 @@ function clearMarkers() {
 	}
 }
 
+function clearLotMarkers() {
+    if ( map.markers ) {
+        $.each(map.markers, function(i, marker) {
+            if (marker.parking.type == "parkingLot"){
+                marker.setMap(null);
+            }
+        });
+    }
+}
+
 // adds markers to the map for each parking
 function initMarkers() {
     clearMarkers();
@@ -134,8 +146,10 @@ function initMarkers() {
 		}
 	});
 	$(document).trigger('mapLoaded');
+}
 
-	$.each(individualLots, function(i, parking) {
+function initLotMarkers() {
+    $.each(individualLots, function(i, parking) {
         if (typeof parking.geo !== 'undefined') {
             var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
             addMarker(parking, position, infoWindow);
@@ -156,7 +170,8 @@ function buttonHandler(event) {
 	$.each(data.cities, function(i, city) {
 		if (city.name == cityName) {
 			map.panTo(new google.maps.LatLng(city.geo.lat, city.geo.lng));
-			map.setZoom(14);
+            zoomLevel = 14;
+			map.setZoom(zoomLevel);
 			return false;
 		}
 	});
@@ -219,6 +234,19 @@ $(document).delegate("#map", "pageshow", function() {
 	
 	// without the resize event, the map stays grey
 	resizeMap();
+
+    // display or hide individual lots depending on the current zoom level
+	$(document).trigger('mapLoaded');
+    google.maps.event.addListener(map, 'zoom_changed', function() {
+        var lastZoomLevel = zoomLevel;
+        zoomLevel = map.getZoom();
+        console.log("zoomLevel: "+zoomLevel)
+        if (zoomLevel == 19 && lastZoomLevel < zoomLevel){
+            initLotMarkers();
+        }else if (zoomLevel = 18 && lastZoomLevel > zoomLevel){
+            clearLotMarkers();
+        }
+    })
 });
 
 // when screen size changes reize the map

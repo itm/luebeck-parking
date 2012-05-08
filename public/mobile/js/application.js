@@ -131,6 +131,7 @@ function convertSSPData(sspData){
         }
 
         if(isParkingArea){
+            formattedData.type = "parkingArea"
             formattedParkings.push(formattedData);
         }
     });
@@ -155,6 +156,7 @@ function convertIndividualLotData(sspData){
         formattedLot.status = "occupied"
         formattedLot.geo = {};
         formattedLot.spaces = 1;
+        formattedLot.type = "parkingLot"
 
         for(var p in parking){
 
