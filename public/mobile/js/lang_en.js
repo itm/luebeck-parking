@@ -1,6 +1,6 @@
 var translate = {
-	'PH': 'parking lot',
-	'PP': 'parking garage',
+	'PH': 'covered parking area',
+	'PP': 'uncovered parking area',
 	'of': 'of',
 	'free': 'free',
 	'search': 'Search...',
