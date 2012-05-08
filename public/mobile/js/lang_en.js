@@ -3,6 +3,7 @@ var translate = {
 	'PP': 'uncovered parking area',
 	'of': 'of',
 	'free': 'free',
+    'occupied' : 'occupied',
 	'search': 'Search...',
 	'closed': 'Closed!',
 

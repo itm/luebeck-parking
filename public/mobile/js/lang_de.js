@@ -3,6 +3,7 @@ var translate = {
 	'PP': 'Parkplatz',
 	'of': 'von',
 	'free': 'frei',
+    'occupied' : 'belegt',
 	'search': 'Suchen...',
 	'closed': 'Geschlossen!',
 
