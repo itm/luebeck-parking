@@ -38,7 +38,18 @@ function createParkingInfoWindow(parking) {
 					+ "<div class=\"free\"><div class=\"occupied\" style=\"width: "
 					+ occupation
 					+ "%;\"></div></div>";
-	} else {
+	} else if (parking.status == "occupied"){
+        info = "<small><b>"+translate['occupied']+"</small></b> <br/>"
+            + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
+            + occupation
+            + "%;\"></div></div>";
+    }
+    else if (parking.status == "free"){
+            info = "<small><b>"+translate['free']+"</small></b> <br/>"
+                + "<div class=\"free\"><div class=\"occupied\" style=\"width: "
+                + occupation
+                + "%;\"></div></div>";
+    } else {
 		info = translate['closed'];
 	}
 
@@ -53,7 +64,7 @@ function createParkingInfoWindow(parking) {
 var addMarker = function(parking, position, infowindow) {
 	var image, util, utilFrac;
 	// calculate utilization and map it to one of 6 states
-	if (parking.spaces == 0 || parking.status != "open") {
+	if (parking.spaces == 0 || parking.status == "closed") {
 		util = "100";
 	} else {
 		utilFrac = parking.free / parking.spaces;
@@ -123,6 +134,15 @@ function initMarkers() {
 		}
 	});
 	$(document).trigger('mapLoaded');
+
+	$.each(individualLots, function(i, parking) {
+        if (typeof parking.geo !== 'undefined') {
+            var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
+            addMarker(parking, position, infoWindow);
+        } else {
+            log('No geo data for ' + parking.name);
+        }
+    });
 }
 
 // handler for clicking the buttons on top ( Lübeck | Travemünde )
@@ -187,6 +207,7 @@ $(document).delegate("#map", "pageshow", function() {
 	map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 	map.markers = [];
 	infoWindow = new google.maps.InfoWindow();
+
 	if ( data === undefined ) {
 		updateData( function(d) {
 			data = d;
