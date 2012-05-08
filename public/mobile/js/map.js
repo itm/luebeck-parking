@@ -79,6 +79,11 @@ var addMarker = function(parking, position, infowindow) {
 			image = "img/ph_u_" + util + ".png";
 			break;
 	};
+
+    if (parking.handicapped) {
+        image = "img/pr_u" + util + ".png";
+    }
+
 	// place marker on the map with our icon
 	var marker = new google.maps.Marker({
 		map: map,
