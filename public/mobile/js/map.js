@@ -2,8 +2,7 @@ var zoomLevel = 0;
 
 
 function resizeMap() {
-	//resize map to fit height
-	var mapHeight = $(window).height()-$(".ui-header:first").outerHeight();
+	var mapHeight = $(window).height()-$(".ui-header:visible:first").outerHeight();
 	$('#map-canvas').css('height', mapHeight+'px');
 	google.maps.event.trigger(map, 'resize');
 }
