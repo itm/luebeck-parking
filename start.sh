@@ -1,3 +1,3 @@
 #!/bin/bash
 
-forever start -o out.log -e err.log luebeck-parking-server.js
+forever start -l forever.log -o out.log -e err.log luebeck-parking-server.js
