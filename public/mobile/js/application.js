@@ -20,20 +20,50 @@ function updateData(callback) {
     var data = {};
     data.cities = [];
     individualLots = [];
-    $.getJSON(sspURL+"be-0001/Luebeck", function(luebeckData) {
-        data.parkings = convertSSPData(luebeckData);
 
-        fillinCities(data);
+    var callbacktimeout = 2000;
 
-        $.getJSON(sspURL+"be-0002/Santander", function(santanderData) {
-            data.parkings = data.parkings.concat(convertSSPData(santanderData));
+    jQuery.ajax( {
+        url:sspURL+"be-0001/Luebeck",
+        dataType:'json',
+        timeout: callbacktimeout,
+        success:
+            function(luebeckData) {
+                data.parkings = convertSSPData(luebeckData);
 
-            $.getJSON(sspURL+"be-0002/SantanderParkingSpaces", function(santanderData) {
-                individualLots = (convertIndividualLotData(santanderData));
-                callback(data);
-            });
+                fillinCities(data);
+            },
+        complete:
+            function() {
 
-        });
+                jQuery.ajax( {
+                    url:sspURL+"be-0002/Santander",
+                    dataType:'json',
+                    timeout: callbacktimeout,
+                    success:
+                        function(santanderData) {
+                            data.parkings = data.parkings.concat(convertSSPData(santanderData));
+                        },
+                    complete:
+                        function() {
+                            jQuery.ajax( {
+                                url:sspURL+"be-0002/SantanderParkingSpaces",
+                                dataType:'json',
+                                timeout: callbacktimeout,
+                                success:
+                                    function(santanderData) {
+                                        individualLots = (convertIndividualLotData(santanderData));
+                                    },
+                                complete:
+                                    function() {
+                                        callback(data);
+                                    }
+
+                            });
+                        }
+
+                });
+            }
 
     });
 }
