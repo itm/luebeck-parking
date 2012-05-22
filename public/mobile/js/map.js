@@ -153,7 +153,7 @@ function initMarkers() {
 }
 
 function initLotMarkers() {
-    $.each(individualLots, function(i, parking) {
+    $.each(data.individualLots, function(i, parking) {
         if (typeof parking.geo !== 'undefined') {
             var position = new google.maps.LatLng(parking.geo.lat, parking.geo.lng);
             addMarker(parking, position, infoWindow);

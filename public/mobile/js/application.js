@@ -1,5 +1,4 @@
 var data = undefined,
-    individualLots = undefined,
     infoWindow = {},
     map = {};
 
@@ -18,7 +17,8 @@ function jsonError() {
 function updateData(callback) {
     var data = {};
     data.cities = [];
-    individualLots = [];
+    data.parkings = [];
+    data.individualLots = [];
 
     var callbacktimeout = 2000;
 
@@ -27,8 +27,9 @@ function updateData(callback) {
         dataType:'json',
         timeout: callbacktimeout,
         success:
-            function(luebeckData) {
-                data.parkings = convertSSPData(luebeckData);
+            function(sspData) {
+                data.parkings = data.parkings.concat(convertSSPData(sspData).areas);
+                data.individualLots = data.parkings.concat(convertSSPData(sspData).lots);
 
                 fillinCities(data);
             },
@@ -40,8 +41,9 @@ function updateData(callback) {
                     dataType:'json',
                     timeout: callbacktimeout,
                     success:
-                        function(santanderData) {
-                            data.parkings = data.parkings.concat(convertSSPData(santanderData));
+                        function(sspData) {
+                            data.parkings = data.parkings.concat(convertSSPData(sspData).areas);
+                            data.individualLots = data.parkings.concat(convertSSPData(sspData).lots);
                         },
                     complete:
                         function() {
@@ -50,8 +52,9 @@ function updateData(callback) {
                                 dataType:'json',
                                 timeout: callbacktimeout,
                                 success:
-                                    function(santanderData) {
-                                        individualLots = (convertIndividualLotData(santanderData));
+                                    function(sspData) {
+                                        data.parkings = data.parkings.concat(convertSSPData(sspData).areas);
+                                        data.individualLots = data.parkings.concat(convertSSPData(sspData).lots);
                                     },
                                 complete:
                                     function() {
@@ -101,142 +104,153 @@ function calculateOccupation(parking) {
 
 function convertSSPData(sspData){
 
-    var formattedParkings = [];
+    var formattedAreas = [];
+    var formattedLots = [];
+    var parkingInformation = {};
+    parkingInformation.areas = formattedAreas;
+    parkingInformation.lots = formattedLots;
 
 
     jQuery.each(sspData, function(i, parking){
 
-        var formattedData = {};
-        var isParkingArea = false;
+        var typeObject = parking["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"];
 
+        if (typeObject !== undefined){
 
-        formattedData.status = "closed"
-        formattedData.geo = {};
+            var parkingType = (typeObject[0].value);
 
-        for(var p in parking){
+            if (parkingType === "http://spitfire-project.eu/cc/parkingOutdoorArea"
+                        || parkingType === "http://spitfire-project.eu/cc/parkingIndoorArea"){
 
-                if (p=="http://spitfire-project.eu/cc/parkingid") {
-                    formattedData.name = parking[p][0].value;
-                    isParkingArea = true;
-                }
+                formattedAreas.push(getParkingArea(parking));
 
-                if (p =="http://www.w3.org/2003/01/geo/wgs84_pos#lat"){
-                    formattedData.geo.lat = parking[p][0].value;
-                }
+            } else if (parkingType === "http://spitfire-project.eu/cc/parkingUncoveredLot"
+                        || parkingType === "http://spitfire-project.eu/cc/CoveredLot"
+                        || parkingType === "http://spitfire-project.eu/cc/CarLot"
+                        || parkingType === "http://spitfire-project.eu/cc/MotorcycleLot"
+                        || parkingType === "http://spitfire-project.eu/cc/BookableLot"){
 
-                if (p =="http://www.w3.org/2003/01/geo/wgs84_pos#long"){
-                    formattedData.geo.lng = parking[p][0].value;
-                }
+                formattedLots.push(getSingleParkingSpace(parking));
 
-                if (p=="http://www.w3.org/2003/01/geo/wgs84_pos#location"){
-                    formattedData.city = parking[p][0].value;
-                }
+            } else{
+                console.log("The provided data is no recognized parking area or parking lot.")
+            }
 
-                if (p=="http://www.w3.org/1999/02/22-rdf-syntax-ns#type") {
-                    if (parking[p][0].value == "http://spitfire-project.eu/cc/parkingIndoorArea"){
-                        formattedData.kind = "PH";
-                    } else if (parking[p][0].value == "http://spitfire-project.eu/cc/parkingOutdoorArea"){
-                        formattedData.kind = "PP";
-                    }
-                }
-
-
-                if (p=="http://spitfire-project.eu/cc/parkingareaStatus") {
-//                    setUpOccupationLevels(parking[p][0].value,formattedData, null);
-                    formattedData.status = parking[p][0].value;
-
-                }
-
-                // this data is not available, yet
-                if (p=="http://spitfire-project.eu/cc/parkingsize") {
-                    formattedData.spaces = parking[p][0].value;
-
-                }
-
-                if (p=="http://spitfire-project.eu/cc/parkingfreeLots") {
-                    formattedData.free = parking[p][0].value;
-                }
-
-        }
-
-        if(isParkingArea){
-            formattedData.type = "parkingArea"
-            formattedParkings.push(formattedData);
         }
     });
-
-    console.log("formattedParkings:");
-    console.log(formattedParkings);
-
-    return formattedParkings;
-
+    return parkingInformation;
 }
 
 
-function convertIndividualLotData(sspData){
+function getParkingArea(parking){
 
-    var formattedLots = [];
+    var formattedData = {};
+    formattedData.geo = {};
+    formattedData.type = "parkingArea"
+    formattedData.status = "closed"
 
-    jQuery.each(sspData, function(i, parking){
+    var object = parking["http://spitfire-project.eu/cc/parkingid"];
+    if (object !== undefined){
+        formattedData.name = object[0].value;
+    }
 
-        var formattedLot = {};
+    if ((object = parking["http://www.w3.org/2003/01/geo/wgs84_pos#lat"]) !== undefined){
+        formattedData.geo.lat = object[0].value;
+    }
 
-        formattedLot.handicapped = false;
-        formattedLot.status = "occupied"
-        formattedLot.geo = {};
-        formattedLot.spaces = 1;
-        formattedLot.type = "parkingLot"
+    if ((object = parking["http://www.w3.org/2003/01/geo/wgs84_pos#long"]) !== undefined){
+        formattedData.geo.lng = object[0].value;
+    }
 
-        for(var p in parking){
+    if ((object = parking["http://www.w3.org/2003/01/geo/wgs84_pos#location"]) !== undefined){
+        formattedData.city = object[0].value;
+    }
 
-            if (p=="http://spitfire-project.eu/cc/parkingid") {
-                formattedLot.name = parking[p][0].value;
-                isParkingArea = true;
-            }
+    if ((object = parking["http://spitfire-project.eu/cc/parkingareaStatus"]) !== undefined){
+        formattedData.status = object[0].value;
+    }
 
-            if (p =="http://www.w3.org/2003/01/geo/wgs84_pos#lat"){
-                formattedLot.geo.lat = parking[p][0].value;
-            }
+    if ((object = parking["http://spitfire-project.eu/cc/parkingsize"]) !== undefined){
+        formattedData.spaces = object[0].value;
+    }
 
-            if (p =="http://www.w3.org/2003/01/geo/wgs84_pos#long"){
-                formattedLot.geo.lng = parking[p][0].value;
-            }
+    if ((object = parking["http://spitfire-project.eu/cc/parkingfreeLots"]) !== undefined){
+        formattedData.free = object[0].value;
+    }
 
-            if (p=="http://www.w3.org/2003/01/geo/wgs84_pos#location"){
-                formattedLot.city = parking[p][0].value;
-            }
-
-            if (p=="http://www.w3.org/1999/02/22-rdf-syntax-ns#type") {
-                if (parking[p][0].value == "http://spitfire-project.eu/cc/parkingCoveredLot"){
-                    formattedLot.kind = "PH";
-                } else if (parking[p][0].value == "http://spitfire-project.eu/cc/parkingUncoveredLot") {
-                    formattedLot.kind = "PP";
-                }
-            }
-
-
-            if (p=="http://spitfire-project.eu/cc/parkingstatus") {
-                for (statusValue in parking[p]) {
-
-                    var status = parking[p][statusValue].value;
-                    if (status == "http://spitfire-project.eu/cc/parkingAvailableLot"){
-                        formattedLot.status = "free"
-                        formattedLot.free = 1;
-                    } else if (status == "http://spitfire-project.eu/cc/parkingUnavailableLot"){
-                        formattedLot.status = "occupied"
-                        formattedLot.free = 0;
-                    } else if (status == "http://spitfire-project.eu/cc/parkingReservedLot"){
-                        formattedLot.handicapped = true;
-                    }
-                }
-            }
-
+    if ((object = parking["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"]) !== undefined){
+        if (object[0].value == "http://spitfire-project.eu/cc/parkingIndoorArea"){
+            formattedData.kind = "PH"
+        } else if (object[0].value == "http://spitfire-project.eu/cc/parkingOutdoorArea"){
+            formattedData.kind = "PP";
         }
-        formattedLots.push(formattedLot);
-    });
+    }
 
-    return formattedLots;
+    return formattedData
+}
 
+
+/**
+ * Converts a single parking space described by the SPITFIRE parking ontology to an internal representation used
+ * later on to fill in the map and the list
+ * @param parking
+ *      A single parking space described by the SPITFIRE parking ontology
+ * @return {Object}
+ *      The internal representation of a single parking space
+ */
+function getSingleParkingSpace(parking){
+
+    var formattedData = {};
+    formattedData.geo = {};
+    formattedData.type = "parkingLot"
+    formattedData.spaces = 1;
+
+    formattedData.handicapped = false;
+    formattedData.status = "occupied"
+
+    var object = parking["http://spitfire-project.eu/cc/parkingid"];
+    if (object !== undefined){
+        formattedData.name = object[0].value;
+    }
+
+    if ((object = parking["http://www.w3.org/2003/01/geo/wgs84_pos#lat"]) !== undefined){
+        formattedData.geo.lat = object[0].value;
+    }
+
+    if ((object = parking["http://www.w3.org/2003/01/geo/wgs84_pos#long"]) !== undefined){
+        formattedData.geo.lng = object[0].value;
+    }
+
+    if ((object = parking["http://www.w3.org/2003/01/geo/wgs84_pos#location"]) !== undefined){
+        formattedData.city = object[0].value;
+    }
+
+    if ((object = parking["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"]) !== undefined){
+        if (object[0].value == "http://spitfire-project.eu/cc/parkingCoveredLot"){
+            formattedData.kind = "PH"
+        } else if (object[0].value == "http://spitfire-project.eu/cc/parkingUncoveredLot"){
+            formattedData.kind = "PP";
+        }
+    }
+
+    if ((object = parking["http://spitfire-project.eu/cc/parkingstatus"]) !== undefined){
+
+        for (statusValue in object) {
+
+            var status = object[statusValue].value;
+            if (status == "http://spitfire-project.eu/cc/parkingAvailableLot"){
+                formattedData.status = "free"
+                formattedData.free = 1;
+            } else if (status == "http://spitfire-project.eu/cc/parkingUnavailableLot"){
+                formattedData.status = "occupied"
+                formattedData.free = 0;
+            } else if (status == "http://spitfire-project.eu/cc/parkingReservedLot"){
+                formattedData.handicapped = true;
+            }
+        }
+    }
+
+    return formattedData;
 }
 
 
