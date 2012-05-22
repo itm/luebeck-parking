@@ -1,8 +1,7 @@
-var sspURL = "http://smarthl.itm.uni-luebeck.de/ssp/",
-		data = undefined,
-        individualLots = undefined,
-		infoWindow = {},
-		map = {};
+var data = undefined,
+    individualLots = undefined,
+    infoWindow = {},
+    map = {};
 
 
 var occupationLevels = {};
@@ -24,7 +23,7 @@ function updateData(callback) {
     var callbacktimeout = 2000;
 
     jQuery.ajax( {
-        url:sspURL+"be-0001/Luebeck",
+        url:datasources[0],
         dataType:'json',
         timeout: callbacktimeout,
         success:
@@ -37,7 +36,7 @@ function updateData(callback) {
             function() {
 
                 jQuery.ajax( {
-                    url:sspURL+"be-0002/Santander",
+                    url:datasources[1],
                     dataType:'json',
                     timeout: callbacktimeout,
                     success:
@@ -47,7 +46,7 @@ function updateData(callback) {
                     complete:
                         function() {
                             jQuery.ajax( {
-                                url:sspURL+"be-0002/SantanderParkingSpaces",
+                                url:datasources[2],
                                 dataType:'json',
                                 timeout: callbacktimeout,
                                 success:
