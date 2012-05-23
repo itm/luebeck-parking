@@ -4,6 +4,7 @@ var cities = [];
 var citiesarray = [];
 
 
+/* Cities of Lübeck and Travemünde */
 datasources.push("http://smarthl.itm.uni-luebeck.de/ssp/be-0001/Luebeck");
 var city = {};
 city.name = "Lübeck";
@@ -22,8 +23,8 @@ cities.push(citiesarray)
 
 
 
+/* City of Santander */
 datasources.push("http://smarthl.itm.uni-luebeck.de/ssp/be-0002/Santander");
-datasources.push("http://smarthl.itm.uni-luebeck.de/ssp/be-0002/SantanderParkingSpaces");
 citiesarray = [];
 city = {};
 city.name = "Santander";
@@ -33,6 +34,7 @@ city.geo.lng = -3.80811;
 citiesarray.push(city);
 cities.push(citiesarray);
 
+datasources.push("http://smarthl.itm.uni-luebeck.de/ssp/be-0002/SantanderParkingSpaces");
 cities.push([]);
 
 
