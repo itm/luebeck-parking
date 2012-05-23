@@ -14,16 +14,26 @@ function jsonError() {
 	log("Couldn't get JSON from Server: 404");
 }
 
-function updateData(callback) {
-    var data = {};
-    data.cities = [];
-    data.parkings = [];
-    data.individualLots = [];
+
+
+function updateData(callback, sourceIndex, data){
+
+    if (sourceIndex === undefined){
+        sourceIndex = 0;
+    }
+
+    if (data === undefined){
+        var data = {};
+        data.cities = [];
+        data.parkings = [];
+        data.individualLots = [];
+    }
 
     var callbacktimeout = 2000;
 
+
     jQuery.ajax( {
-        url:datasources[0],
+        url:datasources[sourceIndex],
         dataType:'json',
         timeout: callbacktimeout,
         success:
@@ -31,71 +41,22 @@ function updateData(callback) {
                 data.parkings = data.parkings.concat(convertSSPData(sspData).areas);
                 data.individualLots = data.parkings.concat(convertSSPData(sspData).lots);
 
-                fillinCities(data);
+                for( var index in cities[sourceIndex]){
+                    data.cities.push(cities[sourceIndex][index]);
+                }
             },
         complete:
             function() {
-
-                jQuery.ajax( {
-                    url:datasources[1],
-                    dataType:'json',
-                    timeout: callbacktimeout,
-                    success:
-                        function(sspData) {
-                            data.parkings = data.parkings.concat(convertSSPData(sspData).areas);
-                            data.individualLots = data.parkings.concat(convertSSPData(sspData).lots);
-                        },
-                    complete:
-                        function() {
-                            jQuery.ajax( {
-                                url:datasources[2],
-                                dataType:'json',
-                                timeout: callbacktimeout,
-                                success:
-                                    function(sspData) {
-                                        data.parkings = data.parkings.concat(convertSSPData(sspData).areas);
-                                        data.individualLots = data.parkings.concat(convertSSPData(sspData).lots);
-                                    },
-                                complete:
-                                    function() {
-                                        callback(data);
-                                    }
-
-                            });
-                        }
-
-                });
+                if (sourceIndex === datasources.length-1){
+                    callback(data);
+                }else{
+                    console.log(sourceIndex);
+                    updateData(callback, sourceIndex+1, data);
+                }
             }
 
     });
 }
-
-
-function fillinCities(data){
-
-    /* TODO: This should be done dynamically (based on data provided by SSP */
-    var city = {};
-    city.name = "Lübeck";
-    city.geo = {};
-    city.geo.lat = 53.867814;
-    city.geo.lng = 10.687208;
-    data.cities.push(city);
-
-    city = {};
-    city.name = "Travemünde";
-    city.geo = {};
-    city.geo.lat = 53.962246;
-    city.geo.lng = 10.870457;
-    data.cities.push(city);
-
-    city = {};
-    city.name = "Santander";
-    city.geo = {};
-    city.geo.lat = 43.46075;
-    city.geo.lng = -3.80811;
-    data.cities.push(city);
-}
-
 
 function calculateOccupation(parking) {
 	return Math.floor((parking.free * 100) / parking.spaces);
