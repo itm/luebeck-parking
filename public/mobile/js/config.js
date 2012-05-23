@@ -1,13 +1,10 @@
 
-var datasources = new Array("http://smarthl.itm.uni-luebeck.de/ssp/be-0001/Luebeck",
-    "http://smarthl.itm.uni-luebeck.de/ssp/be-0002/Santander",
-    "http://smarthl.itm.uni-luebeck.de/ssp/be-0002/SantanderParkingSpaces");
-
+var datasources = [];
 var cities = [];
-
 var citiesarray = [];
 
 
+datasources.push("http://smarthl.itm.uni-luebeck.de/ssp/be-0001/Luebeck");
 var city = {};
 city.name = "Lübeck";
 city.geo = {};
@@ -24,6 +21,9 @@ citiesarray.push(city);
 cities.push(citiesarray)
 
 
+
+datasources.push("http://smarthl.itm.uni-luebeck.de/ssp/be-0002/Santander");
+datasources.push("http://smarthl.itm.uni-luebeck.de/ssp/be-0002/SantanderParkingSpaces");
 citiesarray = [];
 city = {};
 city.name = "Santander";
