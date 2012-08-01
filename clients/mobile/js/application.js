@@ -2,6 +2,8 @@ var data = undefined,
 		infoWindow = {},
 		map = {};
 
+// The name of parking areas which are to be ignored
+var ignoreParkingAreas = ["St. Marien", "Karstadt"];
 
 function calculateOccupation(parking) {
 	return Math.floor((parking.free * 100) / parking.spaces);
@@ -71,30 +73,34 @@ function updateData(callback) {
             var parkings = [];
 
             $.each(lines, function(j, line) {
+                // The header is not to be added
                 if (line[0] != "PHName"){
 
-                    var parking = {};
-                    parking.kind = line[0].substring(0, 2);;
-                    parking.name = line[0].substring(3);
-                    parking.status = line[1] == "1" ? "open" : "closed";
-                    parking.spaces = line[2];
-                    parking.free = line[3];
-                    parking.openingHours = {};
-                    parking.openingHours.begin = line[4];
-                    parking.openingHours.end = line[5];
-                    parking.geo = geo.parkings[parking.name];
+                    if (jQuery.inArray(line[0].substring(3),ignoreParkingAreas) == -1){
 
-                    // If the city was processed for the first time, add it to a separate array.
-                    // This might be used to split the list into different parts for the various cities.
-                    if (jQuery.inArray(parking.geo.city,tmpcities) == -1){
-                        var tmpCity = {};
-                        tmpCity.name = parking.geo.city;
-                        tmpCity.geo = geo.cities[tmpCity.name];
-                        cities.push(tmpCity);
+                        var parking = {};
+                        parking.kind = line[0].substring(0, 2);;
+                        parking.name = line[0].substring(3);
+                        parking.status = line[1] == "1" ? "open" : "closed";
+                        parking.spaces = line[2];
+                        parking.free = line[3];
+                        parking.openingHours = {};
+                        parking.openingHours.begin = line[4];
+                        parking.openingHours.end = line[5];
+                        parking.geo = geo.parkings[parking.name];
 
-                        tmpcities.push(tmpCity.name);
+                        // If the city was processed for the first time, add it to a separate array.
+                        // This might be used to split the list into different parts for the various cities.
+                        if (jQuery.inArray(parking.geo.city,tmpcities) == -1){
+                            var tmpCity = {};
+                            tmpCity.name = parking.geo.city;
+                            tmpCity.geo = geo.cities[tmpCity.name];
+                            cities.push(tmpCity);
+
+                            tmpcities.push(tmpCity.name);
+                        }
+                        parkings.push(parking);
                     }
-                    parkings.push(parking);
                 }
             });
 
