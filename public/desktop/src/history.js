@@ -206,7 +206,7 @@ $(function () {
         total = [];
 
         $.ajax({
-            url:"http://" + host + ":" + port + "/json/history/" + parking,
+            url:"http://" + host + ":" + port + "/parkin/json/history/" + parking,
             method:"GET",
             dataType:"json",
             success:onDataReceived,
