@@ -44,13 +44,18 @@ function updateData(callback) {
             var headers = allTextLines[3].split(',');
             var lines = [];
 
-            for (var i=1; i<allTextLines.length; i++) {
+            for (var i=0; i<allTextLines.length; i++) {
                 var data = allTextLines[i].split(',');
-                if (data.length == headers.length) {
+                var tarr = [];
 
-                    var tarr = [];
+                // Some covered parking areas feature two additional opening and closing times.
+                if (data.length == headers.length || data.length == headers.length+2) {
                     for (var j=0; j<headers.length; j++) {
                         tarr.push(jQuery.trim(data[j]));
+                    }
+                    if (data.length  == headers.length+2) {
+                        tarr[headers.length-2] = jQuery.trim(data[headers.length]);
+                        tarr[headers.length-1] = jQuery.trim(data[headers.length+1]);
                     }
                     lines.push(tarr);
                 }
@@ -66,7 +71,7 @@ function updateData(callback) {
             var parkings = [];
 
             $.each(lines, function(j, line) {
-                if (j > 0){
+                if (line[0] != "PHName"){
 
                     var parking = {};
                     parking.kind = line[0].substring(0, 2);;
