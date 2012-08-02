@@ -60,18 +60,18 @@ exports.data = {
         city:'Lübeck'
     },
     'Lastadie P3':{
-        lat : 53.871671,
-        lng : 10.679751,
+        lat : 53.871295,
+        lng : 10.679331,
         city:'Lübeck'
     },
     'Lastadie P4':{
-        lat : 53.871593,
-        lng : 10.678692,
+        lat : 53.871589,
+        lng : 10.678708,
         city:'Lübeck'
     },
     'Lastadie P5':{
-        lat : 53.872157,
-        lng : 10.680624,
+        lat : 53.870856,
+        lng : 10.678103,
         city:'Lübeck'
     },
     'Radisson Hotel':{
